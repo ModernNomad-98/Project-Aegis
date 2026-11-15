@@ -1,0 +1,35 @@
+{
+  "schema": "aegis.governance-adoption/1",
+  "target_repo": "example-consumer/aegis-consumer",
+  "adopter_role": "owner",
+  "authority": {
+    "kind": "OWNER_LINE",
+    "ref": "consumer owner line 2026-11-14: adopt the required-governance contract for this repository",
+    "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "contract": {
+    "id": "aegis.required-governance",
+    "version": "__CONTRACT_VERSION__",
+    "sha256": "__CONTRACT_SHA256__"
+  },
+  "adoption": {
+    "profile": "consumer-role-b-default",
+    "adopted_rule_ids": ["AG-01", "AG-02", "AG-03", "CA-01", "CA-02", "CA-05", "MO-01", "MO-02", "DR-03"],
+    "rejected": [
+      {"rule_id": "CA-03", "reason": "ambiguous mapping resolved locally as proposed-only"}
+    ]
+  },
+  "manual_only_overrides_ref": null,
+  "installation": {
+    "method": "copied-starter",
+    "aegis_pin_commit": "66620739818466d3fa9646e7fbf85671284e4ebf",
+    "aegis_pin_tree": "2222222222222222222222222222222222222222",
+    "payload_manifest_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "effective_at_utc": "2026-11-14T00:00:00Z",
+  "revoked_at_utc": null,
+  "revocation_authority": null,
+  "supersedes": null,
+  "next_review_date": "2026-12-14",
+  "limitations": ["synthetic fixture; the adopted rule ids are the fixture's own explicit list, not a recommendation"]
+}

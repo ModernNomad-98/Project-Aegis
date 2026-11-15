@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aegis.governance-contract/1",
+  "title": "Aegis required-governance contract v1",
+  "description": "Strict schema for schema aegis.governance-contract/1. Validated by tools/aegis_preflight/governance.py using the documented JSON-Schema subset (type, required, properties, additionalProperties, items, enum, const, pattern, minItems, maxItems, minLength, uniqueItems, oneOf, anyOf, $ref). Unknown fields are rejected at every object level.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "contract_id", "contract_version", "source", "summary", "roles", "documents", "entry_routes", "dependency_graph", "rule_applicability", "conflicts", "lifecycle", "local_adoption", "host_boundary", "enforcement_claims", "trust", "non_claims"],
+  "properties": {
+    "schema": {"const": "aegis.governance-contract/1"},
+    "contract_id": {"const": "aegis.required-governance"},
+    "contract_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "source": {"$ref": "#/definitions/source"},
+    "summary": {"type": "string", "minLength": 1},
+    "roles": {"$ref": "#/definitions/roles"},
+    "documents": {"type": "array", "minItems": 27, "maxItems": 27, "items": {"$ref": "#/definitions/document"}},
+    "entry_routes": {"type": "array", "minItems": 5, "maxItems": 5, "items": {"$ref": "#/definitions/entry_route"}},
+    "dependency_graph": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/graph_edge"}},
+    "rule_applicability": {"type": "array", "minItems": 187, "maxItems": 187, "items": {"$ref": "#/definitions/rule"}},
+    "conflicts": {"type": "array", "items": {"$ref": "#/definitions/conflict"}},
+    "lifecycle": {"$ref": "#/definitions/lifecycle"},
+    "local_adoption": {"$ref": "#/definitions/local_adoption"},
+    "host_boundary": {"$ref": "#/definitions/host_boundary"},
+    "enforcement_claims": {"$ref": "#/definitions/enforcement_claims"},
+    "trust": {"$ref": "#/definitions/trust"},
+    "non_claims": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  },
+  "definitions": {
+    "hex40": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "hex64_upper": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "generated_by"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit": {"$ref": "#/definitions/hex40"},
+        "tree": {"$ref": "#/definitions/hex40"},
+        "generated_by": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "version"],
+          "properties": {
+            "tool": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"}
+          }
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source-library", "consumer"],
+      "properties": {
+        "source-library": {"$ref": "#/definitions/role"},
+        "consumer": {"$ref": "#/definitions/role"}
+      }
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role_id", "required_documents", "conditional_documents", "exclusions", "adoption_required", "role_entry_routes"],
+      "properties": {
+        "role_id": {"type": "string", "enum": ["source-library", "consumer"]},
+        "required_documents": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "conditional_documents": {"type": "array", "items": {"$ref": "#/definitions/conditional_document"}},
+        "exclusions": {"type": "array", "items": {"$ref": "#/definitions/document_exclusion"}},
+        "adoption_required": {"type": "boolean"},
+        "role_entry_routes": {"type": "array", "items": {"type": "string", "enum": ["source-checkout", "copied-starter", "external-skill", "standalone-export", "resume", "compaction", "handoff"]}, "uniqueItems": true}
+      }
+    },
+    "conditional_document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["doc_id", "condition"],
+      "properties": {
+        "doc_id": {"type": "string", "minLength": 1},
+        "condition": {"type": "string", "enum": ["delivery-stage-work", "protected-operation", "consumer-adoption-work", "prior-review-artifact", "manual-only-invocation", "source-role-register-read"]}
+      }
+    },
+    "document_exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["doc_id", "reason"],
+      "properties": {
+        "doc_id": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["doc_id", "path", "role_scope", "tier", "bytes", "lf", "sha256", "authority_class", "lifecycle", "read_depth", "citations"],
+      "properties": {
+        "doc_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]*$"},
+        "path": {"type": "string", "pattern": "^[A-Za-z0-9_.//-]+$"},
+        "role_scope": {"type": "array", "minItems": 1, "items": {"type": "string", "enum": ["source-library", "consumer"]}, "uniqueItems": true},
+        "tier": {"type": "string", "enum": ["T1", "T2", "T3"]},
+        "bytes": {"type": "integer", "minimum": 0},
+        "lf": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/definitions/hex64_upper"},
+        "authority_class": {"type": "string", "enum": ["owner-instruction", "policy", "method", "record", "evidence", "enforcement-surface"]},
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "effective_from", "superseded_by"],
+          "properties": {
+            "state": {"type": "string", "enum": ["effective", "superseded", "withdrawn"]},
+            "effective_from": {"oneOf": [{"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}, {"type": "null"}]},
+            "superseded_by": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+          }
+        },
+        "read_depth": {
+          "oneOf": [
+            {"const": "full"},
+            {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          ]
+        },
+        "citations": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{2,3}-[0-9]{2}$"}, "uniqueItems": true}
+      }
+    },
+    "entry_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_family", "route_ids", "triggers", "resolution_inputs", "required", "fail_closed_behavior", "evidence_required", "supported_host_scope"],
+      "properties": {
+        "route_family": {"type": "string", "enum": ["source-checkout", "copied-starter", "external-skill", "standalone-export", "session-boundary"]},
+        "route_ids": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "string", "enum": ["source-checkout", "copied-starter", "external-skill", "standalone-export", "resume", "compaction", "handoff"]}, "uniqueItems": true},
+        "triggers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "resolution_inputs": {"type": "array", "items": {"type": "string", "enum": ["target_root", "role_evidence", "adoption_record", "host_session_facts", "approved_upstream_pin", "skill_packaging_metadata", "nested_local_policy"]}, "uniqueItems": true},
+        "required": {"type": "boolean"},
+        "fail_closed_behavior": {"type": "string", "minLength": 1},
+        "evidence_required": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "supported_host_scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope", "claim_label", "host_evidence_ref", "limitations"],
+          "properties": {
+            "scope": {"type": "string", "minLength": 1},
+            "claim_label": {"type": "string", "enum": ["GUIDANCE-ONLY", "CI-STRUCTURAL", "HOST-ENFORCED"]},
+            "host_evidence_ref": {"type": "string", "minLength": 1},
+            "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+          }
+        }
+      }
+    },
+    "graph_edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_node", "to_doc_id", "class", "rule", "reason"],
+      "properties": {
+        "from_node": {"type": "string", "pattern": "^(doc|route|route_family|skill):[A-Za-z0-9_.-]+$"},
+        "to_doc_id": {"type": "string", "minLength": 1},
+        "class": {"type": "string", "enum": ["required", "conditional", "optional", "maintainer-only"]},
+        "rule": {"oneOf": [{"type": "string", "enum": ["delivery-stage-work", "protected-operation", "consumer-adoption-work", "prior-review-artifact", "manual-only-invocation", "source-role-register-read"]}, {"type": "null"}]},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "anchor", "class", "dimension", "lifecycle", "adoption_status", "consumer_effect", "source_document", "applies_to_roles", "authority_action", "enforcement_class", "enforcement_ref"],
+      "properties": {
+        "rule_id": {"type": "string", "pattern": "^[A-Z]{2,3}-[0-9]{2}$"},
+        "anchor": {"type": "string", "minLength": 1},
+        "class": {"type": "string", "enum": ["source-only-method", "portable-method-adopted", "portable-method-proposed", "action-permission", "historical", "ambiguous"]},
+        "dimension": {"type": "string", "enum": ["method", "reporting", "record", "authority", "manual-only", "scope", "enforcement", "staffing"]},
+        "lifecycle": {"type": "string", "enum": ["effective", "historical", "effective-conditional", "evidence-only", "proposed", "ambiguous", "program", "recording"]},
+        "adoption_status": {"type": "string", "enum": ["not-portable", "proposed-default", "adopted-if-consumer-adopts", "adopted-by-copy", "adopted-boundary"]},
+        "consumer_effect": {"type": "string"},
+        "source_document": {"type": "string", "minLength": 1},
+        "applies_to_roles": {"type": "array", "minItems": 1, "items": {"type": "string", "enum": ["source-library", "consumer"]}, "uniqueItems": true},
+        "authority_action": {"type": "boolean"},
+        "enforcement_class": {"type": "string", "enum": ["HOST-ENFORCED", "CI-REQUIRED", "CI-STRUCTURAL", "GUIDANCE-ONLY"]},
+        "enforcement_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conflict_id", "title", "status", "documents", "rule_ids", "resolution_owner"],
+      "properties": {
+        "conflict_id": {"type": "string", "pattern": "^C[0-9]+$"},
+        "title": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["UNRESOLVED", "UNRUN"]},
+        "documents": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "rule_ids": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{2,3}-[0-9]{2}$"}, "uniqueItems": true},
+        "resolution_owner": {"type": "string", "minLength": 1}
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "review_date", "supersedes", "migration_rule", "rollback_rule"],
+      "properties": {
+        "status": {"type": "string", "enum": ["proposed", "effective"]},
+        "review_date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "supersedes": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "migration_rule": {"type": "string", "minLength": 1},
+        "rollback_rule": {"type": "string", "minLength": 1}
+      }
+    },
+    "local_adoption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "required_for_consumer", "record_paths", "required_fields", "invalidation_inputs"],
+      "properties": {
+        "schema": {"const": "aegis.governance-adoption/1"},
+        "required_for_consumer": {"type": "boolean"},
+        "record_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "required_fields": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "invalidation_inputs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "host_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supported_hosts", "unsupported_host_behavior", "data_exit_disclosures"],
+      "properties": {
+        "supported_hosts": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/supported_host"}},
+        "unsupported_host_behavior": {"type": "string", "minLength": 1},
+        "data_exit_disclosures": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/data_exit"}}
+      }
+    },
+    "supported_host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host_product", "host_version", "host_build_sha256", "claim", "evidence_refs", "limitations"],
+      "properties": {
+        "host_product": {"type": "string", "minLength": 1},
+        "host_version": {"type": "string", "minLength": 1},
+        "host_build_sha256": {"$ref": "#/definitions/hex64_upper"},
+        "claim": {"type": "string", "enum": ["OBSERVED-TESTED", "OBSERVED-IDENTITY-ONLY", "UNSUPPORTED-UNVERIFIED"]},
+        "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "data_exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "state", "ref"],
+      "properties": {
+        "channel": {"type": "string", "minLength": 1},
+        "state": {"type": "string", "enum": ["DEFAULT-ON", "DEFAULT-FEEDBACK-ONLY", "DOCUMENTED", "DISABLED"]},
+        "ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "enforcement_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim", "claim_scope", "named_surfaces", "host_plugin", "bypass_routes", "unrun"],
+      "properties": {
+        "claim": {"type": "string", "enum": ["GUIDANCE-ONLY", "CI-STRUCTURAL", "HOST-PLUGIN"]},
+        "claim_scope": {"type": "string", "minLength": 1},
+        "named_surfaces": {"type": "array", "items": {"$ref": "#/definitions/named_surface"}},
+        "host_plugin": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "additionalProperties": false, "required": ["composition_sha256", "evidence_refs"], "properties": {"composition_sha256": {"$ref": "#/definitions/hex64_upper"}, "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}}
+          ]
+        },
+        "bypass_routes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "unrun": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "named_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "class", "evidence_ref"],
+      "properties": {
+        "surface": {"type": "string", "minLength": 1},
+        "class": {"type": "string", "enum": ["CI-REQUIRED", "CI-STRUCTURAL", "HOST-ENFORCED"]},
+        "evidence_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoritative_inputs", "not_authoritative", "verification_rule"],
+      "properties": {
+        "authoritative_inputs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "not_authoritative": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "verification_rule": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

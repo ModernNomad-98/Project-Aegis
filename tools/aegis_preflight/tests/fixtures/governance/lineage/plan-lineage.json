@@ -1,0 +1,30 @@
+{
+  "schema": "aegis.plan-lineage-fixture/1",
+  "note": "Synthetic L01-L17 table shape for the planning-lineage/budget separation case (21). It mirrors the audited plan's section 13.1 shape only; the audited plan is the authority, not this fixture.",
+  "source_plan_sha256": "0A5F8A65C2BEF4EFAEACED0262A78EFFDA36121333A0EB6BC1B57583881A1A40",
+  "entries": [
+    {"id": "L01", "kind": "design-proposal", "counted_as_plan_revision": false},
+    {"id": "L02", "kind": "design-proposal", "counted_as_plan_revision": false},
+    {"id": "L03", "kind": "handoff-draft-plan", "counted_as_plan_revision": false},
+    {"id": "L04", "kind": "handoff-draft-kickoff", "counted_as_plan_revision": false},
+    {"id": "L05", "kind": "handoff-corrected", "counted_as_plan_revision": false},
+    {"id": "L06", "kind": "kickoff-corrected", "counted_as_plan_revision": false},
+    {"id": "L07", "kind": "pre-handoff-review", "counted_as_plan_revision": false},
+    {"id": "L08", "kind": "planning-stop-rule", "counted_as_plan_revision": false},
+    {"id": "L09", "kind": "revision-state-store", "counted_as_plan_revision": false},
+    {"id": "L10", "kind": "maturity-programme-record", "counted_as_plan_revision": false},
+    {"id": "L11", "kind": "item-a-stop-state", "counted_as_plan_revision": false},
+    {"id": "L12", "kind": "experience-cc-names", "counted_as_plan_revision": false},
+    {"id": "L13", "kind": "task-lane-records", "counted_as_plan_revision": false},
+    {"id": "L14", "kind": "register-lifecycle", "counted_as_plan_revision": false},
+    {"id": "L15", "kind": "reuse-baseline", "counted_as_plan_revision": false},
+    {"id": "L16", "kind": "preservation-manifest", "counted_as_plan_revision": false},
+    {"id": "L17", "kind": "open-uncertainties", "counted_as_plan_revision": false}
+  ],
+  "plan_captures": [
+    {"revision": "r1", "sha256": "8F3AE38C45342065CE35A51773584B4EAB21177EEF389BAFC9B17F5B65BA896D", "audit_verdict": "REVISE"},
+    {"revision": "r2", "sha256": "1F224B7FB5573404DDF231CB8E229CA5ECE08AEE00231239C84ADE172774B98D", "audit_verdict": "REVISE"},
+    {"revision": "r3", "sha256": "0A5F8A65C2BEF4EFAEACED0262A78EFFDA36121333A0EB6BC1B57583881A1A40", "audit_verdict": "ACCEPT"}
+  ],
+  "counts_asserted": null
+}

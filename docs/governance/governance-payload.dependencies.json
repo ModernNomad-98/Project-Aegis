@@ -1,0 +1,7 @@
+[
+  {"from": "required-governance-contract.v1.json", "to": "rule-projection.v1.json", "class": "required"},
+  {"from": "required-governance-contract.v1.json", "to": "schemas/admission-decision-v1.schema.json", "class": "required"},
+  {"from": "required-governance-contract.v1.json", "to": "schemas/adoption-record-v1.schema.json", "class": "required"},
+  {"from": "required-governance-contract.v1.json", "to": "schemas/context-receipt-v1.schema.json", "class": "required"},
+  {"from": "required-governance-contract.v1.json", "to": "schemas/governance-contract-v1.schema.json", "class": "required"}
+]

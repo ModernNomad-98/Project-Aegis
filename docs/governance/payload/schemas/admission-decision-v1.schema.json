@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aegis.admission-decision/1",
+  "title": "Aegis protected-operation admission decision v1",
+  "description": "Strict schema for schema aegis.admission-decision/1. A decision is a record of a recheck at admission time, not a prompt and not a durable permission. On this host the decision is produced in-session as guidance plus an evidence record; it is not a host-enforced denial.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "decision_id", "operation_class", "operation_ref", "requested_at_utc", "receipt_id", "receipt_sha256", "recheck", "decision", "reason_code", "authority_ref", "evidence_refs", "limitations"],
+  "properties": {
+    "schema": {"const": "aegis.admission-decision/1"},
+    "decision_id": {"type": "string", "pattern": "^AD-[A-Za-z0-9_.:-]+$"},
+    "operation_class": {"type": "string", "enum": ["read-only-diagnostic", "design-plan-write", "protected-write", "commit", "push", "pr-create-update", "merge", "deploy-publish", "provider-call-spend", "settings-branch-protection-change", "consumer-repository-write", "manual-only-invocation"]},
+    "operation_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {"type": "string", "enum": ["path-set", "commit", "branch", "pull-request", "deploy", "settings", "consumer-write", "manual-invocation", "read"]},
+        "ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "requested_at_utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "receipt_id": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+    "receipt_sha256": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"type": "null"}]},
+    "recheck": {
+      "type": "object", "additionalProperties": false,
+      "required": ["inputs_rehashed", "digest_before", "digest_after", "differing_inputs", "role_rechecked", "adoption_rechecked"],
+      "properties": {
+        "inputs_rehashed": {"type": "boolean"},
+        "digest_before": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"type": "null"}]},
+        "digest_after": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"type": "null"}]},
+        "differing_inputs": {"type": "array", "items": {"$ref": "#/definitions/differing_input"}},
+        "role_rechecked": {"type": "boolean"},
+        "adoption_rechecked": {"type": "boolean"}
+      }
+    },
+    "decision": {"type": "string", "enum": ["ALLOW", "DENY", "BLOCKED"]},
+    "reason_code": {"type": "string", "enum": ["FRESH_RECEIPT_REVALIDATED", "READ_ONLY_DIAGNOSTIC_PERMITTED", "RECEIPT_INVALID", "RECEIPT_CONTRACT_MISMATCH", "ROLE_TARGET_MISMATCH", "AUTHORITY_ISOLATION_VIOLATION", "HOST_CLAIM_UNSUPPORTED", "MANUAL_ONLY_AUTO_INVOCATION_DENIED", "ROLLBACK_REVOKED_AUTHORITY", "OBSERVATION_STALE", "OBSERVATION_PRE_BOUNDARY", "ADOPTION_MISSING", "ADOPTION_WITHDRAWN", "CONFLICT_UNRESOLVED", "DEPENDENCY_UNRESOLVABLE", "MISSING_REQUIRED_DOCUMENT", "DOCUMENT_HASH_MISMATCH", "PIN_CHANGED", "EXECUTION_CONFLICT"]},
+    "authority_ref": {"type": "string", "minLength": 1},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "definitions": {
+    "differing_input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "path", "expected_sha256", "actual_sha256"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "expected_sha256": {"oneOf": [{"type": "string", "pattern": "^[0-9A-F]{64}$"}, {"type": "null"}]},
+        "actual_sha256": {"oneOf": [{"type": "string", "pattern": "^[0-9A-F]{64}$"}, {"type": "null"}]}
+      }
+    }
+  }
+}

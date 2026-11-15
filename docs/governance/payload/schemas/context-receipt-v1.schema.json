@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aegis.context-receipt/1",
+  "title": "Aegis context receipt v1",
+  "description": "Strict schema for schema aegis.context-receipt/1 (self-asserted observation of the applicable governance context at a point in time). A receipt is evidence, never authority. Null is allowed only where the host does not expose the fact and a limitations entry names it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "receipt_id", "observation_type", "route_id", "route_family", "observed_at_utc", "task", "target", "host_session", "instructions", "contract", "packaging_manifest_binding", "required_documents", "local_adoption", "nested_local_policy", "resolved_rules", "exclusions", "invalidation_inputs_digest", "integrity", "limitations", "non_claims"],
+  "properties": {
+    "schema": {"const": "aegis.context-receipt/1"},
+    "receipt_id": {"type": "string", "pattern": "^CR-[A-Za-z0-9_.:-]+$"},
+    "observation_type": {"type": "string", "enum": ["fresh-start", "resume", "compaction", "handoff", "protected-operation"]},
+    "route_id": {"type": "string", "enum": ["source-checkout", "copied-starter", "external-skill", "standalone-export", "resume", "compaction", "handoff"]},
+    "route_family": {"type": "string", "enum": ["source-checkout", "copied-starter", "external-skill", "standalone-export", "session-boundary"]},
+    "observed_at_utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task_id", "task_ref", "scope_summary", "task_authority_ref"],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1},
+        "task_ref": {"type": "string", "minLength": 1},
+        "scope_summary": {"type": "string", "minLength": 1},
+        "task_authority_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target_repo", "target_kind", "workspace_role", "role_evidence"],
+      "properties": {
+        "target_repo": {"type": "string", "minLength": 1},
+        "target_kind": {"type": "string", "enum": ["source-library-checkout", "consumer-copy", "external-skill-context", "standalone-export"]},
+        "workspace_role": {"type": "string", "enum": ["source-library", "consumer"]},
+        "role_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "host_session": {
+      "type": "object", "additionalProperties": false,
+      "required": ["host_product", "host_version", "host_build_sha256", "profile_digest", "session_id", "origin", "delegation_depth", "agent_preset", "requested_model_route", "reported_model_display", "reasoning_effort", "permission_preset", "sandbox_mode", "approval_policy", "gates_active", "data_exit_paths"],
+      "properties": {
+        "host_product": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "host_version": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "host_build_sha256": {"oneOf": [{"type": "string", "pattern": "^[0-9A-F]{64}$"}, {"type": "null"}]},
+        "profile_digest": {"oneOf": [{"type": "string", "pattern": "^[0-9A-F]{64}$"}, {"type": "null"}]},
+        "session_id": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "origin": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "delegation_depth": {"oneOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
+        "agent_preset": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "requested_model_route": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "reported_model_display": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "reasoning_effort": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "permission_preset": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "sandbox_mode": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "approval_policy": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "gates_active": {"type": "string", "enum": ["none", "unknown"]},
+        "data_exit_paths": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "instructions": {
+      "type": "object", "additionalProperties": false,
+      "required": ["baseline_identity", "files", "budget_omissions"],
+      "properties": {
+        "baseline_identity": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "files": {"type": "array", "items": {"$ref": "#/definitions/instruction_file"}},
+        "budget_omissions": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_id", "contract_version", "contract_sha256", "contract_source_commit", "approved_upstream_pin", "dependency_closure_verified", "verifier_identity", "lifecycle_state"],
+      "properties": {
+        "contract_id": {"const": "aegis.required-governance"},
+        "contract_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "contract_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+        "contract_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "approved_upstream_pin": {"$ref": "#/definitions/pin"},
+        "dependency_closure_verified": {"type": "boolean"},
+        "verifier_identity": {"type": "string", "minLength": 1},
+        "lifecycle_state": {"type": "string", "enum": ["proposed", "effective"]}
+      }
+    },
+    "packaging_manifest_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["manifest_bytes", "manifest_lf", "manifest_sha256", "manifest_path", "detached_binding_evidence_ref", "detached_binding_sha256", "commands", "stage_a_feasibility_ref", "c1_dependency_consumption_used"],
+      "properties": {
+        "manifest_bytes": {"type": "integer", "minimum": 1},
+        "manifest_lf": {"type": "integer", "minimum": 0},
+        "manifest_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+        "manifest_path": {"type": "string", "minLength": 1},
+        "detached_binding_evidence_ref": {"type": "string", "minLength": 1},
+        "detached_binding_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "commands": {"type": "array", "minItems": 3, "items": {"$ref": "#/definitions/command"}},
+        "stage_a_feasibility_ref": {"type": "string", "minLength": 1},
+        "c1_dependency_consumption_used": {"type": "boolean"}
+      }
+    },
+    "required_documents": {"type": "array", "items": {"$ref": "#/definitions/required_document"}},
+    "local_adoption": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "adoption_record_ref", "adoption_record_sha256", "adopted_rules_digest", "overrides", "authority_ref"],
+      "properties": {
+        "state": {"type": "string", "enum": ["adopted", "not-adopted", "withdrawn", "unknown"]},
+        "adoption_record_ref": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "adoption_record_sha256": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"type": "null"}]},
+        "adopted_rules_digest": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"type": "null"}]},
+        "overrides": {"type": "array", "items": {"$ref": "#/definitions/manual_only_override"}},
+        "authority_ref": {"oneOf": [{"type": "string"}, {"type": "null"}]}
+      }
+    },
+    "nested_local_policy": {"type": "array", "items": {"$ref": "#/definitions/nested_policy"}},
+    "resolved_rules": {"type": "array", "items": {"$ref": "#/definitions/resolved_rule"}},
+    "exclusions": {"type": "array", "items": {"$ref": "#/definitions/exclusion"}},
+    "invalidation_inputs_digest": {"$ref": "#/definitions/invalidation_digest"},
+    "integrity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["self_asserted", "verification_status", "evidence_refs"],
+      "properties": {
+        "self_asserted": {"const": true},
+        "verification_status": {"type": "string", "enum": ["UNVERIFIED", "RECONCILED-AGAINST-AUTHORITATIVE-INPUTS", "MISMATCH"]},
+        "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "non_claims": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  },
+  "definitions": {
+    "instruction_file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "source_scope", "bytes", "sha256", "budget_state"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "source_scope": {"type": "string", "enum": ["user-global", "project", "nested", "local-overlay"]},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+        "budget_state": {"type": "string", "enum": ["loaded", "omitted", "unknown"]}
+      }
+    },
+    "pin": {
+      "type": "object", "additionalProperties": false,
+      "required": ["commit", "tree", "package_manifest_sha256"],
+      "properties": {
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "package_manifest_sha256": {"oneOf": [{"type": "string", "pattern": "^[0-9A-F]{64}$"}, {"type": "null"}]}
+      }
+    },
+    "command": {
+      "type": "object", "additionalProperties": false,
+      "required": ["verb", "command", "exit_code"],
+      "properties": {
+        "verb": {"type": "string", "enum": ["build", "verify", "check-manifest", "verify-check-dependencies"]},
+        "command": {"type": "string", "minLength": 1},
+        "exit_code": {"type": "integer", "minimum": 0, "maximum": 3}
+      }
+    },
+    "required_document": {
+      "type": "object", "additionalProperties": false,
+      "required": ["doc_id", "path", "bytes", "sha256", "role_scope", "lifecycle", "read_status", "adoption_provenance"],
+      "properties": {
+        "doc_id": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+        "role_scope": {"type": "array", "minItems": 1, "items": {"type": "string", "enum": ["source-library", "consumer"]}},
+        "lifecycle": {"type": "string", "enum": ["effective", "superseded", "withdrawn"]},
+        "read_status": {"type": "string", "enum": ["read-verified", "not-read", "hash-mismatch"]},
+        "adoption_provenance": {"oneOf": [{"type": "string"}, {"type": "null"}]}
+      }
+    },
+    "manual_only_override": {
+      "type": "object", "additionalProperties": false,
+      "required": ["skill_id", "override_ref", "authority_ref"],
+      "properties": {
+        "skill_id": {"type": "string", "minLength": 1},
+        "override_ref": {"type": "string", "minLength": 1},
+        "authority_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "nested_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256", "applies_to"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+        "applies_to": {"type": "string", "minLength": 1}
+      }
+    },
+    "resolved_rule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rule_id", "source_document", "applicability", "adoption_status", "enforcement_class", "authority_action"],
+      "properties": {
+        "rule_id": {"type": "string", "pattern": "^[A-Z]{2,3}-[0-9]{2}$"},
+        "source_document": {"type": "string", "minLength": 1},
+        "applicability": {"type": "string", "enum": ["yes", "no"]},
+        "adoption_status": {"type": "string", "enum": ["not-portable", "proposed-default", "adopted-if-consumer-adopts", "adopted-by-copy", "adopted-boundary"]},
+        "enforcement_class": {"type": "string", "enum": ["HOST-ENFORCED", "CI-REQUIRED", "CI-STRUCTURAL", "GUIDANCE-ONLY"]},
+        "authority_action": {"type": "boolean"}
+      }
+    },
+    "exclusion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ref", "reason"],
+      "properties": {
+        "ref": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "enum": ["superseded", "withdrawn", "out-of-scope", "not-adopted", "manual-only-not-invoked", "role-excluded", "historical", "proposed-not-in-force", "ambiguous-classification", "enforcement-surface"]}
+      }
+    },
+    "invalidation_digest": {
+      "type": "object", "additionalProperties": false,
+      "required": ["algorithm", "inputs", "digest"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "inputs": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/invalidation_input"}},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "invalidation_input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "path", "bytes", "sha256"],
+      "properties": {
+        "kind": {"type": "string", "enum": ["contract", "document", "adoption-record", "nested-local-policy", "instruction-baseline", "role-evidence", "host-profile", "task-authority"]},
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+      }
+    }
+  }
+}

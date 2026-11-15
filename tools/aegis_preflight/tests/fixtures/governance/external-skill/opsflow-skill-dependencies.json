@@ -1,0 +1,25 @@
+{
+  "schema": "aegis.governance-dependencies/1",
+  "contract": {
+    "id": "aegis.required-governance",
+    "version": "__CONTRACT_VERSION__",
+    "sha256": "__TARGET_CONTRACT_SHA256__"
+  },
+  "generator": {"tool": "synthetic-fixture", "version": "1.0.0"},
+  "declared_rule": "synthetic OpsFlow-shaped external skill declaration; materialised by the test only",
+  "entrypoints": [
+    {
+      "name": "plan-of-record-author",
+      "path": ".claude/skills/plan-of-record-author/SKILL.md",
+      "dependency_class": "required",
+      "manual_only": false,
+      "contract": {
+        "id": "aegis.required-governance",
+        "accepted_versions": ["__CONTRACT_VERSION__"],
+        "expected_sha256_when_bundled": "__TARGET_CONTRACT_SHA256__"
+      },
+      "export_closure_rule": "required: include the contract and the role-scoped required documents"
+    }
+  ],
+  "non_claims": ["synthetic external-skill fixture; not an OpsFlow artifact"]
+}

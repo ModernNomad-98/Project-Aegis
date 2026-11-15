@@ -1,0 +1,3604 @@
+{
+  "contract": {
+    "id": "aegis.required-governance",
+    "sha256": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+    "version": "1.0.0"
+  },
+  "declared_rule": "generated deterministically by tools.aegis_preflight.governance from the shipped skill entrypoints (directory scan, sorted) and the contract bytes; no timestamps; the manual_only flag is the skill description's own MANUAL-ONLY marker; dependency_class is 'required' exactly for skill entrypoints named in the contract dependency graph",
+  "entrypoints": [
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ab-test-designer",
+      "path": ".claude/skills/ab-test-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "acceptance-criteria-reviewer",
+      "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "accessibility-test-harness",
+      "path": ".claude/skills/accessibility-test-harness/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "admin-console-architect",
+      "path": ".claude/skills/admin-console-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "adr-sequencer",
+      "path": ".claude/skills/adr-sequencer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "adr-writer",
+      "path": ".claude/skills/adr-writer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "aegis-setup",
+      "path": ".claude/skills/aegis-setup/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "agent-authorization-matrix",
+      "path": ".claude/skills/agent-authorization-matrix/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "agent-containment-reviewer",
+      "path": ".claude/skills/agent-containment-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "agent-failure-recovery",
+      "path": ".claude/skills/agent-failure-recovery/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "agent-goal-hijack-defender",
+      "path": ".claude/skills/agent-goal-hijack-defender/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "agent-governance-audit",
+      "path": ".claude/skills/agent-governance-audit/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "agent-harness-architect",
+      "path": ".claude/skills/agent-harness-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "agent-identity-privilege-reviewer",
+      "path": ".claude/skills/agent-identity-privilege-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "agent-instruction-consolidator",
+      "path": ".claude/skills/agent-instruction-consolidator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "agent-memory-governance",
+      "path": ".claude/skills/agent-memory-governance/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "required",
+      "export_closure_rule": "required: a standalone export must include the contract and the role-scoped required documents and pass the distributed-payload closure check; an export missing a required governance edge is rejected",
+      "manual_only": false,
+      "name": "agent-startup-context-gate",
+      "path": ".claude/skills/agent-startup-context-gate/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "agent-tool-safety-guard",
+      "path": ".claude/skills/agent-tool-safety-guard/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "agentic-loop-designer",
+      "path": ".claude/skills/agentic-loop-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-closeout-reporter",
+      "path": ".claude/skills/ai-closeout-reporter/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-cost-guardrail-designer",
+      "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "ai-evaluation-harness",
+      "path": ".claude/skills/ai-evaluation-harness/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-governance-risk-reviewer",
+      "path": ".claude/skills/ai-governance-risk-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-human-in-the-loop-designer",
+      "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-lifecycle-risk-manager",
+      "path": ".claude/skills/ai-lifecycle-risk-manager/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-misinformation-guard",
+      "path": ".claude/skills/ai-misinformation-guard/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "ai-router-architect",
+      "path": ".claude/skills/ai-router-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-sdlc-operating-model",
+      "path": ".claude/skills/ai-sdlc-operating-model/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-task-decomposer",
+      "path": ".claude/skills/ai-task-decomposer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ai-threat-modeler",
+      "path": ".claude/skills/ai-threat-modeler/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "api-contract-test-designer",
+      "path": ".claude/skills/api-contract-test-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "api-doc-generator-designer",
+      "path": ".claude/skills/api-doc-generator-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "api-event-architect",
+      "path": ".claude/skills/api-event-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "application-layer-pattern-advisor",
+      "path": ".claude/skills/application-layer-pattern-advisor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "appsec-implementer",
+      "path": ".claude/skills/appsec-implementer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "architecture-advisor",
+      "path": ".claude/skills/architecture-advisor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "architecture-designer",
+      "path": ".claude/skills/architecture-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "architecture-fitness-function-designer",
+      "path": ".claude/skills/architecture-fitness-function-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "architecture-spike-planner",
+      "path": ".claude/skills/architecture-spike-planner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "audit-log-architect",
+      "path": ".claude/skills/audit-log-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "authentication-flow-reviewer",
+      "path": ".claude/skills/authentication-flow-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "authority-invalidation-architect",
+      "path": ".claude/skills/authority-invalidation-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "authorization-matrix-designer",
+      "path": ".claude/skills/authorization-matrix-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "aws-saas-architect",
+      "path": ".claude/skills/aws-saas-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "azure-saas-architect",
+      "path": ".claude/skills/azure-saas-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "background-job-orchestration-architect",
+      "path": ".claude/skills/background-job-orchestration-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "branching-strategy-designer",
+      "path": ".claude/skills/branching-strategy-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "browser-boundary-reviewer",
+      "path": ".claude/skills/browser-boundary-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "caching-strategy-designer",
+      "path": ".claude/skills/caching-strategy-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "cell-based-architecture-designer",
+      "path": ".claude/skills/cell-based-architecture-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "change-classification-gate",
+      "path": ".claude/skills/change-classification-gate/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "chat-backlog-reconciliation",
+      "path": ".claude/skills/chat-backlog-reconciliation/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ci-failure-classifier",
+      "path": ".claude/skills/ci-failure-classifier/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "ci-pipeline-architect",
+      "path": ".claude/skills/ci-pipeline-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "clickthrough-test-engineer",
+      "path": ".claude/skills/clickthrough-test-engineer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "client-state-boundary-reviewer",
+      "path": ".claude/skills/client-state-boundary-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "cloud-architecture-decider",
+      "path": ".claude/skills/cloud-architecture-decider/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "cloud-security-baseline-reviewer",
+      "path": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "code-reviewer",
+      "path": ".claude/skills/code-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "code-simplifier",
+      "path": ".claude/skills/code-simplifier/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "command-gateway-architect",
+      "path": ".claude/skills/command-gateway-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "complete-project-checkpoint",
+      "path": ".claude/skills/complete-project-checkpoint/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "compliance-control-foundation",
+      "path": ".claude/skills/compliance-control-foundation/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "compliance-evidence-collector",
+      "path": ".claude/skills/compliance-evidence-collector/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "compliance-gap-auditor",
+      "path": ".claude/skills/compliance-gap-auditor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "component-boundary-designer",
+      "path": ".claude/skills/component-boundary-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "concurrency-race-reviewer",
+      "path": ".claude/skills/concurrency-race-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "configuration-architect",
+      "path": ".claude/skills/configuration-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "context-co-update-ci-gate",
+      "path": ".claude/skills/context-co-update-ci-gate/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "contribution-guide-author",
+      "path": ".claude/skills/contribution-guide-author/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "cqrs-read-model-designer",
+      "path": ".claude/skills/cqrs-read-model-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "cross-team-dependency-negotiator",
+      "path": ".claude/skills/cross-team-dependency-negotiator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "dast-safety-harness-designer",
+      "path": ".claude/skills/dast-safety-harness-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "data-flow-diagrammer",
+      "path": ".claude/skills/data-flow-diagrammer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "data-migration-runbook-author",
+      "path": ".claude/skills/data-migration-runbook-author/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "data-partitioning-sharding-strategist",
+      "path": ".claude/skills/data-partitioning-sharding-strategist/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "data-quality-monitor-designer",
+      "path": ".claude/skills/data-quality-monitor-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "database-backup-verifier",
+      "path": ".claude/skills/database-backup-verifier/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "defect-triage-facilitator",
+      "path": ".claude/skills/defect-triage-facilitator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "demo-tenant-safety-designer",
+      "path": ".claude/skills/demo-tenant-safety-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "dependency-direction-guard",
+      "path": ".claude/skills/dependency-direction-guard/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "design-review-facilitator",
+      "path": ".claude/skills/design-review-facilitator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "design-system-token-governor",
+      "path": ".claude/skills/design-system-token-governor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "diataxis-doc-organizer",
+      "path": ".claude/skills/diataxis-doc-organizer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "docs-as-code-architect",
+      "path": ".claude/skills/docs-as-code-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "docs-first-implementer",
+      "path": ".claude/skills/docs-first-implementer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "docs-retention-index",
+      "path": ".claude/skills/docs-retention-index/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "domain-modeler",
+      "path": ".claude/skills/domain-modeler/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "edge-function-designer",
+      "path": ".claude/skills/edge-function-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "edge-state-ux-designer",
+      "path": ".claude/skills/edge-state-ux-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "environment-parity-reviewer",
+      "path": ".claude/skills/environment-parity-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "error-handling-security-reviewer",
+      "path": ".claude/skills/error-handling-security-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "error-taxonomy-designer",
+      "path": ".claude/skills/error-taxonomy-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "eval-runner-designer",
+      "path": ".claude/skills/eval-runner-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "event-schema-architect",
+      "path": ".claude/skills/event-schema-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "exploratory-charter-designer",
+      "path": ".claude/skills/exploratory-charter-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "export-pipeline-architect",
+      "path": ".claude/skills/export-pipeline-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "export-qa-strategy-designer",
+      "path": ".claude/skills/export-qa-strategy-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "extensibility-boundary-designer",
+      "path": ".claude/skills/extensibility-boundary-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "feature-flag-architect",
+      "path": ".claude/skills/feature-flag-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "feature-flag-rollout-strategist",
+      "path": ".claude/skills/feature-flag-rollout-strategist/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "file-upload-storage-architect",
+      "path": ".claude/skills/file-upload-storage-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "flaky-test-detective",
+      "path": ".claude/skills/flaky-test-detective/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "framework-edition-tracker",
+      "path": ".claude/skills/framework-edition-tracker/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "framework-mapping-refresher",
+      "path": ".claude/skills/framework-mapping-refresher/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "frontend-architecture-mapper",
+      "path": ".claude/skills/frontend-architecture-mapper/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "frontend-perf-engineer",
+      "path": ".claude/skills/frontend-perf-engineer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "full-codebase-auditor",
+      "path": ".claude/skills/full-codebase-auditor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "funnel-definition-designer",
+      "path": ".claude/skills/funnel-definition-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "gated-deployment-prompt-template",
+      "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "graphql-boundary-reviewer",
+      "path": ".claude/skills/graphql-boundary-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "hidden-context-exposure-reviewer",
+      "path": ".claude/skills/hidden-context-exposure-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "horizontal-scalability-reviewer",
+      "path": ".claude/skills/horizontal-scalability-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "human-agent-trust-reviewer",
+      "path": ".claude/skills/human-agent-trust-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "human-approval-boundary",
+      "path": ".claude/skills/human-approval-boundary/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "iac-reviewer",
+      "path": ".claude/skills/iac-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "import-pipeline-architect",
+      "path": ".claude/skills/import-pipeline-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "import-qa-strategy-designer",
+      "path": ".claude/skills/import-qa-strategy-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "incident-response-runbook",
+      "path": ".claude/skills/incident-response-runbook/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "integration-test-designer",
+      "path": ".claude/skills/integration-test-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "inter-agent-comms-reviewer",
+      "path": ".claude/skills/inter-agent-comms-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "interface-first-designer",
+      "path": ".claude/skills/interface-first-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "intra-tenant-scope-architect",
+      "path": ".claude/skills/intra-tenant-scope-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "iso-27001-isms-architect",
+      "path": ".claude/skills/iso-27001-isms-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "iso-42001-aims-architect",
+      "path": ".claude/skills/iso-42001-aims-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "lane-authoring-guide",
+      "path": ".claude/skills/lane-authoring-guide/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "latency-budget-architect",
+      "path": ".claude/skills/latency-budget-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "layered-architecture-enforcer",
+      "path": ".claude/skills/layered-architecture-enforcer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "library-diff-reviewer",
+      "path": ".claude/skills/library-diff-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "llm-output-safety-reviewer",
+      "path": ".claude/skills/llm-output-safety-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "load-test-planner",
+      "path": ".claude/skills/load-test-planner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "local-ci-mirror-preflight",
+      "path": ".claude/skills/local-ci-mirror-preflight/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "manual-test-case-creator",
+      "path": ".claude/skills/manual-test-case-creator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "membership-invitation-designer",
+      "path": ".claude/skills/membership-invitation-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "memory-context-poisoning-reviewer",
+      "path": ".claude/skills/memory-context-poisoning-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "merge-is-deploy-governance",
+      "path": ".claude/skills/merge-is-deploy-governance/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "mobile-journey-test-designer",
+      "path": ".claude/skills/mobile-journey-test-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "mobile-viewport-craft",
+      "path": ".claude/skills/mobile-viewport-craft/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "model-context-designer",
+      "path": ".claude/skills/model-context-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "model-poisoning-reviewer",
+      "path": ".claude/skills/model-poisoning-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "model-routing-policy",
+      "path": ".claude/skills/model-routing-policy/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "modernization-cutover-planner",
+      "path": ".claude/skills/modernization-cutover-planner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "multi-framework-crosswalk",
+      "path": ".claude/skills/multi-framework-crosswalk/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "multi-tenant-data-architect",
+      "path": ".claude/skills/multi-tenant-data-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "multi-tenant-security-tester",
+      "path": ".claude/skills/multi-tenant-security-tester/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "n-plus-one-detector",
+      "path": ".claude/skills/n-plus-one-detector/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "notification-webhook-ux-designer",
+      "path": ".claude/skills/notification-webhook-ux-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "observability-by-design",
+      "path": ".claude/skills/observability-by-design/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "observability-operator",
+      "path": ".claude/skills/observability-operator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "offline-first-sync-architect",
+      "path": ".claude/skills/offline-first-sync-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "onboarding-doc-designer",
+      "path": ".claude/skills/onboarding-doc-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "operational-vs-analytical-splitter",
+      "path": ".claude/skills/operational-vs-analytical-splitter/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "outbound-integration-adapter-designer",
+      "path": ".claude/skills/outbound-integration-adapter-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "pagination-cursor-designer",
+      "path": ".claude/skills/pagination-cursor-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "performance-test-harness",
+      "path": ".claude/skills/performance-test-harness/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "phased-work-handoff-designer",
+      "path": ".claude/skills/phased-work-handoff-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "pii-lifecycle-designer",
+      "path": ".claude/skills/pii-lifecycle-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "required",
+      "export_closure_rule": "required: a standalone export must include the contract and the role-scoped required documents and pass the distributed-payload closure check; an export missing a required governance edge is rejected",
+      "manual_only": false,
+      "name": "plan-audit-reviewer",
+      "path": ".claude/skills/plan-audit-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "plan-entitlement-architect",
+      "path": ".claude/skills/plan-entitlement-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "required",
+      "export_closure_rule": "required: a standalone export must include the contract and the role-scoped required documents and pass the distributed-payload closure check; an export missing a required governance edge is rejected",
+      "manual_only": false,
+      "name": "plan-of-record-author",
+      "path": ".claude/skills/plan-of-record-author/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "playwright-e2e-engineer",
+      "path": ".claude/skills/playwright-e2e-engineer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "principal-code-analyst",
+      "path": ".claude/skills/principal-code-analyst/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "prioritization-frame-picker",
+      "path": ".claude/skills/prioritization-frame-picker/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "product-analytics-instrumenter",
+      "path": ".claude/skills/product-analytics-instrumenter/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "product-spec-writer",
+      "path": ".claude/skills/product-spec-writer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "production-safe-smoke-tester",
+      "path": ".claude/skills/production-safe-smoke-tester/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "profiling-methodology-designer",
+      "path": ".claude/skills/profiling-methodology-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "required",
+      "export_closure_rule": "required: a standalone export must include the contract and the role-scoped required documents and pass the distributed-payload closure check; an export missing a required governance edge is rejected",
+      "manual_only": false,
+      "name": "project-orchestrator",
+      "path": ".claude/skills/project-orchestrator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "promotion-packet-writer",
+      "path": ".claude/skills/promotion-packet-writer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "prompt-injection-defender",
+      "path": ".claude/skills/prompt-injection-defender/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "property-based-test-designer",
+      "path": ".claude/skills/property-based-test-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "pwa-boundary-reviewer",
+      "path": ".claude/skills/pwa-boundary-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "qa-automation-architect",
+      "path": ".claude/skills/qa-automation-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "qa-strategy-architect",
+      "path": ".claude/skills/qa-strategy-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "query-plan-reader",
+      "path": ".claude/skills/query-plan-reader/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "rag-security-architect",
+      "path": ".claude/skills/rag-security-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "readme-craftsman",
+      "path": ".claude/skills/readme-craftsman/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "realtime-subscription-architect",
+      "path": ".claude/skills/realtime-subscription-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "regression-suite-curator",
+      "path": ".claude/skills/regression-suite-curator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "required",
+      "export_closure_rule": "required: a standalone export must include the contract and the role-scoped required documents and pass the distributed-payload closure check; an export missing a required governance edge is rejected",
+      "manual_only": false,
+      "name": "release-readiness-reviewer",
+      "path": ".claude/skills/release-readiness-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "requirements-gathering-facilitator",
+      "path": ".claude/skills/requirements-gathering-facilitator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "resilience-architecture-reviewer",
+      "path": ".claude/skills/resilience-architecture-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "retrieval-engineering-designer",
+      "path": ".claude/skills/retrieval-engineering-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "reviewable-diff-discipline",
+      "path": ".claude/skills/reviewable-diff-discipline/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "risk-tiered-validation-selector",
+      "path": ".claude/skills/risk-tiered-validation-selector/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "rls-policy-auditor",
+      "path": ".claude/skills/rls-policy-auditor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "roadmap-to-commitments-translator",
+      "path": ".claude/skills/roadmap-to-commitments-translator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "roadmap-under-uncertainty-planner",
+      "path": ".claude/skills/roadmap-under-uncertainty-planner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "role-coverage-test-designer",
+      "path": ".claude/skills/role-coverage-test-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "rollback-runbook-author",
+      "path": ".claude/skills/rollback-runbook-author/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "route-protection-designer",
+      "path": ".claude/skills/route-protection-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "saas-cost-architect",
+      "path": ".claude/skills/saas-cost-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "saas-localization-architect",
+      "path": ".claude/skills/saas-localization-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "saas-offboarding-architect",
+      "path": ".claude/skills/saas-offboarding-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "saas-platform-architect",
+      "path": ".claude/skills/saas-platform-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "saas-timezone-architect",
+      "path": ".claude/skills/saas-timezone-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "sast-orchestration-designer",
+      "path": ".claude/skills/sast-orchestration-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "schema-evolution-planner",
+      "path": ".claude/skills/schema-evolution-planner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "scoped-approval-register",
+      "path": ".claude/skills/scoped-approval-register/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "screenshot-evidence-planner",
+      "path": ".claude/skills/screenshot-evidence-planner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "search-architecture-designer",
+      "path": ".claude/skills/search-architecture-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "secrets-identity-hardener",
+      "path": ".claude/skills/secrets-identity-hardener/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "secure-migration-reviewer",
+      "path": ".claude/skills/secure-migration-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "security-drift-detector",
+      "path": ".claude/skills/security-drift-detector/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "security-impact-note-author",
+      "path": ".claude/skills/security-impact-note-author/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "security-logging-alerting-architect",
+      "path": ".claude/skills/security-logging-alerting-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "security-pr-reviewer",
+      "path": ".claude/skills/security-pr-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "security-regression-harness-designer",
+      "path": ".claude/skills/security-regression-harness-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "security-scan-orchestrator",
+      "path": ".claude/skills/security-scan-orchestrator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "sensitive-disclosure-guard",
+      "path": ".claude/skills/sensitive-disclosure-guard/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "server-state-architect",
+      "path": ".claude/skills/server-state-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "sharded-validation-with-resume",
+      "path": ".claude/skills/sharded-validation-with-resume/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "share-link-access-architect",
+      "path": ".claude/skills/share-link-access-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "skill-deprecation-planner",
+      "path": ".claude/skills/skill-deprecation-planner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "skill-quality-reviewer",
+      "path": ".claude/skills/skill-quality-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "skill-selection-advisor",
+      "path": ".claude/skills/skill-selection-advisor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "skill-usage-instrumenter",
+      "path": ".claude/skills/skill-usage-instrumenter/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "skill-usage-ledger",
+      "path": ".claude/skills/skill-usage-ledger/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "slo-reliability-architect",
+      "path": ".claude/skills/slo-reliability-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "soc2-trust-criteria-mapper",
+      "path": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "source-currency-auditor",
+      "path": ".claude/skills/source-currency-auditor/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "source-of-truth-reconciler",
+      "path": ".claude/skills/source-of-truth-reconciler/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "staff-scope-selector",
+      "path": ".claude/skills/staff-scope-selector/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "standing-approval-and-auto-advance",
+      "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "state-machine-modeler",
+      "path": ".claude/skills/state-machine-modeler/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "statement-of-applicability-author",
+      "path": ".claude/skills/statement-of-applicability-author/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "static-analysis-reviewer",
+      "path": ".claude/skills/static-analysis-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "streaming-event-architect",
+      "path": ".claude/skills/streaming-event-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "structured-output-validator",
+      "path": ".claude/skills/structured-output-validator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "subscription-lifecycle-designer",
+      "path": ".claude/skills/subscription-lifecycle-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "sunset-deprecation-communicator",
+      "path": ".claude/skills/sunset-deprecation-communicator/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "superadmin-observability-console-designer",
+      "path": ".claude/skills/superadmin-observability-console-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "supply-chain-security-reviewer",
+      "path": ".claude/skills/supply-chain-security-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "synthetic-monitoring-architect",
+      "path": ".claude/skills/synthetic-monitoring-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "systematic-debugger",
+      "path": ".claude/skills/systematic-debugger/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "tdd-engineer",
+      "path": ".claude/skills/tdd-engineer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "tech-spec-writer",
+      "path": ".claude/skills/tech-spec-writer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "technical-debt-classifier",
+      "path": ".claude/skills/technical-debt-classifier/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "tenant-isolation-reviewer",
+      "path": ".claude/skills/tenant-isolation-reviewer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "tenant-modeler",
+      "path": ".claude/skills/tenant-modeler/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "tenant-provisioning-designer",
+      "path": ".claude/skills/tenant-provisioning-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "test-coverage-mapper",
+      "path": ".claude/skills/test-coverage-mapper/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "test-data-architect",
+      "path": ".claude/skills/test-data-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "test-plan-designer",
+      "path": ".claude/skills/test-plan-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "test-tenant-provisioner",
+      "path": ".claude/skills/test-tenant-provisioner/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "threat-modeler",
+      "path": ".claude/skills/threat-modeler/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "transaction-scope-designer",
+      "path": ".claude/skills/transaction-scope-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "url-state-architect",
+      "path": ".claude/skills/url-state-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "usage-metering-and-cost-attribution-pipeline-designer",
+      "path": ".claude/skills/usage-metering-and-cost-attribution-pipeline-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "user-preference-architect",
+      "path": ".claude/skills/user-preference-architect/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "ux-design-iteration",
+      "path": ".claude/skills/ux-design-iteration/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "validation-boundary-designer",
+      "path": ".claude/skills/validation-boundary-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "visual-regression-test-designer",
+      "path": ".claude/skills/visual-regression-test-designer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "vite-build-qa-engineer",
+      "path": ".claude/skills/vite-build-qa-engineer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": true,
+      "name": "vitest-unit-component-engineer",
+      "path": ".claude/skills/vitest-unit-component-engineer/SKILL.md"
+    },
+    {
+      "contract": {
+        "accepted_versions": [
+          "1.0.0"
+        ],
+        "expected_sha256_when_bundled": "4CD2EF524FBF2FB795D2CB371D6EDAC871C4064FC86A42D122FD39EE05466FF2",
+        "id": "aegis.required-governance"
+      },
+      "dependency_class": "optional",
+      "export_closure_rule": "optional: the export may omit the contract only if it makes no governance coverage claim; an absent dependency may never be reported as none",
+      "manual_only": false,
+      "name": "warehouse-lake-architect",
+      "path": ".claude/skills/warehouse-lake-architect/SKILL.md"
+    }
+  ],
+  "generator": {
+    "tool": "aegis-governance",
+    "version": "1.0.0"
+  },
+  "non_claims": [
+    "this declaration is packaging metadata, not a second policy or a gate",
+    "an 'optional' declaration does not mean the contract is irrelevant; it means the export is not rejected without it while the skill makes no governance-coverage claim",
+    "the expected contract sha256 binds the declaration to one contract build; a different contract version requires a new declaration"
+  ],
+  "schema": "aegis.governance-dependencies/1"
+}

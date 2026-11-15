@@ -240,3 +240,207 @@ def self_test() -> typing.Dict[str, object]:
         "check_ids": list(CHECK_IDS),
         "canonical_sample_sha256": digest(sample),
     }
+
+
+# --- Governance resolver vocabulary and result records (P0-GOV C1) ----------
+# The resolver/validator lives in governance.py; these are the shared closed
+# vocabularies and the typed result records it returns.  They add a second verb
+# family to this package and do not change PF-01..PF-10 semantics.
+
+GOVERNANCE_SCHEMA_VERSION = "aegis.governance-output/v1"
+GOVERNANCE_CHECK_IDS = (
+    "GR-01", "GR-02", "GR-03", "GR-04", "GR-05", "GR-06",
+    "GR-07", "GR-08", "GR-09", "GR-10", "GR-11", "GR-12",
+)
+GOVERNANCE_STATUSES = ("PASS", "FAIL", "BLOCKED", "UNRUN")
+GOVERNANCE_DECISIONS = ("ALLOW", "DENY", "BLOCKED")
+ROLE_IDS = ("source-library", "consumer")
+ROUTE_IDS = (
+    "source-checkout",
+    "copied-starter",
+    "external-skill",
+    "standalone-export",
+    "resume",
+    "compaction",
+    "handoff",
+)
+ROUTE_FAMILIES = (
+    "source-checkout",
+    "copied-starter",
+    "external-skill",
+    "standalone-export",
+    "session-boundary",
+)
+ROUTE_FAMILY_OF = {
+    "source-checkout": "source-checkout",
+    "copied-starter": "copied-starter",
+    "external-skill": "external-skill",
+    "standalone-export": "standalone-export",
+    "resume": "session-boundary",
+    "compaction": "session-boundary",
+    "handoff": "session-boundary",
+}
+# The observation typing of the session-boundary route ids.  An old receipt
+# keeps its old observation type; admission never upgrades it.
+BOUNDARY_OBSERVATION_OF = {
+    "resume": "resume",
+    "compaction": "compaction",
+    "handoff": "handoff",
+}
+OBSERVATION_TYPES = ("fresh-start", "resume", "compaction", "handoff", "protected-operation")
+OPERATION_CLASSES = (
+    "read-only-diagnostic",
+    "design-plan-write",
+    "protected-write",
+    "commit",
+    "push",
+    "pr-create-update",
+    "merge",
+    "deploy-publish",
+    "provider-call-spend",
+    "settings-branch-protection-change",
+    "consumer-repository-write",
+    "manual-only-invocation",
+)
+ENFORCEMENT_CLASSES = ("HOST-ENFORCED", "CI-REQUIRED", "CI-STRUCTURAL", "GUIDANCE-ONLY")
+DEPENDENCY_CLASSES = ("required", "conditional", "optional", "maintainer-only")
+CONDITION_RULES = (
+    "delivery-stage-work",
+    "protected-operation",
+    "consumer-adoption-work",
+    "prior-review-artifact",
+    "manual-only-invocation",
+    "source-role-register-read",
+)
+BUDGET_CATEGORIES = (
+    "planning-revision",
+    "code-review-round",
+    "review-head",
+    "host-evidence",
+)
+LIFECYCLE_STATES = ("effective", "superseded", "withdrawn")
+RULE_LIFECYCLE_ACTIVE = ("effective", "effective-conditional", "evidence-only", "program", "recording")
+RULE_LIFECYCLE_EXCLUDED = {
+    "historical": "historical",
+    "proposed": "proposed-not-in-force",
+    "ambiguous": "ambiguous-classification",
+}
+AUTHORITY_KINDS = ("OWNER_LINE", "A_ROW", "DECISION")
+ADOPTION_STATES = ("adopted", "not-adopted", "withdrawn", "unknown")
+HOST_CLAIM_LABELS = ("OBSERVED-TESTED", "OBSERVED-IDENTITY-ONLY", "UNSUPPORTED-UNVERIFIED")
+
+
+@dataclasses.dataclass
+class GovernanceFinding:
+    """One GR-* finding (never a verdict, never an approval)."""
+
+    code: str
+    status: str
+    message: str
+    ref: str = ""
+
+    def as_dict(self) -> typing.Dict[str, object]:
+        return {"code": self.code, "status": self.status, "message": self.message, "ref": self.ref}
+
+
+@dataclasses.dataclass
+class ResolvedDocument:
+    """One document in a resolved set, with the identity that was re-derived."""
+
+    doc_id: str
+    path: str
+    bytes: int
+    sha256: str
+    role_scope: typing.Sequence[str]
+    lifecycle: str
+    read_status: str
+    adoption_provenance: typing.Optional[str] = None
+
+    def as_dict(self) -> typing.Dict[str, object]:
+        return {
+            "doc_id": self.doc_id,
+            "path": self.path,
+            "bytes": self.bytes,
+            "sha256": self.sha256,
+            "role_scope": list(self.role_scope),
+            "lifecycle": self.lifecycle,
+            "read_status": self.read_status,
+            "adoption_provenance": self.adoption_provenance,
+        }
+
+
+@dataclasses.dataclass
+class ResolutionResult:
+    """Result of resolving one role/route against one contract.
+
+    status is RESOLVED or BLOCKED; BLOCKED is fail-closed and always names the
+    missing/changed/hard-failure inputs in findings and exclusions.  No field
+    here is authority: the resolution is an observation.
+    """
+
+    status: str
+    role: str
+    route_id: str
+    route_family: str
+    resolved_documents: typing.List[ResolvedDocument]
+    conditional_documents: typing.List[typing.Dict[str, object]]
+    excluded_documents: typing.List[typing.Dict[str, object]]
+    resolved_rules: typing.List[typing.Dict[str, object]]
+    exclusions: typing.List[typing.Dict[str, object]]
+    conflicts: typing.List[typing.Dict[str, object]]
+    findings: typing.List[GovernanceFinding]
+    enforcement_claim: str
+    gates_active: str
+    labels: typing.List[str]
+    resolved_set_digest: str
+    nested_local_policy: typing.List[typing.Dict[str, object]] = dataclasses.field(default_factory=list)
+    adoption_state: str = "unknown"
+    adoption_authority_ref: typing.Optional[str] = None
+    adoption_ref: typing.Optional[str] = None
+    adoption_sha256: typing.Optional[str] = None
+    installation_pin: typing.Optional[typing.Dict[str, object]] = None
+    limitations: typing.List[str] = dataclasses.field(default_factory=list)
+
+    def as_dict(self) -> typing.Dict[str, object]:
+        return {
+            "status": self.status,
+            "role": self.role,
+            "route_id": self.route_id,
+            "route_family": self.route_family,
+            "resolved_documents": [document.as_dict() for document in self.resolved_documents],
+            "conditional_documents": list(self.conditional_documents),
+            "excluded_documents": list(self.excluded_documents),
+            "resolved_rules": list(self.resolved_rules),
+            "exclusions": list(self.exclusions),
+            "conflicts": list(self.conflicts),
+            "findings": [finding.as_dict() for finding in self.findings],
+            "enforcement_claim": self.enforcement_claim,
+            "gates_active": self.gates_active,
+            "labels": list(self.labels),
+            "resolved_set_digest": self.resolved_set_digest,
+            "nested_local_policy": list(self.nested_local_policy),
+            "adoption_state": self.adoption_state,
+            "adoption_authority_ref": self.adoption_authority_ref,
+            "adoption_ref": self.adoption_ref,
+            "adoption_sha256": self.adoption_sha256,
+            "installation_pin": self.installation_pin,
+            "limitations": list(self.limitations),
+        }
+
+
+@dataclasses.dataclass
+class AdmissionOutcome:
+    """One protected-operation admission decision record (never a permission)."""
+
+    decision: str
+    reason_code: str
+    recheck: typing.Dict[str, object]
+    decision_record: typing.Dict[str, object]
+
+    def as_dict(self) -> typing.Dict[str, object]:
+        return {
+            "decision": self.decision,
+            "reason_code": self.reason_code,
+            "recheck": dict(self.recheck),
+            "decision_record": dict(self.decision_record),
+        }

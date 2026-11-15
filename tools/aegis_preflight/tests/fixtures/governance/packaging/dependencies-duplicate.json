@@ -1,0 +1,5 @@
+[
+  {"from": "alpha.json", "to": "beta.json", "class": "required"},
+  {"from": "alpha.json", "to": "beta.json", "class": "required"},
+  {"from": "alpha.json", "to": "beta.json", "class": "optional"}
+]

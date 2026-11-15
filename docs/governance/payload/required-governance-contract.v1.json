@@ -1,0 +1,4645 @@
+{
+  "conflicts": [
+    {
+      "conflict_id": "C1",
+      "documents": [
+        "CONTRIBUTING",
+        "REGISTER"
+      ],
+      "resolution_owner": "Repository owner (rule-text change) via the seven-stage workflow; a fresh author/auditor/implementer/reviewer/merger chain. Not this task (read-only).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "CONTRIBUTING says AEGIS-APR-047 is 'the one standing exception', but the register later records two more standing gate-guard exceptions."
+    },
+    {
+      "conflict_id": "C2",
+      "documents": [
+        "DW"
+      ],
+      "resolution_owner": "Repository owner / Lead-authorized governance PR (template is not held by PR #1095; verify no concurrent edit before opening).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "The required PR-body reconciliation witness has 8 rows, while the canonical page defines 9 numbered collapse sites."
+    },
+    {
+      "conflict_id": "C3",
+      "documents": [
+        "AGENTS",
+        "CLAUDE",
+        "STARTER"
+      ],
+      "resolution_owner": "PR #1095 holder plus repository owner for the merged wording. This inventory records the conflict; it does not edit the files.",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "Consumer copies of CLAUDE.md say 'continue with ordinary care' when a matching skill is absent, while the starter package says the J1 route must stop and name the install."
+    },
+    {
+      "conflict_id": "C4",
+      "documents": [
+        "REGISTER"
+      ],
+      "resolution_owner": "Peter Nguyen (owner) for the append; coordinator routes one concrete decision.",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "Register preamble/APR-100 say AEGIS-APR-047 is the only standing gate-guard exception; later entries create more without appending a supersession of that sentence."
+    },
+    {
+      "conflict_id": "C5",
+      "documents": [
+        "REGISTER"
+      ],
+      "resolution_owner": "Peter Nguyen (owner).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "SDP-2's citable-repository set is limited by the recording; the owner's words name 'every repo the owner owns where an Aegis Lead operates'."
+    },
+    {
+      "conflict_id": "C6",
+      "documents": [
+        "OWNER-DECISIONS",
+        "REGISTER"
+      ],
+      "resolution_owner": "Peter Nguyen (owner).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "Two owner-sourced texts disagree on when the continuous loop ends (APR-138 subject (ii)(d) is UNRESOLVED)."
+    },
+    {
+      "conflict_id": "C7",
+      "documents": [
+        "REGISTER"
+      ],
+      "resolution_owner": "Peter Nguyen (owner).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "The receipt-posting is named as a grant subject but never defined; the grant covers a name with no defined act."
+    },
+    {
+      "conflict_id": "C8",
+      "documents": [
+        "REGISTER"
+      ],
+      "resolution_owner": "Peter Nguyen (owner).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "The docs-only auto-merge policy D0-3/D0-3b is named as the applicable route but its texts are owner-held and not recorded in the repository."
+    },
+    {
+      "conflict_id": "C9",
+      "documents": [
+        "REGISTER"
+      ],
+      "resolution_owner": "Peter Nguyen (owner).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "SDP-3 is recorded provisionally with a pending owner source and must not be cited; #987 state also conflicts with the last mirrored owner line."
+    },
+    {
+      "conflict_id": "C10",
+      "documents": [
+        "DW",
+        "STATUS-PRESENTATION"
+      ],
+      "resolution_owner": "Repository owner (policy home) / Lead (routing).",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "The 'review-head budget (default 3)' cited by the proposed consumer status presentation has no normative home in the authoritative set."
+    },
+    {
+      "conflict_id": "C11",
+      "documents": [
+        "DW"
+      ],
+      "resolution_owner": "Peter Nguyen (owner) with the Lead routing; belongs to P0-GOV later stages.",
+      "rule_ids": [],
+      "status": "UNRUN",
+      "title": "Two self-declared review dates in the authoritative set have passed without a recorded outcome."
+    },
+    {
+      "conflict_id": "C12",
+      "documents": [],
+      "resolution_owner": "Repository owner for the register-maintenance direction; coordinator routes.",
+      "rule_ids": [],
+      "status": "UNRESOLVED",
+      "title": "Register lifecycle completeness: several one-time grants and directions have no recorded consumption/merge event at b2666f97."
+    }
+  ],
+  "contract_id": "aegis.required-governance",
+  "contract_version": "1.0.0",
+  "dependency_graph": [
+    {
+      "class": "conditional",
+      "from_node": "doc:AGENTS",
+      "reason": "a source-role agent reads the grant register before relying on any grant",
+      "rule": "source-role-register-read",
+      "to_doc_id": "REGISTER"
+    },
+    {
+      "class": "required",
+      "from_node": "doc:DW",
+      "reason": "the PR-body obligations are defined by the canonical workflow",
+      "rule": null,
+      "to_doc_id": "PR-TEMPLATE"
+    },
+    {
+      "class": "required",
+      "from_node": "doc:DW",
+      "reason": "the workflow's gates cite register entries that are not imported into the contract",
+      "rule": null,
+      "to_doc_id": "REGISTER"
+    },
+    {
+      "class": "conditional",
+      "from_node": "doc:STARTER",
+      "reason": "consumer route resolves the consumer manual-only contract only while adopting",
+      "rule": "consumer-adoption-work",
+      "to_doc_id": "CONSUMER-MANUAL-ONLY"
+    },
+    {
+      "class": "required",
+      "from_node": "doc:STARTER",
+      "reason": "the starter installs the manual-only policy reference",
+      "rule": null,
+      "to_doc_id": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "class": "required",
+      "from_node": "route:copied-starter",
+      "reason": "the copied startup file is the consumer's instruction entry",
+      "rule": null,
+      "to_doc_id": "AGENTS"
+    },
+    {
+      "class": "required",
+      "from_node": "route:copied-starter",
+      "reason": "the copied startup file is the consumer's instruction entry",
+      "rule": null,
+      "to_doc_id": "CLAUDE"
+    },
+    {
+      "class": "required",
+      "from_node": "route:copied-starter",
+      "reason": "consumer manual-only obligations are normative for adopters",
+      "rule": null,
+      "to_doc_id": "CONSUMER-MANUAL-ONLY"
+    },
+    {
+      "class": "required",
+      "from_node": "route:copied-starter",
+      "reason": "manual-only policy reference installed by the starter",
+      "rule": null,
+      "to_doc_id": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "class": "conditional",
+      "from_node": "route:external-skill",
+      "reason": "external skill work resolves the target's consumer obligations only while adopting",
+      "rule": "consumer-adoption-work",
+      "to_doc_id": "CONSUMER-MANUAL-ONLY"
+    },
+    {
+      "class": "required",
+      "from_node": "route:external-skill",
+      "reason": "an external skill may not auto-apply a manual-only step",
+      "rule": null,
+      "to_doc_id": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "class": "required",
+      "from_node": "route:source-checkout",
+      "reason": "the startup instruction is the source entry pointer",
+      "rule": null,
+      "to_doc_id": "AGENTS"
+    },
+    {
+      "class": "required",
+      "from_node": "route:source-checkout",
+      "reason": "source work resolves the canonical seven-stage workflow",
+      "rule": null,
+      "to_doc_id": "DW"
+    },
+    {
+      "class": "required",
+      "from_node": "route:source-checkout",
+      "reason": "source authority is derived only from the register/owner lines",
+      "rule": null,
+      "to_doc_id": "REGISTER"
+    },
+    {
+      "class": "required",
+      "from_node": "route:standalone-export",
+      "reason": "an exported skill may not auto-apply a manual-only step",
+      "rule": null,
+      "to_doc_id": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "class": "required",
+      "from_node": "route_family:session-boundary",
+      "reason": "re-establish the startup instruction before the next protected operation",
+      "rule": null,
+      "to_doc_id": "AGENTS"
+    },
+    {
+      "class": "conditional",
+      "from_node": "route_family:session-boundary",
+      "reason": "a session boundary before a protected operation resolves the workflow",
+      "rule": "protected-operation",
+      "to_doc_id": "DW"
+    },
+    {
+      "class": "required",
+      "from_node": "skill:agent-startup-context-gate",
+      "reason": "the startup gate verifies the instruction source",
+      "rule": null,
+      "to_doc_id": "AGENTS"
+    },
+    {
+      "class": "conditional",
+      "from_node": "skill:agent-startup-context-gate",
+      "reason": "the startup gate feeds protected operations that need the workflow",
+      "rule": "protected-operation",
+      "to_doc_id": "DW"
+    },
+    {
+      "class": "conditional",
+      "from_node": "skill:plan-audit-reviewer",
+      "reason": "an audit of recorded lifecycle evidence needs the grading semantics",
+      "rule": "prior-review-artifact",
+      "to_doc_id": "APPROVAL-LIFECYCLE-GRADING"
+    },
+    {
+      "class": "required",
+      "from_node": "skill:plan-audit-reviewer",
+      "reason": "the independent audit contract is the canonical workflow's stage rule",
+      "rule": null,
+      "to_doc_id": "DW"
+    },
+    {
+      "class": "required",
+      "from_node": "skill:plan-of-record-author",
+      "reason": "the plan-of-record contract is the canonical workflow's stage rule",
+      "rule": null,
+      "to_doc_id": "DW"
+    },
+    {
+      "class": "required",
+      "from_node": "skill:project-orchestrator",
+      "reason": "routing resolves the startup instruction",
+      "rule": null,
+      "to_doc_id": "AGENTS"
+    },
+    {
+      "class": "conditional",
+      "from_node": "skill:project-orchestrator",
+      "reason": "routing delivery-stage work needs the workflow",
+      "rule": "delivery-stage-work",
+      "to_doc_id": "DW"
+    },
+    {
+      "class": "required",
+      "from_node": "skill:release-readiness-reviewer",
+      "reason": "a readiness claim cites the compatibility matrix",
+      "rule": null,
+      "to_doc_id": "COMPATIBILITY-MATRIX"
+    },
+    {
+      "class": "required",
+      "from_node": "skill:release-readiness-reviewer",
+      "reason": "a readiness claim cites the support-claims ledger",
+      "rule": null,
+      "to_doc_id": "SUPPORT-CLAIMS"
+    }
+  ],
+  "documents": [
+    {
+      "authority_class": "owner-instruction",
+      "bytes": 29137,
+      "citations": [
+        "AG-01",
+        "AG-02",
+        "AG-03",
+        "AG-04",
+        "AG-05",
+        "AG-06",
+        "AG-07",
+        "AG-08",
+        "AG-09",
+        "AG-10",
+        "AG-11",
+        "AG-12",
+        "AG-13",
+        "AG-14",
+        "AG-15",
+        "AG-16",
+        "AG-17",
+        "AG-18",
+        "AG-19",
+        "AG-20",
+        "AG-21",
+        "AG-22",
+        "CA-03",
+        "CA-12",
+        "MO-01",
+        "PM-02"
+      ],
+      "doc_id": "AGENTS",
+      "lf": 251,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "AGENTS.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "48A8834B6E96D7117A5B7EA84E77A482456DFFEC96C6AAADF12E67CAB1E3A353",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "method",
+      "bytes": 6751,
+      "citations": [
+        "AR-29"
+      ],
+      "doc_id": "APPROVAL-LIFECYCLE-GRADING",
+      "lf": 123,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/approval-lifecycle-grading.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "2B42B9458FF4A1BFC9BF7FEC3C3CB91FB240DD177B47CA7B090F1205B4F32389",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 9106,
+      "citations": [],
+      "doc_id": "AUTO-MERGE-POLICY",
+      "lf": 141,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/reconciliation/auto-merge-policy.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "C3839F3B69211CF4C055C4424FD5AC899BDC99FE495C9F4BCBE7BACE84954C27",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "owner-instruction",
+      "bytes": 2687,
+      "citations": [
+        "CL-01",
+        "CL-02",
+        "CL-03",
+        "CL-04",
+        "CL-05",
+        "CL-06"
+      ],
+      "doc_id": "CLAUDE",
+      "lf": 17,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "CLAUDE.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "760AFD104F1B058CFE08DAC6CF2648C5391EACE1DB5E7CD86EE7ED6CD8CAFB6C",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "enforcement-surface",
+      "bytes": 194,
+      "citations": [],
+      "doc_id": "CODEOWNERS",
+      "lf": 3,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": ".github/CODEOWNERS",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "CB1F4F11139BEFEB79AD829EF27A254F87EA3AED5E8CD196688B90BAAF571671",
+      "tier": "T3"
+    },
+    {
+      "authority_class": "evidence",
+      "bytes": 21442,
+      "citations": [
+        "CA-10"
+      ],
+      "doc_id": "COMPATIBILITY-MATRIX",
+      "lf": 202,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/consumer-readiness/compatibility-matrix-v1.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "79CF5AB4EB12AA2904BF67D6A5C41899BBD0378D6404F66A54FCC9FBD30B6031",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 4273,
+      "citations": [
+        "CA-11",
+        "MO-10",
+        "MO-11"
+      ],
+      "doc_id": "CONSUMER-MANUAL-ONLY",
+      "lf": 28,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/consumer-contract-manual-only.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "42EEFE63D96B80A14BD447F5B848D8B8F3740523D892BD2818F12AB9602F05EC",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 18747,
+      "citations": [
+        "CT-01",
+        "CT-02",
+        "CT-03",
+        "CT-04",
+        "CT-05",
+        "CT-06",
+        "CT-07",
+        "CT-08",
+        "CT-09",
+        "CT-10",
+        "CT-11",
+        "CT-12",
+        "CT-13",
+        "CT-14",
+        "CT-15",
+        "CT-16",
+        "CT-17",
+        "CT-18"
+      ],
+      "doc_id": "CONTRIBUTING",
+      "lf": 279,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "CONTRIBUTING.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "D8CC6DF84017F70A93EBFE3E303BABAED9488E22AF9981AE490510218AA71D88",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 99577,
+      "citations": [
+        "CA-01",
+        "DW-01",
+        "DW-02",
+        "DW-03",
+        "DW-04",
+        "DW-05",
+        "DW-06",
+        "DW-07",
+        "DW-08",
+        "DW-09",
+        "DW-10",
+        "DW-11",
+        "DW-12",
+        "DW-13",
+        "DW-14",
+        "DW-15",
+        "DW-16",
+        "DW-17",
+        "DW-18",
+        "DW-19",
+        "DW-20",
+        "DW-21",
+        "DW-22",
+        "DW-23",
+        "DW-24",
+        "DW-25",
+        "DW-26",
+        "DW-27",
+        "DW-28",
+        "DW-29",
+        "DW-30",
+        "DW-31",
+        "DW-32",
+        "DW-33",
+        "DW-34",
+        "DW-35",
+        "DW-36",
+        "DW-37",
+        "DW-38",
+        "DW-39"
+      ],
+      "doc_id": "DW",
+      "lf": 1415,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/delivery-workflow.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "2AC865A48FE7AF6581CBDB5579FF981FECF862EFAE70D0D23B153A8DB6E38C4E",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 337820,
+      "citations": [
+        "PM-01",
+        "PM-04"
+      ],
+      "doc_id": "EXECUTION-METRICS",
+      "lf": 3613,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/roadmaps/aegis-execution-metrics.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "1921F71F0F2BD50F9A9AC1E74DD90B077282F7C3023235D4C862CAA62414AD64",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 3739,
+      "citations": [
+        "MO-02",
+        "MO-03",
+        "MO-04",
+        "MO-05",
+        "MO-06",
+        "MO-07",
+        "MO-08",
+        "MO-09"
+      ],
+      "doc_id": "MANUAL-ONLY-POLICY",
+      "lf": 35,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/manual-only-policy.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "15FB9EB598161DEF4CEAE86FC337469C6735D394F0C9015D25264244AC4C9635",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 23704,
+      "citations": [
+        "PM-02",
+        "PM-03"
+      ],
+      "doc_id": "MATURITY-PACKAGE",
+      "lf": 126,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/roadmaps/aegis-maturity-package.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "18DA8D126C78BE3F251E96DC135DC30D584A199C600DF36F86955AA7F17CACEE",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 29099,
+      "citations": [],
+      "doc_id": "OFFLINE-CI",
+      "lf": 442,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/offline-ci.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "1348FBA1E37D3C0072584EEC5E4322CC0C7D6741FBAE20F1A6C3F3633306E2AC",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 84477,
+      "citations": [
+        "DR-11",
+        "DR-12",
+        "DR-16"
+      ],
+      "doc_id": "OPEN-DECISIONS",
+      "lf": 430,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/roadmaps/aegis-open-decisions-2026-09-23.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "FEAFD2006A55C1656644C3CD424CB2C3491A1A627CAB720EFDF2CF95BF902990",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 26109,
+      "citations": [
+        "DR-13",
+        "DR-14",
+        "DR-15"
+      ],
+      "doc_id": "OWNER-DECISIONS",
+      "lf": 405,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/roadmaps/OWNER-DECISIONS-2026-10-15.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "652ACD6A8325056DB679D63F30ED60A91F70F05817D27E575F55E6BC21CFD872",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 9932,
+      "citations": [
+        "PT-01",
+        "PT-02",
+        "PT-03",
+        "PT-04",
+        "PT-05",
+        "PT-06",
+        "PT-07",
+        "PT-08"
+      ],
+      "doc_id": "PR-TEMPLATE",
+      "lf": 152,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": ".github/pull_request_template.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "672344931D55881C2FE00B147894A4D3CEA5B12F7C3177DD2BCD16E079C26E8E",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 660099,
+      "citations": [
+        "RB-01",
+        "RB-02",
+        "RB-03",
+        "RB-04",
+        "RB-05",
+        "RB-06"
+      ],
+      "doc_id": "READABILITY-BACKLOG",
+      "lf": 6398,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "DC0DCAC99B9BD1AD39C82D78F92FDA62134CCE04D912F9F18078B5EE9EF18BCE",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "evidence",
+      "bytes": 15292,
+      "citations": [
+        "CA-09"
+      ],
+      "doc_id": "READINESS-GUIDE",
+      "lf": 157,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/consumer-readiness/consumer-guide-v1.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "A8D824C57A08201F60B90FFD02EA466327F25F83C6E3C64CC483788B9DD27536",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 425797,
+      "citations": [
+        "DR-01",
+        "DR-02",
+        "DR-03",
+        "DR-04",
+        "DR-05",
+        "DR-06",
+        "DR-07",
+        "DR-08",
+        "DR-09",
+        "DR-10"
+      ],
+      "doc_id": "RECONCILIATION",
+      "lf": 4997,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/reconciliation/step-0-reconciliation-v4.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "DBAF681076E738FE3C00070EED79FA797DC0F50C4CF69F879A280D8C99303EBF",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "record",
+      "bytes": 683303,
+      "citations": [
+        "AR-01",
+        "AR-02",
+        "AR-03",
+        "AR-04",
+        "AR-05",
+        "AR-06",
+        "AR-07",
+        "AR-08",
+        "AR-09",
+        "AR-10",
+        "AR-11",
+        "AR-12",
+        "AR-13",
+        "AR-14",
+        "AR-15",
+        "AR-16",
+        "AR-17",
+        "AR-18",
+        "AR-19",
+        "AR-20",
+        "AR-21",
+        "AR-22",
+        "AR-23",
+        "AR-24",
+        "AR-25",
+        "AR-26",
+        "AR-27",
+        "AR-28",
+        "AR-30"
+      ],
+      "doc_id": "REGISTER",
+      "lf": 7794,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/approvals/APPROVAL_REGISTER.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "CD33F052C25EFF7BCE0B2138B79D80A2AF082B94A6892E41D716FF5DB776EDFD",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 2511,
+      "citations": [
+        "SEC-01",
+        "SEC-02",
+        "SEC-03"
+      ],
+      "doc_id": "SECURITY",
+      "lf": 50,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "SECURITY.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "EFDB15CBF071D9C1F6A3AB80B972E63A1FF2CF07E37D4AABF4F5C5E218D1C130",
+      "tier": "T3"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 43194,
+      "citations": [
+        "MO-12",
+        "MO-13",
+        "SGS-01",
+        "SGS-02",
+        "SGS-03",
+        "SGS-04",
+        "SGS-05"
+      ],
+      "doc_id": "SKILL-GENERATION-STANDARD",
+      "lf": 612,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/skill-generation-standard.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "9C69AE1009A3828589D018EB9F997CD5FE188A6126DCC99052CAADF4F4083879",
+      "tier": "T2"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 171444,
+      "citations": [
+        "CA-02",
+        "CA-03",
+        "CA-04",
+        "CA-05",
+        "CA-06",
+        "CA-07",
+        "CA-12",
+        "MO-14"
+      ],
+      "doc_id": "STARTER",
+      "lf": 2243,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/consumer-starter-package.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "E4F248A7AB51C4709621128648512339E3259CEB50868078FAFA450D4ACD566F",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "policy",
+      "bytes": 15878,
+      "citations": [
+        "CA-08",
+        "CA-11"
+      ],
+      "doc_id": "STATUS-PRESENTATION",
+      "lf": 90,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/consumer-status-presentation-v1.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "AA1E0766E0C0E17A4DF7DE625301704D1E6C98E077456D2E28E878B0F3C0F40B",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "evidence",
+      "bytes": 19508,
+      "citations": [
+        "CA-10"
+      ],
+      "doc_id": "SUPPORT-CLAIMS",
+      "lf": 117,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/consumer-readiness/support-claims-v1.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library",
+        "consumer"
+      ],
+      "sha256": "FFB52F6EFD56764F780DC7329D79F1D01CF3888289EFDCB8B45232935DD10C34",
+      "tier": "T1"
+    },
+    {
+      "authority_class": "enforcement-surface",
+      "bytes": 33268,
+      "citations": [],
+      "doc_id": "VALIDATE-SKILLS-WORKFLOW",
+      "lf": 620,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": ".github/workflows/validate-skills.yml",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "D91351DD64A372A2E2607879B5DACBA22FE8F0F625F115E0BE69B04EAA9D58CC",
+      "tier": "T3"
+    },
+    {
+      "authority_class": "method",
+      "bytes": 10865,
+      "citations": [
+        "ZT-01",
+        "ZT-02",
+        "ZT-03",
+        "ZT-04"
+      ],
+      "doc_id": "ZERO-TRUST-DISCIPLINE",
+      "lf": 191,
+      "lifecycle": {
+        "effective_from": "2026-11-14",
+        "state": "effective",
+        "superseded_by": null
+      },
+      "path": "docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md",
+      "read_depth": "full",
+      "role_scope": [
+        "source-library"
+      ],
+      "sha256": "D038BCFB43DD6EF78A58D0EFE9F65C3AC5268F4DB7C9CBDC0C3EA5B9ABAB760A",
+      "tier": "T2"
+    }
+  ],
+  "enforcement_claims": {
+    "bypass_routes": [
+      "direct Node effects inside run_code (inner tool calls are gated; direct fs/network/subprocess effects are not)",
+      "alternate launchers and CLI profiles composing user-controlled policy",
+      "GUI/remote bridges and ACP external backends with their own permission systems",
+      "host-user configuration edits (bundle list, profile patch, --patch overlays)",
+      "subprocess effects under the harness process authority",
+      "local mutation of receipts and session logs by a sufficiently privileged actor",
+      "default-on provider upload of session content"
+    ],
+    "claim": "GUIDANCE-ONLY",
+    "claim_scope": "all repository content in this change and the auditable tools it adds; no host gate is active on the observed installation",
+    "host_plugin": null,
+    "named_surfaces": [
+      {
+        "class": "CI-REQUIRED",
+        "evidence_ref": ".github/workflows/validate-skills.yml",
+        "surface": "validate-skills (configured as a required context; live registration DOCUMENTED-BUT-UNVERIFIED)"
+      },
+      {
+        "class": "CI-REQUIRED",
+        "evidence_ref": ".github/workflows/validate-skills.yml",
+        "surface": "gate-guard (configured as a required context; live registration DOCUMENTED-BUT-UNVERIFIED)"
+      },
+      {
+        "class": "CI-STRUCTURAL",
+        "evidence_ref": "tools/aegis_preflight, tools/distributed_payload",
+        "surface": "aegis_preflight and distributed_payload (auditable local checks; not wired into CI)"
+      }
+    ],
+    "unrun": [
+      "live required-context registration and branch protection (DOCUMENTED-BUT-UNVERIFIED from this seat)",
+      "live resume/compaction/handoff boundary evidence",
+      "live bypass suite",
+      "host-profile plugin absence (owner choice O15)",
+      "served-model attestation",
+      "live OpsFlow adoption route"
+    ]
+  },
+  "entry_routes": [
+    {
+      "evidence_required": [
+        "resolved document identities (bytes/sha256 re-derived in-turn)",
+        "context receipt",
+        "admission decision record for the protected class"
+      ],
+      "fail_closed_behavior": "block dependent work and name the missing or changed document; diagnostic reads remain allowed with the missing source named",
+      "required": true,
+      "resolution_inputs": [
+        "target_root",
+        "role_evidence",
+        "host_session_facts"
+      ],
+      "route_family": "source-checkout",
+      "route_ids": [
+        "source-checkout"
+      ],
+      "supported_host_scope": {
+        "claim_label": "GUIDANCE-ONLY",
+        "host_evidence_ref": "none",
+        "limitations": [
+          "no runtime enforcement on the observed host"
+        ],
+        "scope": "repository content and local auditable tooling"
+      },
+      "triggers": [
+        "an agent works in a checkout whose four source-library landmarks are present"
+      ]
+    },
+    {
+      "evidence_required": [
+        "consumer context receipt",
+        "adoption record identity",
+        "excluded source documents with reasons"
+      ],
+      "fail_closed_behavior": "an absent, malformed, mismatched or revoked adoption record means not-adopted and dependent work blocks; a gate-owning skill outside the installed set stops and names the install",
+      "required": true,
+      "resolution_inputs": [
+        "target_root",
+        "role_evidence",
+        "adoption_record"
+      ],
+      "route_family": "copied-starter",
+      "route_ids": [
+        "copied-starter"
+      ],
+      "supported_host_scope": {
+        "claim_label": "GUIDANCE-ONLY",
+        "host_evidence_ref": "none",
+        "limitations": [
+          "live starter install is UNRUN; case 02 evidence is synthetic-only in P0"
+        ],
+        "scope": "repository content; live starter install is a separate governed outcome (O12)"
+      },
+      "triggers": [
+        "a consumer repository contains the copied startup files and installed skills without the source landmarks"
+      ]
+    },
+    {
+      "evidence_required": [
+        "declared skill dependency (tools/governance-dependencies.json)",
+        "target adoption state",
+        "pin comparison"
+      ],
+      "fail_closed_behavior": "a pin or contract mismatch between the skill's expected dependency and the target blocks with both versions named",
+      "required": true,
+      "resolution_inputs": [
+        "target_root",
+        "role_evidence",
+        "skill_packaging_metadata",
+        "approved_upstream_pin"
+      ],
+      "route_family": "external-skill",
+      "route_ids": [
+        "external-skill"
+      ],
+      "supported_host_scope": {
+        "claim_label": "GUIDANCE-ONLY",
+        "host_evidence_ref": "none",
+        "limitations": [
+          "the live OpsFlow-shaped route is UNRUN; no OpsFlow edit is performed"
+        ],
+        "scope": "packaging metadata and resolver tooling"
+      },
+      "triggers": [
+        "a skill is opened from outside the target root"
+      ]
+    },
+    {
+      "evidence_required": [
+        "distributed-payload closure report (verify --check-dependencies)",
+        "governance dependency declaration"
+      ],
+      "fail_closed_behavior": "the export is rejected when a required governance dependency edge is missing; the resolver never treats an absent dependency as none",
+      "required": true,
+      "resolution_inputs": [
+        "target_root",
+        "skill_packaging_metadata",
+        "adoption_record"
+      ],
+      "route_family": "standalone-export",
+      "route_ids": [
+        "standalone-export"
+      ],
+      "supported_host_scope": {
+        "claim_label": "CI-STRUCTURAL",
+        "host_evidence_ref": "none",
+        "limitations": [
+          "the closure check runs locally/read-only and is not a required context"
+        ],
+        "scope": "structural packaging check, not runtime enforcement"
+      },
+      "triggers": [
+        "a single skill is copied or exported without the rest of the library"
+      ]
+    },
+    {
+      "evidence_required": [
+        "resume/compaction/handoff receipt with the typed observation",
+        "fresh admission recheck before the next protected class"
+      ],
+      "fail_closed_behavior": "re-establish the current context before the next protected operation; a receipt observed before the boundary cannot authorize it",
+      "required": true,
+      "resolution_inputs": [
+        "host_session_facts",
+        "target_root",
+        "role_evidence"
+      ],
+      "route_family": "session-boundary",
+      "route_ids": [
+        "resume",
+        "compaction",
+        "handoff"
+      ],
+      "supported_host_scope": {
+        "claim_label": "GUIDANCE-ONLY",
+        "host_evidence_ref": "none",
+        "limitations": [
+          "no handoff primitive on the observed host; live resume/compaction evidence is UNRUN"
+        ],
+        "scope": "session-boundary logic tested synthetically"
+      },
+      "triggers": [
+        "a session continues across a boundary: resume after interruption, context compaction, or handoff to a replacement agent"
+      ]
+    }
+  ],
+  "host_boundary": {
+    "data_exit_disclosures": [
+      {
+        "channel": "DSH session-log upload",
+        "ref": "task-34 observed delivery events",
+        "state": "DEFAULT-ON"
+      },
+      {
+        "channel": "DSH plugin inventory",
+        "ref": "task-34",
+        "state": "DOCUMENTED"
+      },
+      {
+        "channel": "DSH telemetry",
+        "ref": "task-34",
+        "state": "DEFAULT-FEEDBACK-ONLY"
+      }
+    ],
+    "supported_hosts": [
+      {
+        "claim": "OBSERVED-IDENTITY-ONLY",
+        "evidence_refs": [
+          "task-34 host capability record: HOST-CAPABILITY.md sha256 AD096DA6330763D7502143E22B3DD7D958918440BF431B21A9F001DB5C935D03"
+        ],
+        "host_build_sha256": "5FA8A6B21BCEB8F3E99E30EFA2270EFD0CC773A11E42AA0488F804A64B34E637",
+        "host_product": "DeepSeek Harness Desktop",
+        "host_version": "0.2.2-rc.1",
+        "limitations": [
+          "no repository-installable hook or interception facility was observed; no host gate is active",
+          "the served model is unobservable; only the requested route can be recorded",
+          "case 25 cannot pass on this host without a separately provisioned host-profile gate (owner choice O15)"
+        ]
+      }
+    ],
+    "unsupported_host_behavior": "fail closed on any claimed enforcement; diagnostic reads remain allowed with the missing host evidence named"
+  },
+  "lifecycle": {
+    "migration_rule": "A consumer adopts a new contract by recording the new contract id/version/sha256 in its adoption record; a source edit to any bound document requires re-generation, a contract_version bump and a re-derived manifest; receipts observed under an older contract remain old observations and are never upgraded.",
+    "review_date": "2026-12-15",
+    "rollback_rule": "Roll back by restoring the previous committed payload bytes and manifest and superseding the new contract version in the record; never restore revoked authority and never silently delete consumer-local policy files. Triggers: a false admission, a broken install, an unusable restoration, or the owner's withdrawal.",
+    "status": "proposed",
+    "supersedes": null
+  },
+  "local_adoption": {
+    "invalidation_inputs": [
+      "contract bytes/version",
+      "any required document hash",
+      "the approved upstream pin",
+      "the target repository or role",
+      "the adoption record content (including a withdrawal or re-pin)",
+      "any nested/local policy file hash",
+      "the host build/profile digest or session boundary",
+      "the task/authority reference"
+    ],
+    "record_paths": [
+      "docs/aegis-adoption.json",
+      "docs/project-state.md (A-* rows)"
+    ],
+    "required_fields": [
+      "schema",
+      "target_repo",
+      "adopter_role",
+      "authority",
+      "contract",
+      "adoption",
+      "manual_only_overrides_ref",
+      "installation",
+      "effective_at_utc",
+      "revoked_at_utc",
+      "revocation_authority",
+      "supersedes",
+      "next_review_date",
+      "limitations"
+    ],
+    "required_for_consumer": true,
+    "schema": "aegis.governance-adoption/1"
+  },
+  "non_claims": [
+    "this contract is not an approval, a grant or a permission",
+    "this contract does not enforce at runtime; on the observed host it is guidance-only and the auditable tools are local checks",
+    "no serving-model attestation is made or possible from repository content",
+    "no instruction-load or reading-comprehension guarantee is made",
+    "no consumer readiness, support commitment or host qualification is claimed",
+    "this contract is not a second policy, register, backlog or compliance scorecard",
+    "reading this contract in a consumer repository does not make that repository a source-library seat"
+  ],
+  "roles": {
+    "consumer": {
+      "adoption_required": true,
+      "conditional_documents": [
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "COMPATIBILITY-MATRIX"
+        },
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "READINESS-GUIDE"
+        },
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "STATUS-PRESENTATION"
+        },
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "SUPPORT-CLAIMS"
+        }
+      ],
+      "exclusions": [
+        {
+          "doc_id": "APPROVAL-LIFECYCLE-GRADING",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "AUTO-MERGE-POLICY",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "CODEOWNERS",
+          "reason": "source-library enforcement surface; not distributed to consumers"
+        },
+        {
+          "doc_id": "CONTRIBUTING",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "DW",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "EXECUTION-METRICS",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "MATURITY-PACKAGE",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "OFFLINE-CI",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "OPEN-DECISIONS",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "OWNER-DECISIONS",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "PR-TEMPLATE",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "READABILITY-BACKLOG",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "RECONCILIATION",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "REGISTER",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "SECURITY",
+          "reason": "source-library enforcement surface; not distributed to consumers"
+        },
+        {
+          "doc_id": "SKILL-GENERATION-STANDARD",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        },
+        {
+          "doc_id": "VALIDATE-SKILLS-WORKFLOW",
+          "reason": "source-library enforcement surface; not distributed to consumers"
+        },
+        {
+          "doc_id": "ZERO-TRUST-DISCIPLINE",
+          "reason": "source-library document; Role B does not inherit the source process by copying"
+        }
+      ],
+      "required_documents": [
+        "AGENTS",
+        "CLAUDE",
+        "CONSUMER-MANUAL-ONLY",
+        "MANUAL-ONLY-POLICY",
+        "STARTER"
+      ],
+      "role_entry_routes": [
+        "compaction",
+        "copied-starter",
+        "external-skill",
+        "handoff",
+        "resume",
+        "standalone-export"
+      ],
+      "role_id": "consumer"
+    },
+    "source-library": {
+      "adoption_required": false,
+      "conditional_documents": [
+        {
+          "condition": "prior-review-artifact",
+          "doc_id": "APPROVAL-LIFECYCLE-GRADING"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "AUTO-MERGE-POLICY"
+        },
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "COMPATIBILITY-MATRIX"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "EXECUTION-METRICS"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "MATURITY-PACKAGE"
+        },
+        {
+          "condition": "protected-operation",
+          "doc_id": "OFFLINE-CI"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "OPEN-DECISIONS"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "OWNER-DECISIONS"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "READABILITY-BACKLOG"
+        },
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "READINESS-GUIDE"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "RECONCILIATION"
+        },
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "STATUS-PRESENTATION"
+        },
+        {
+          "condition": "consumer-adoption-work",
+          "doc_id": "SUPPORT-CLAIMS"
+        },
+        {
+          "condition": "delivery-stage-work",
+          "doc_id": "ZERO-TRUST-DISCIPLINE"
+        }
+      ],
+      "exclusions": [
+        {
+          "doc_id": "CODEOWNERS",
+          "reason": "enforcement surface: recorded, not a rule source (Tier 3)"
+        },
+        {
+          "doc_id": "SECURITY",
+          "reason": "enforcement surface: recorded, not a rule source (Tier 3)"
+        },
+        {
+          "doc_id": "VALIDATE-SKILLS-WORKFLOW",
+          "reason": "enforcement surface: recorded, not a rule source (Tier 3)"
+        }
+      ],
+      "required_documents": [
+        "AGENTS",
+        "CLAUDE",
+        "CONSUMER-MANUAL-ONLY",
+        "CONTRIBUTING",
+        "DW",
+        "MANUAL-ONLY-POLICY",
+        "PR-TEMPLATE",
+        "REGISTER",
+        "SKILL-GENERATION-STANDARD",
+        "STARTER"
+      ],
+      "role_entry_routes": [
+        "compaction",
+        "handoff",
+        "resume",
+        "source-checkout"
+      ],
+      "role_id": "source-library"
+    }
+  },
+  "rule_applicability": [
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:3-10",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Prevents a consumer product repo from being mistaken for the library and from spawning a second app directory.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-01",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:12-16",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer agents route to installed skills instead of improvising.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-02",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:15-26",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Users get plain-language option comparisons and are not surprised by side effects.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-03",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:27-36",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect; a consumer owner may choose an equivalent local rule.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-04",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:37-43",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer users know which skill is running and what decision is owed.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-05",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:44",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer agents re-check facts instead of relying on stale memory.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-06",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:46-56",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer work reports carry commands/outputs or explicit unverified labels.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-07",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:57-59",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer reports admit gaps instead of inventing them.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-08",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:61-64",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers do not inherit the coordinator separation; a consumer may use a coordinator if it wants.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-09",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:65-84",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer changes get plan, independent audit, implementation, audit, validation, final review and a human merge gate.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-10",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:86-89",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may adopt an equivalent one-holder rule; not inherited.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-11",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:91-103",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer changes are not self-approved; a human or independent reviewer holds the merge gate.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-12",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:105-123",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer teams can use Aegis with a solo agent without importing the Role A seven-holder requirement.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-13",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:125-137",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer reviewers do not mis-bind a finding to a later head.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-14",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:133-137",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer agents do not misread a finished run as unfinished or vice versa.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-15",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:139-151",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect unless its owner asks for the same reporting.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-16",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:153-170",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may adopt a plain-label rule for their own owner/stakeholders; not inherited.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-17",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:172-178",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumer must build its own approval record; AEGIS-APR-* grants are never authority in a consumer repo (consumer-starter 10.1 item 5, 10.4).",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-18",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:179-199",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer review text does not leave readers guessing whether a human wrote it.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-19",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:201-231",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may adopt an equivalent PR evidence record; the five-column format is a proposed default only if their owner adopts it. The four-column table's machine-check contract is source-repo-specific (docs/delivery-workflow.md 874-910).",
+      "dimension": "reporting",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "structural:pr-body-template",
+      "lifecycle": "effective",
+      "rule_id": "AG-20",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:233-251",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect; no inheritance.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AG-21",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:5-10,44,46-56,57-59",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumers avoid importing Role A authority while keeping skill routing and honesty rules.",
+      "dimension": "record",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "AG-22",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/approvals/APPROVAL_REGISTER.md:3-17 (preamble)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers must never cite AEGIS-APR-* entries; they create their own approval record with the same append-only lifecycle discipline.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-01",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/approvals/APPROVAL_REGISTER.md:19-39",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-02",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/approvals/APPROVAL_REGISTER.md:142-147",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-03",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-001 (L151-168)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers may use read-only agents freely without this grant because it is a source-library-specific permission; a consumer's own owner sets its rules.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-04",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-002 (L169-193); AEGIS-APR-013 (L512-533); AEGIS-APR-048 (L1298-1332); AEGIS-APR-049 (L1333-1363); AEGIS-APR-050 (L1364-1388)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers define their own merge authority; the 'wait for the automated reviewer and triage P1/P2' pattern is a possible local choice, not inherited.",
+      "dimension": "authority",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:gate-guard",
+      "lifecycle": "effective",
+      "rule_id": "AR-05",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-003 (L194-211)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-06",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-039 (L1003-1030); AEGIS-APR-051 (L1389-1418)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers use their own delivery authority.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-07",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-047 (L1224-1297)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers must not import a gate-guard exception; their protected-path policy is their own.",
+      "dimension": "authority",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:gate-guard",
+      "lifecycle": "effective",
+      "rule_id": "AR-08",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-100 (L3075-3147)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-09",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-101 (L3149-3159); AEGIS-APR-116 (L4976-5014); AEGIS-APR-117 (L5016-5048)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "A consumer keeping its own docs-acceptance ledger may adopt an analogous keeper role; it must be its own decision.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-10",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AEGIS-APR-102 (L3160-3237)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer users are not shown untested candidates as selectable options.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-11",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-105 (L3387-3455)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-12",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-113 (L4565-4821); AEGIS-APR-115 (L4902-4953); AEGIS-APR-118 (L5050-5090); AEGIS-APR-137 (L5969-6105)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "A consumer maintaining a docs-acceptance count may adopt the one-source-of-truth and pending-on-lost-commit rules by its own decision.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-13",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-123 (L5283-5352)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-14",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-129 (L5493-5528)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-15",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AEGIS-APR-138 (L6106-6434) + AEGIS-APR-138-E1 (L6435-6637)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer process cannot be shortened by a passing directive, and its decision records are append-only.",
+      "dimension": "method",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "AR-16",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-139 (L6639-6710)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect; a consumer must not use issue #805 or #910 channels.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-17",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-140 (L6712-6771); AEGIS-APR-142 (L6902-7029); AEGIS-APR-144 (L7168-7239)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers must not import either exception; they may adopt the 'typed vs relayed + verbatim + id' provenance rule for their own owner decisions.",
+      "dimension": "authority",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:gate-guard",
+      "lifecycle": "effective",
+      "rule_id": "AR-18",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-141 (L6779-6900); AEGIS-APR-143 (L7031-7135); AEGIS-APR-163 (L7637-7654); AEGIS-APR-164 (L7656-7673)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer may adopt a local rule that monitoring channels never grant authority.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-19",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-146 (L7292-7303)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may adopt the portable principles locally; the channels, grants and owner gates do not transfer.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-20",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AEGIS-APR-149 (L7345-7353)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer installs keep honest commit provenance without forcing the solo owner to use an agent identity.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-21",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-150 (L7355-7363)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "No consumer effect; the merged code's limits are the code's own.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-22",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AEGIS-APR-152 (L7376-7384) + AEGIS-APR-154 (L7405-7417)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer history stays merge-commit based if adopted; no agent settings changes.",
+      "dimension": "enforcement",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-23",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-157 (L7453-7477)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "recording",
+      "rule_id": "AR-24",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-162 (L7603-7635)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "A consumer must not cite SDP-2; it may adopt a similar 'merge on green under named grant' pattern only under its own owner's recorded authorization.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-25",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-165 (L7676-7689); AEGIS-APR-166 (L7691-7704)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "ambiguous",
+      "rule_id": "AR-26",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-169 (L7765-7776); AEGIS-APR-170 (L7779-7787); AEGIS-APR-171 (L7789-7795)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-27",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AEGIS-APR-145 (L7241-7290); AEGIS-APR-169 variants; AEGIS-APR-131 (L5564-5736); AEGIS-APR-107/109/110/111/112",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "historical",
+      "consumer_effect": "None.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "historical",
+      "rule_id": "AR-28",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/approval-lifecycle-grading.md:51-86",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer approval records have the same lifecycle discipline without the source register.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "AR-29",
+      "source_document": "APPROVAL-LIFECYCLE-GRADING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "Register historical entries (see JSON approval_entries)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "historical",
+      "consumer_effect": "None.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "historical",
+      "rule_id": "AR-30",
+      "source_document": "REGISTER"
+    },
+    {
+      "adoption_status": "adopted-boundary",
+      "anchor": "docs/delivery-workflow.md:1348-1356",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "The boundary is explicit: consumers do not silently inherit Role A gates, grants or staffing rules.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CA-01",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "adopted-by-copy",
+      "anchor": "docs/consumer-starter-package.md:308-321",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumers get the startup routing and skill rules without a false promise that the Role A links work.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CA-02",
+      "source_document": "STARTER"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:3-10,14,119-123; docs/consumer-starter-package.md:308-321",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "ambiguous",
+      "consumer_effect": "Consumers can act without importing Role A authority while keeping required behavior.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "proposed",
+      "rule_id": "CA-03",
+      "source_document": "STARTER"
+    },
+    {
+      "adoption_status": "adopted-by-copy",
+      "anchor": "docs/consumer-starter-package.md:383-401 (4.2)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer gates are not routed around by improvisation.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CA-04",
+      "source_document": "STARTER"
+    },
+    {
+      "adoption_status": "adopted-by-copy",
+      "anchor": "docs/consumer-starter-package.md:2090-2159 (section 10)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer authority is local and auditable; source grants are not misapplied.",
+      "dimension": "authority",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:scripts",
+      "lifecycle": "effective",
+      "rule_id": "CA-05",
+      "source_document": "STARTER"
+    },
+    {
+      "adoption_status": "adopted-by-copy",
+      "anchor": "docs/consumer-starter-package.md:89-104 (1.2)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumers do not assume the package covers their whole product journey.",
+      "dimension": "scope",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:scripts",
+      "lifecycle": "effective",
+      "rule_id": "CA-06",
+      "source_document": "STARTER"
+    },
+    {
+      "adoption_status": "adopted-by-copy",
+      "anchor": "docs/consumer-starter-package.md:137-140; :2195-2243 (12)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumers inherit honest claim limits, not a readiness claim.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CA-07",
+      "source_document": "STARTER"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/consumer-status-presentation-v1.md:1-7; :38-77",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-proposed",
+      "consumer_effect": "A consumer status UI cannot manufacture approval, readiness or enforcement.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "proposed",
+      "rule_id": "CA-08",
+      "source_document": "STATUS-PRESENTATION"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/consumer-readiness/consumer-guide-v1.md:11-37; :104-127; :155-157",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer must not treat this guide as a support commitment or installation authority.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "evidence-only",
+      "rule_id": "CA-09",
+      "source_document": "READINESS-GUIDE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/consumer-readiness/support-claims-v1.md:1-58; docs/consumer-readiness/compatibility-matrix-v1.md:13-24,57-72,147-163",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may read them as evidence of what is not claimed.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "evidence-only",
+      "rule_id": "CA-10",
+      "source_document": "SUPPORT-CLAIMS"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/consumer-contract-manual-only.md:21-28; docs/consumer-status-presentation-v1.md:1-7",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumers can adopt manual-only governance today without adopting the proposed status UI.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CA-11",
+      "source_document": "CONSUMER-MANUAL-ONLY"
+    },
+    {
+      "adoption_status": "adopted-by-copy",
+      "anchor": "AGENTS.md:119-123; docs/consumer-starter-package.md:10.1 level 5; 10.4",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumers can use Aegis without importing Role A authority.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CA-12",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CLAUDE.md:1",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "One shared contract, two entry points; no drift between CLAUDE.md and AGENTS.md.",
+      "dimension": "method",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "CL-01",
+      "source_document": "CLAUDE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CLAUDE.md:5",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer works in its current product repository.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CL-02",
+      "source_document": "CLAUDE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CLAUDE.md:7-11",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer users get requirements discovery before technology choices.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CL-03",
+      "source_document": "CLAUDE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CLAUDE.md:13",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "MANUAL-ONLY skills stay human-invoked unless the consumer records an explicit override.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "CL-04",
+      "source_document": "CLAUDE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CLAUDE.md:15",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "ambiguous",
+      "consumer_effect": "Avoids a consumer gate being skipped under 'ordinary care'.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CL-05",
+      "source_document": "CLAUDE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CLAUDE.md:17",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CL-06",
+      "source_document": "CLAUDE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:28-31 (rule 1)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer agents do not collide in a shared checkout.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-01",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:33-38 (rule 2)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer merges rest on evidence, not a closeout claim.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-02",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:40-59 (rule 3)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers must not arm auto-merge or import the admin-merge grants; their human/owner merge gate stands.",
+      "dimension": "authority",
+      "enforcement_class": "CI-REQUIRED",
+      "enforcement_ref": "ci:gate-guard",
+      "lifecycle": "effective",
+      "rule_id": "CT-03",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:61-66 (rule 4)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer records its own decisions; does not write this log.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-04",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:68-71 (rule 5)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer agents do not act on stale memory.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-05",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:73-77 (rule 6)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer work does not silently shrink scope.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-06",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:79-83 (rule 7)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer agents do not commit a neighbour's work or push the wrong branch.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-07",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:85-93 (rule 8)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer uses its own validation; do not install the source scripts/ tree or landmarks (starter 10.4).",
+      "dimension": "enforcement",
+      "enforcement_class": "CI-REQUIRED",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "CT-08",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:95-105 (rule 9)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer changes carry a plan and a head-bound final review under its own approval model.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-09",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:107-108 (rule 10)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-10",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:110-153",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer docs are readable by newcomers and counts name their method.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-11",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:155-204",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer uses its own skill inventory; do not copy the source scripts/ tree.",
+      "dimension": "method",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "CT-12",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:206-211",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect beyond the append-only spirit.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-13",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:213-232",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "enforcement",
+      "enforcement_class": "CI-REQUIRED",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "CT-14",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "CONTRIBUTING.md:234-239",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers may mirror it, but it is not inherited.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-15",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:241-254",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer outside contributions get a defined security review surface.",
+      "dimension": "scope",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:gate-guard",
+      "lifecycle": "effective",
+      "rule_id": "CT-16",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:256-261",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer PRs cannot silently touch security surfaces.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "CT-17",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "CONTRIBUTING.md:263-279",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer commits have a provenance signal; enforcement is its own CI.",
+      "dimension": "enforcement",
+      "enforcement_class": "CI-REQUIRED",
+      "enforcement_ref": "ci:validate-skills.yml",
+      "lifecycle": "effective",
+      "rule_id": "CT-18",
+      "source_document": "CONTRIBUTING"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:921-929 (D7)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "historical",
+      "consumer_effect": "None.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "historical",
+      "rule_id": "DR-01",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:1499-1570 (D34)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "historical",
+      "consumer_effect": "Consumers do not arm auto-merge by default.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "historical",
+      "rule_id": "DR-02",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:1867-1919 (D43)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer validation is real, not theater.",
+      "dimension": "enforcement",
+      "enforcement_class": "CI-REQUIRED",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "DR-03",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:2266-2295 (D50)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Copied skills remain portable and MANUAL-ONLY signals stay visible.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "DR-04",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:3029-3173 (D60)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer commit provenance is checked and fail-closed.",
+      "dimension": "enforcement",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "DR-05",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "adopted-by-copy",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:3175-3228 (D61)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer Claude Code sessions load the shared contract.",
+      "dimension": "method",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "DR-06",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:3701-3750 (D72)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DR-07",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:3751-3910 (D73); :4165-4206 (D84)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "A consumer may adopt an analogous docs-acceptance ledger by its own decision.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "historical",
+      "rule_id": "DR-08",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:4406-4434 (D94); :4436-4454 (D95)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "historical",
+      "rule_id": "DR-09",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/reconciliation/step-0-reconciliation-v4.md:4676-4733 (D103)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DR-10",
+      "source_document": "RECONCILIATION"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-open-decisions-2026-09-23.md:132",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may choose to require security review for all contributions or only outside ones.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DR-11",
+      "source_document": "OPEN-DECISIONS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-open-decisions-2026-09-23.md:184-185",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DR-12",
+      "source_document": "OPEN-DECISIONS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/roadmaps/OWNER-DECISIONS-2026-10-15.md:94-115 (Decision 2)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer records are honest about bypasses.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DR-13",
+      "source_document": "OWNER-DECISIONS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/OWNER-DECISIONS-2026-10-15.md:150-182 (S3)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect unless its owner adopts the same posture.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DR-14",
+      "source_document": "OWNER-DECISIONS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/OWNER-DECISIONS-2026-10-15.md:184-306 (S4-S6)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "program",
+      "rule_id": "DR-15",
+      "source_document": "OWNER-DECISIONS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-open-decisions-2026-09-23.md:255-263 (Decided 2026-10-12)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DR-16",
+      "source_document": "OPEN-DECISIONS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:27-38",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer changes have plan->review->implement->audit->validate->final-review->merge.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-01",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:30-38",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer stages are auditable.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-02",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:40-66",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect; the habit is portable but the IDs/conditions are Role A.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-03",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:47-59",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer work cannot rubber-stamp through a failed stage.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-04",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:74-104",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer maps its available skills/reviewers to stages; the illustrative table does not transfer.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-05",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:106-108; 799-822",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer plan audits bind to a captured revision, not a moving text.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-06",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:110-112",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer audits do not fork queues or scope.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-07",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:114-116",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer work is not self-approved; the human is the merge gate.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-08",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:119-130",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer validation claims are backed by executed checks.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-09",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:132-179",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer work justifies itself and reuses existing mechanisms.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-10",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:163-174",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer reuses evidence only when it still applies.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-11",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:181-229",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer stage verdicts are explicit, prefixed and route non-affirmative results back.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-12",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:231-249",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-13",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:251-268",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer handoffs let the next holder pick up cold with evidence.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-14",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:270-307",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer receipts do not silently restate or drift from its rules.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-15",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:309-398",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": true,
+      "class": "action-permission",
+      "consumer_effect": "Consumers define their own merge-gate conditions under their own approvals; the human remains the merge gate.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-16",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:400-403",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer merges rest on an explicit non-author verdict at the exact head (or its own equivalent).",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-17",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:405-468",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer chooses its own advisory tooling; advisory findings never become a pass by label.",
+      "dimension": "enforcement",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-18",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:470-543",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers define their own gate surfaces and triage classes; the R3 categories may be adopted by choice.",
+      "dimension": "enforcement",
+      "enforcement_class": "CI-REQUIRED",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "DW-19",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:545-590",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers must not claim authenticated verdicts or enforcement; see CS-01..CS-06.",
+      "dimension": "record",
+      "enforcement_class": "CI-REQUIRED",
+      "enforcement_ref": "tool:checker",
+      "lifecycle": "effective-conditional",
+      "rule_id": "DW-20",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:592-626",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer changes are not self-approved.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-21",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:636-751",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer documentation changes move faster without weakening review.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-22",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:753-787",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Bot PRs and external patches are not merged without a plan audit.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-23",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:789-797",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer teams with one agent can still use the workflow; teams with several agents keep separation.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-24",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:799-822",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer verdicts are not reused across head moves.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-25",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:824-836",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer merges are review-gated, not just CI-gated.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-26",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:838-872",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer small changes do not drown in process; large changes still get deep audit.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-27",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:874-910",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may adopt a simplified skills record; the four-column table's contract is source-specific.",
+      "dimension": "reporting",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills.yml",
+      "lifecycle": "effective",
+      "rule_id": "DW-28",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:912-1000",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect beyond a possible local record convention.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-29",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:1002-1018",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer reports do not present unrun checks as passes or assume approvals.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-30",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1020-1080",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer should record its own enforced-vs-procedural split rather than assume enforcement.",
+      "dimension": "enforcement",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "DW-31",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1082-1123",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect; C2's template gap is source-repo only.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-32",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1124-1234",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers can copy the method if they build their own checker; not inherited.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-33",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1236-1245",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-34",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1247-1346",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-35",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1348-1356",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "ambiguous",
+      "consumer_effect": "Consumers must not cite Role A workflow/gates as their authority; they build their own.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-36",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/delivery-workflow.md:1358-1371",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer failures route to a named stage/skill instead of being smoothed over.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-37",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1373-1388",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers may run with one agent; they must not claim Role A compliance.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-38",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/delivery-workflow.md:1390-1414",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "DW-39",
+      "source_document": "DW"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "AGENTS.md:14; CLAUDE.md:13; docs/delivery-workflow.md:874-881",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "MANUAL-ONLY skills stay human-invoked in the consumer workspace.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "MO-01",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:1-7 (definitions)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer skills cannot be auto-invoked unless the consumer records a valid trigger-scoped override.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-02",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:11 (obligation 2)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer copies of the skills stay human-invoked; no silent sentinel removal.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-03",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:15 (override meaning)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer can authorize a MANUAL-ONLY skill only through an explicit human record, never model initiative.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-04",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:19 (authorization requirements)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer overrides are auditable and none are anonymous or implicit.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-05",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:23 (trigger-scoped standing override)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer overrides cannot silently become blanket permissions.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-06",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:27 (fail-closed)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer cannot run a MANUAL-ONLY skill on an unverifiable override.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-07",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:31 (audit evidence)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer overrides can be reviewed without exposing secrets.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-08",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/manual-only-policy.md:35 (consumer obligations)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer users get a clean refusal instead of a silent workaround.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-09",
+      "source_document": "MANUAL-ONLY-POLICY"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/consumer-contract-manual-only.md:1-19",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "A consumer has a single-page normative manual-only contract instead of reading the source policy.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-10",
+      "source_document": "CONSUMER-MANUAL-ONLY"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/consumer-contract-manual-only.md:21-28 (rule 9)",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "A consumer UI cannot become an approval authority by accident.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-11",
+      "source_document": "CONSUMER-MANUAL-ONLY"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/skill-generation-standard.md:167-175",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer copies preserve the visible safety signal on hosts that ignore disable-model-invocation.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "MO-12",
+      "source_document": "SKILL-GENERATION-STANDARD"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/skill-generation-standard.md:253-275 (section 5)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect; the copied skills are already authored.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "MO-13",
+      "source_document": "SKILL-GENERATION-STANDARD"
+    },
+    {
+      "adoption_status": "adopted-if-consumer-adopts",
+      "anchor": "docs/consumer-starter-package.md:375; :2168-2193",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumers begin with a clean refusal rather than a latent auto-invocation risk.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "MO-14",
+      "source_document": "STARTER"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-execution-metrics.md:98-113",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect unless its owner asks for the same reporting.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PM-01",
+      "source_document": "EXECUTION-METRICS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "AGENTS.md:233-251; docs/roadmaps/aegis-maturity-package.md:28-57,108-116",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PM-02",
+      "source_document": "AGENTS"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-maturity-package.md:74-112",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective-conditional",
+      "rule_id": "PM-03",
+      "source_document": "MATURITY-PACKAGE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-execution-metrics.md:3-40; :799-1048",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "None.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "historical",
+      "rule_id": "PM-04",
+      "source_document": "EXECUTION-METRICS"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": ".github/pull_request_template.md:12-24",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer PRs state what/why/blast radius/paths/criteria and bind the audited plan.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PT-01",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": ".github/pull_request_template.md:26-45",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer keeps its own required items; the three-bound-field structure is source-specific.",
+      "dimension": "reporting",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "PT-02",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": ".github/pull_request_template.md:47-74",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect unless its owner adopts a comparable record.",
+      "dimension": "reporting",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills.yml",
+      "lifecycle": "effective",
+      "rule_id": "PT-03",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": ".github/pull_request_template.md:76-96",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PT-04",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": ".github/pull_request_template.md:98-109",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer PRs declare security surfaces.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PT-05",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": ".github/pull_request_template.md:111-132",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PT-06",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": ".github/pull_request_template.md:134-142",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PT-07",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": ".github/pull_request_template.md:144-152",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "PT-08",
+      "source_document": "PR-TEMPLATE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-documentation-readability-backlog.md:2949-2958 (owner decision 2026-09-27)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "RB-01",
+      "source_document": "READABILITY-BACKLOG"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-documentation-readability-backlog.md:2960-2975 (owner decisions 2026-09-28)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "RB-02",
+      "source_document": "READABILITY-BACKLOG"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-documentation-readability-backlog.md:2977-2998 (owner decisions 2026-09-28)",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "RB-03",
+      "source_document": "READABILITY-BACKLOG"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-documentation-readability-backlog.md:3000-3016",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "staffing",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "RB-04",
+      "source_document": "READABILITY-BACKLOG"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/roadmaps/aegis-documentation-readability-backlog.md:19-32; :270-270",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "None.",
+      "dimension": "record",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "RB-05",
+      "source_document": "READABILITY-BACKLOG"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/roadmaps/aegis-documentation-readability-backlog.md:2803-2862; :2979-2986",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer docs are written for new readers and reviewed by a non-author.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "RB-06",
+      "source_document": "READABILITY-BACKLOG"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "SECURITY.md:3-26",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer creates its own SECURITY.md and private reporting path.",
+      "dimension": "reporting",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "SEC-01",
+      "source_document": "SECURITY"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "SECURITY.md:9-12",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "scope",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "SEC-02",
+      "source_document": "SECURITY"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "SECURITY.md:29-50",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer gets a useful starting threat scope.",
+      "dimension": "scope",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:gate-guard",
+      "lifecycle": "effective",
+      "rule_id": "SEC-03",
+      "source_document": "SECURITY"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/skill-generation-standard.md:108-122",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers should not add forbidden frontmatter keys; a consumer adding its own skills follows its own standard.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "SGS-01",
+      "source_document": "SKILL-GENERATION-STANDARD"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/skill-generation-standard.md:129-179",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumer may adopt the contract for its own skills.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "ci:validate-skills",
+      "lifecycle": "effective",
+      "rule_id": "SGS-02",
+      "source_document": "SKILL-GENERATION-STANDARD"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/skill-generation-standard.md:253-275",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect on copied skills.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "SGS-03",
+      "source_document": "SKILL-GENERATION-STANDARD"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/skill-generation-standard.md:458-529",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No direct consumer effect.",
+      "dimension": "manual-only",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "SGS-04",
+      "source_document": "SKILL-GENERATION-STANDARD"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/skill-generation-standard.md:197-252; :565-611",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "No consumer effect.",
+      "dimension": "manual-only",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "SGS-05",
+      "source_document": "SKILL-GENERATION-STANDARD"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md:13-36; CONTRIBUTING.md:14-21",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer work is evidence-based.",
+      "dimension": "method",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "ZT-01",
+      "source_document": "ZERO-TRUST-DISCIPLINE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md:81-171",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer engineering practice inherits the discipline, not the source owner's grants.",
+      "dimension": "method",
+      "enforcement_class": "CI-STRUCTURAL",
+      "enforcement_ref": "tool:validator",
+      "lifecycle": "effective",
+      "rule_id": "ZT-02",
+      "source_document": "ZERO-TRUST-DISCIPLINE"
+    },
+    {
+      "adoption_status": "proposed-default",
+      "anchor": "docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md:101-102",
+      "applies_to_roles": [
+        "source-library",
+        "consumer"
+      ],
+      "authority_action": false,
+      "class": "portable-method-adopted",
+      "consumer_effect": "Consumer checks are meaningful.",
+      "dimension": "enforcement",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "ZT-03",
+      "source_document": "ZERO-TRUST-DISCIPLINE"
+    },
+    {
+      "adoption_status": "not-portable",
+      "anchor": "docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md:116-123",
+      "applies_to_roles": [
+        "source-library"
+      ],
+      "authority_action": false,
+      "class": "source-only-method",
+      "consumer_effect": "Consumers must not cite the source administrator-merge grant.",
+      "dimension": "authority",
+      "enforcement_class": "GUIDANCE-ONLY",
+      "enforcement_ref": "none",
+      "lifecycle": "effective",
+      "rule_id": "ZT-04",
+      "source_document": "ZERO-TRUST-DISCIPLINE"
+    }
+  ],
+  "schema": "aegis.governance-contract/1",
+  "source": {
+    "commit": "b2666f97b91335a72a5e7e6456e8c251c3ee09c3",
+    "generated_by": {
+      "tool": "aegis-governance",
+      "version": "1.0.0"
+    },
+    "repository": "ModernNomad-98/Project-Aegis",
+    "tree": "3a5edd6a39b95a77d649d8caff118245b43e4ccd"
+  },
+  "summary": "A versioned, machine-readable statement of which Aegis documents and rules govern a source-library (Role A) or consumer (Role B) work item, how the governance dependency is resolved for five entry-route families, what a context receipt must record, and what this repository can and cannot enforce on the observed host. It binds authoritative documents and rules by identity and declares applicability, lifecycle and local adoption; it neither replaces any authoritative document nor creates approval, and it does not enforce at runtime.",
+  "trust": {
+    "authoritative_inputs": [
+      "the target git tree bytes at a revision",
+      "the contract bytes in the payload",
+      "the register bytes for the source role",
+      "the consumer's adoption record and local policy hashes",
+      "host-exposed session facts where available"
+    ],
+    "not_authoritative": [
+      "self-written receipts and JSON",
+      "task-board prose",
+      "another agent's assertion",
+      "a provider model name"
+    ],
+    "verification_rule": "every claim is re-derived in-turn against an authoritative input; a self-asserted receipt is evidence, never authority"
+  }
+}

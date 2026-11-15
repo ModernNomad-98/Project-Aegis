@@ -5,6 +5,7 @@ Usage (from the repository root):
     python -m tools.aegis_preflight --self-test
     python -m tools.aegis_preflight check --bundle bundle.json [--repo-root .] \
         [--json] [--fixture-mode [--supported-auth-method NAME]...]
+    python -m tools.aegis_preflight governance <validate|resolve|receipt|admit|render> ...
 
 Exit codes:
     0  all ten checks PASS
@@ -87,8 +88,17 @@ def _self_test() -> int:
 
 
 def main(argv: typing.Optional[typing.Sequence[str]] = None) -> int:
+    # Second verb family (P0-GOV C1): the governance resolver/validator.  It is
+    # dispatched before the preflight parser so PF-01..PF-10 semantics and the
+    # existing CLI surface are untouched.  The governance family is read-only;
+    # its render verbs print canonical artifacts to stdout.
+    effective = list(sys.argv[1:] if argv is None else argv)
+    if effective and effective[0] == "governance":
+        from . import governance  # local import: the preflight path does not load it
+
+        return governance.main(effective[1:])
     parser = _build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(effective)
     if args.self_test:
         return _self_test()
     if args.supported_auth_method and not args.fixture_mode:

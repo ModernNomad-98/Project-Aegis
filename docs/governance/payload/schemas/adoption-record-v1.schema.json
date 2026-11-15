@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aegis.governance-adoption/1",
+  "title": "Aegis consumer governance adoption record v1",
+  "description": "Strict schema for schema aegis.governance-adoption/1. One record per consumer repository; adoption is explicit, revocation is recorded, and an absent, malformed, mismatched or revoked record is treated as not-adopted/withdrawn by the resolver. This record is the consumer's own claim; it creates no source-library authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "target_repo", "adopter_role", "authority", "contract", "adoption", "manual_only_overrides_ref", "installation", "effective_at_utc", "revoked_at_utc", "revocation_authority", "supersedes", "next_review_date", "limitations"],
+  "properties": {
+    "schema": {"const": "aegis.governance-adoption/1"},
+    "target_repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "adopter_role": {"type": "string", "enum": ["owner", "authorised-agent"]},
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "ref", "sha256"],
+      "properties": {
+        "kind": {"type": "string", "enum": ["OWNER_LINE", "A_ROW", "DECISION"]},
+        "ref": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version", "sha256"],
+      "properties": {
+        "id": {"const": "aegis.required-governance"},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+      }
+    },
+    "adoption": {
+      "type": "object", "additionalProperties": false,
+      "required": ["profile", "adopted_rule_ids", "rejected"],
+      "properties": {
+        "profile": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "adopted_rule_ids": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{2,3}-[0-9]{2}$"}, "uniqueItems": true},
+        "rejected": {"type": "array", "items": {"$ref": "#/definitions/rejection"}}
+      }
+    },
+    "manual_only_overrides_ref": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+    "installation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "aegis_pin_commit", "aegis_pin_tree", "payload_manifest_sha256"],
+      "properties": {
+        "method": {"type": "string", "enum": ["copied-starter", "external-skill", "standalone-export", "source-checkout-reference"]},
+        "aegis_pin_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "aegis_pin_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "payload_manifest_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+      }
+    },
+    "effective_at_utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "revoked_at_utc": {"oneOf": [{"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"}, {"type": "null"}]},
+    "revocation_authority": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "ref"], "properties": {"kind": {"type": "string", "enum": ["OWNER_LINE", "A_ROW", "DECISION"]}, "ref": {"type": "string", "minLength": 1}}}
+      ]
+    },
+    "supersedes": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"type": "null"}]},
+    "next_review_date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "definitions": {
+    "rejection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rule_id", "reason"],
+      "properties": {
+        "rule_id": {"type": "string", "pattern": "^[A-Z]{2,3}-[0-9]{2}$"},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

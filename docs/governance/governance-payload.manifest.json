@@ -1,0 +1,103 @@
+{
+  "dependencies": [
+    {
+      "class": "required",
+      "from": "required-governance-contract.v1.json",
+      "to": "rule-projection.v1.json"
+    },
+    {
+      "class": "required",
+      "from": "required-governance-contract.v1.json",
+      "to": "schemas/admission-decision-v1.schema.json"
+    },
+    {
+      "class": "required",
+      "from": "required-governance-contract.v1.json",
+      "to": "schemas/adoption-record-v1.schema.json"
+    },
+    {
+      "class": "required",
+      "from": "required-governance-contract.v1.json",
+      "to": "schemas/context-receipt-v1.schema.json"
+    },
+    {
+      "class": "required",
+      "from": "required-governance-contract.v1.json",
+      "to": "schemas/governance-contract-v1.schema.json"
+    }
+  ],
+  "entries": [
+    {
+      "bytes": 151608,
+      "lf": 4645,
+      "path": "required-governance-contract.v1.json",
+      "sha256_normalized": "4cd2ef524fbf2fb795d2cb371d6edac871c4064fc86a42d122fd39ee05466ff2",
+      "sha256_raw": "4cd2ef524fbf2fb795d2cb371d6edac871c4064fc86a42d122fd39ee05466ff2",
+      "type": "file"
+    },
+    {
+      "bytes": 61041,
+      "lf": 2292,
+      "path": "rule-projection.v1.json",
+      "sha256_normalized": "d4e6c52c44a338c3c8924e87561769b0addd913b3352f8bd6f08174d6bc13b38",
+      "sha256_raw": "d4e6c52c44a338c3c8924e87561769b0addd913b3352f8bd6f08174d6bc13b38",
+      "type": "file"
+    },
+    {
+      "bytes": 3903,
+      "lf": 54,
+      "path": "schemas/admission-decision-v1.schema.json",
+      "sha256_normalized": "2ffad02dd880529984310a106bc65834e881be745149c787ab49574633375f39",
+      "sha256_raw": "2ffad02dd880529984310a106bc65834e881be745149c787ab49574633375f39",
+      "type": "file"
+    },
+    {
+      "bytes": 4057,
+      "lf": 73,
+      "path": "schemas/adoption-record-v1.schema.json",
+      "sha256_normalized": "558b8603a4f3aedf395a2e4e728f14f8e6b13f5b3b188758f50a5c4d5010bf51",
+      "sha256_raw": "558b8603a4f3aedf395a2e4e728f14f8e6b13f5b3b188758f50a5c4d5010bf51",
+      "type": "file"
+    },
+    {
+      "bytes": 13716,
+      "lf": 228,
+      "path": "schemas/context-receipt-v1.schema.json",
+      "sha256_normalized": "398fda1b4e5f149488f1b11b724488e63f3710bc8a12f01f435bfa4a96eab99d",
+      "sha256_raw": "398fda1b4e5f149488f1b11b724488e63f3710bc8a12f01f435bfa4a96eab99d",
+      "type": "file"
+    },
+    {
+      "bytes": 16347,
+      "lf": 287,
+      "path": "schemas/governance-contract-v1.schema.json",
+      "sha256_normalized": "48489439c5fa7578e9a4a18020f96dea10ee56c4ef9b812ee0d6b9c425b7986c",
+      "sha256_raw": "48489439c5fa7578e9a4a18020f96dea10ee56c4ef9b812ee0d6b9c425b7986c",
+      "type": "file"
+    }
+  ],
+  "generator": {
+    "tool": "aegis-distributed-payload",
+    "version": "1.0.0"
+  },
+  "hash_contract": {
+    "bytes": "decimal count of on-disk file bytes",
+    "equality_rule": "raw equality is authoritative; normalized equality is diagnostic and never proves raw-byte identity",
+    "lf": "decimal count of 0x0A bytes",
+    "normalized_sha256": "SHA-256 over bytes with every CRLF replaced by LF; this is the only normalization",
+    "path_encoding": "UTF-8, POSIX '/' separators, relative, no leading './'",
+    "raw_sha256": "SHA-256 over exact on-disk bytes, line endings included",
+    "sort": "ordinal byte order of the UTF-8 path"
+  },
+  "package": {
+    "profile_id": "aegis.required-governance",
+    "profile_version": "1.0.0"
+  },
+  "schema": "aegis.distributed-payload-manifest/1",
+  "source": {
+    "commit": "b2666f97b91335a72a5e7e6456e8c251c3ee09c3",
+    "note": "declared source identity for the committed governance payload; recorded from the base checkout, not proof of authorship or approval",
+    "repository": "ModernNomad-98/Project-Aegis",
+    "tree": "3a5edd6a39b95a77d649d8caff118245b43e4ccd"
+  }
+}

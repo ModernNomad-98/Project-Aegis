@@ -1,0 +1,2292 @@
+{
+  "authority_action": {
+    "equals": "action-permission",
+    "field": "class",
+    "output": "boolean"
+  },
+  "conflict_rule_ids": {
+    "C1": [],
+    "C10": [],
+    "C11": [],
+    "C12": [],
+    "C2": [],
+    "C3": [],
+    "C4": [],
+    "C5": [],
+    "C6": [],
+    "C7": [],
+    "C8": [],
+    "C9": []
+  },
+  "contract_id": "aegis.required-governance",
+  "derived": {
+    "classifier_version": "1.0.0",
+    "rules": {
+      "AG-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-03": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-05": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-06": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-07": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-08": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-09": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-10": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-11": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-12": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-13": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-14": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-15": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-16": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-17": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-18": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-19": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-20": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "structural:pr-body-template",
+        "source_document": "AGENTS"
+      },
+      "AG-21": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "AG-22": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "AGENTS"
+      },
+      "AR-01": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-02": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-03": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-05": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:gate-guard",
+        "source_document": "REGISTER"
+      },
+      "AR-06": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-07": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-08": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:gate-guard",
+        "source_document": "REGISTER"
+      },
+      "AR-09": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-10": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-11": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-12": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-13": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-14": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-15": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-16": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "REGISTER"
+      },
+      "AR-17": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-18": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:gate-guard",
+        "source_document": "REGISTER"
+      },
+      "AR-19": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-20": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-21": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-22": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-23": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-24": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-25": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-26": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-27": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-28": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "AR-29": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "APPROVAL-LIFECYCLE-GRADING"
+      },
+      "AR-30": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "REGISTER"
+      },
+      "CA-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "CA-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "STARTER"
+      },
+      "CA-03": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "STARTER"
+      },
+      "CA-04": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "STARTER"
+      },
+      "CA-05": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:scripts",
+        "source_document": "STARTER"
+      },
+      "CA-06": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:scripts",
+        "source_document": "STARTER"
+      },
+      "CA-07": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "STARTER"
+      },
+      "CA-08": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "STATUS-PRESENTATION"
+      },
+      "CA-09": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "READINESS-GUIDE"
+      },
+      "CA-10": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "SUPPORT-CLAIMS"
+      },
+      "CA-11": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONSUMER-MANUAL-ONLY"
+      },
+      "CA-12": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "CL-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "CLAUDE"
+      },
+      "CL-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CLAUDE"
+      },
+      "CL-03": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CLAUDE"
+      },
+      "CL-04": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "CLAUDE"
+      },
+      "CL-05": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CLAUDE"
+      },
+      "CL-06": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CLAUDE"
+      },
+      "CT-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-03": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "CI-REQUIRED",
+        "enforcement_ref": "ci:gate-guard",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-05": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-06": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-07": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-08": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-REQUIRED",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-09": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-10": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-11": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-12": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-13": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-14": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-REQUIRED",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-15": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-16": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:gate-guard",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-17": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONTRIBUTING"
+      },
+      "CT-18": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-REQUIRED",
+        "enforcement_ref": "ci:validate-skills.yml",
+        "source_document": "CONTRIBUTING"
+      },
+      "DR-01": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-03": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-REQUIRED",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-04": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-05": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-06": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-07": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-08": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-09": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-10": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "RECONCILIATION"
+      },
+      "DR-11": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "OPEN-DECISIONS"
+      },
+      "DR-12": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "OPEN-DECISIONS"
+      },
+      "DR-13": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "OWNER-DECISIONS"
+      },
+      "DR-14": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "OWNER-DECISIONS"
+      },
+      "DR-15": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "OWNER-DECISIONS"
+      },
+      "DR-16": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "OPEN-DECISIONS"
+      },
+      "DW-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-03": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-04": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-05": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-06": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-07": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-08": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-09": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-10": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-11": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-12": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-13": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-14": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-15": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-16": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": true,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-17": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-18": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-19": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-REQUIRED",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "DW"
+      },
+      "DW-20": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-REQUIRED",
+        "enforcement_ref": "tool:checker",
+        "source_document": "DW"
+      },
+      "DW-21": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-22": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-23": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-24": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-25": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-26": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-27": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-28": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills.yml",
+        "source_document": "DW"
+      },
+      "DW-29": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-30": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-31": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "DW"
+      },
+      "DW-32": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-33": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-34": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-35": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-36": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-37": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-38": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "DW-39": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "DW"
+      },
+      "MO-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "AGENTS"
+      },
+      "MO-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-03": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-04": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-05": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-06": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-07": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-08": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-09": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MANUAL-ONLY-POLICY"
+      },
+      "MO-10": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONSUMER-MANUAL-ONLY"
+      },
+      "MO-11": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "CONSUMER-MANUAL-ONLY"
+      },
+      "MO-12": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "SKILL-GENERATION-STANDARD"
+      },
+      "MO-13": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "SKILL-GENERATION-STANDARD"
+      },
+      "MO-14": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "STARTER"
+      },
+      "PM-01": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "EXECUTION-METRICS"
+      },
+      "PM-02": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "AGENTS"
+      },
+      "PM-03": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "MATURITY-PACKAGE"
+      },
+      "PM-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "EXECUTION-METRICS"
+      },
+      "PT-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "PR-TEMPLATE"
+      },
+      "PT-02": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "PR-TEMPLATE"
+      },
+      "PT-03": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills.yml",
+        "source_document": "PR-TEMPLATE"
+      },
+      "PT-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "PR-TEMPLATE"
+      },
+      "PT-05": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "PR-TEMPLATE"
+      },
+      "PT-06": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "PR-TEMPLATE"
+      },
+      "PT-07": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "PR-TEMPLATE"
+      },
+      "PT-08": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "PR-TEMPLATE"
+      },
+      "RB-01": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "READABILITY-BACKLOG"
+      },
+      "RB-02": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "READABILITY-BACKLOG"
+      },
+      "RB-03": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "READABILITY-BACKLOG"
+      },
+      "RB-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "READABILITY-BACKLOG"
+      },
+      "RB-05": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "READABILITY-BACKLOG"
+      },
+      "RB-06": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "READABILITY-BACKLOG"
+      },
+      "SEC-01": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "SECURITY"
+      },
+      "SEC-02": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "SECURITY"
+      },
+      "SEC-03": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:gate-guard",
+        "source_document": "SECURITY"
+      },
+      "SGS-01": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "SKILL-GENERATION-STANDARD"
+      },
+      "SGS-02": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "ci:validate-skills",
+        "source_document": "SKILL-GENERATION-STANDARD"
+      },
+      "SGS-03": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "SKILL-GENERATION-STANDARD"
+      },
+      "SGS-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "SKILL-GENERATION-STANDARD"
+      },
+      "SGS-05": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "SKILL-GENERATION-STANDARD"
+      },
+      "ZT-01": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "ZERO-TRUST-DISCIPLINE"
+      },
+      "ZT-02": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "CI-STRUCTURAL",
+        "enforcement_ref": "tool:validator",
+        "source_document": "ZERO-TRUST-DISCIPLINE"
+      },
+      "ZT-03": {
+        "applies_to_roles": [
+          "source-library",
+          "consumer"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "ZERO-TRUST-DISCIPLINE"
+      },
+      "ZT-04": {
+        "applies_to_roles": [
+          "source-library"
+        ],
+        "authority_action": false,
+        "enforcement_class": "GUIDANCE-ONLY",
+        "enforcement_ref": "none",
+        "source_document": "ZERO-TRUST-DISCIPLINE"
+      }
+    }
+  },
+  "description": "Committed deterministic mapping and classifier for the derived rule_applicability fields of the required-governance contract (plan section 5.2.1). The direct fields are imported unchanged from the task-33 inventory; the derived fields below are produced only by this file. The 'derived' object is generated output kept byte-identical by the build; no derived value may be hand-edited.",
+  "document_ids": [
+    {
+      "doc_id": "AGENTS",
+      "path": "AGENTS.md"
+    },
+    {
+      "doc_id": "CLAUDE",
+      "path": "CLAUDE.md"
+    },
+    {
+      "doc_id": "CONTRIBUTING",
+      "path": "CONTRIBUTING.md"
+    },
+    {
+      "doc_id": "DW",
+      "path": "docs/delivery-workflow.md"
+    },
+    {
+      "doc_id": "REGISTER",
+      "path": "docs/approvals/APPROVAL_REGISTER.md"
+    },
+    {
+      "doc_id": "MANUAL-ONLY-POLICY",
+      "path": "docs/manual-only-policy.md"
+    },
+    {
+      "doc_id": "CONSUMER-MANUAL-ONLY",
+      "path": "docs/consumer-contract-manual-only.md"
+    },
+    {
+      "doc_id": "STARTER",
+      "path": "docs/consumer-starter-package.md"
+    },
+    {
+      "doc_id": "STATUS-PRESENTATION",
+      "path": "docs/consumer-status-presentation-v1.md"
+    },
+    {
+      "doc_id": "READINESS-GUIDE",
+      "path": "docs/consumer-readiness/consumer-guide-v1.md"
+    },
+    {
+      "doc_id": "COMPATIBILITY-MATRIX",
+      "path": "docs/consumer-readiness/compatibility-matrix-v1.md"
+    },
+    {
+      "doc_id": "SUPPORT-CLAIMS",
+      "path": "docs/consumer-readiness/support-claims-v1.md"
+    },
+    {
+      "doc_id": "OPEN-DECISIONS",
+      "path": "docs/roadmaps/aegis-open-decisions-2026-09-23.md"
+    },
+    {
+      "doc_id": "OWNER-DECISIONS",
+      "path": "docs/roadmaps/OWNER-DECISIONS-2026-10-15.md"
+    },
+    {
+      "doc_id": "RECONCILIATION",
+      "path": "docs/reconciliation/step-0-reconciliation-v4.md"
+    },
+    {
+      "doc_id": "AUTO-MERGE-POLICY",
+      "path": "docs/reconciliation/auto-merge-policy.md"
+    },
+    {
+      "doc_id": "MATURITY-PACKAGE",
+      "path": "docs/roadmaps/aegis-maturity-package.md"
+    },
+    {
+      "doc_id": "EXECUTION-METRICS",
+      "path": "docs/roadmaps/aegis-execution-metrics.md"
+    },
+    {
+      "doc_id": "READABILITY-BACKLOG",
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md"
+    },
+    {
+      "doc_id": "APPROVAL-LIFECYCLE-GRADING",
+      "path": "docs/approval-lifecycle-grading.md"
+    },
+    {
+      "doc_id": "SKILL-GENERATION-STANDARD",
+      "path": "docs/skill-generation-standard.md"
+    },
+    {
+      "doc_id": "ZERO-TRUST-DISCIPLINE",
+      "path": "docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md"
+    },
+    {
+      "doc_id": "OFFLINE-CI",
+      "path": "docs/offline-ci.md"
+    },
+    {
+      "doc_id": "PR-TEMPLATE",
+      "path": ".github/pull_request_template.md"
+    },
+    {
+      "doc_id": "CODEOWNERS",
+      "path": ".github/CODEOWNERS"
+    },
+    {
+      "doc_id": "VALIDATE-SKILLS-WORKFLOW",
+      "path": ".github/workflows/validate-skills.yml"
+    },
+    {
+      "doc_id": "SECURITY",
+      "path": "SECURITY.md"
+    }
+  ],
+  "enforcement_classifier": {
+    "aggregate_count_published": false,
+    "classes": [
+      "HOST-ENFORCED",
+      "CI-REQUIRED",
+      "CI-STRUCTURAL",
+      "GUIDANCE-ONLY"
+    ],
+    "default_class": "GUIDANCE-ONLY",
+    "guidance_prefixes": [
+      "none",
+      "nothing",
+      "no ",
+      "not applicable"
+    ],
+    "guidance_ref": "none",
+    "host_keywords": [
+      "host-enforced",
+      "hook",
+      "sandbox",
+      "os confinement",
+      "acl enforced"
+    ],
+    "required_keywords": [
+      "required context",
+      "required ci job",
+      "required job",
+      "required status",
+      "registered required",
+      "branch protection"
+    ],
+    "structural_keywords": [
+      "validator",
+      "validate-skills",
+      "checker",
+      "check_pr_body",
+      "scripts/",
+      "aegis_verdict_gate",
+      "manifest",
+      "structural",
+      "preflight",
+      "gate-guard",
+      "check_claude_bridge",
+      "check_readme",
+      "sentinel check",
+      "hard check"
+    ],
+    "surface_patterns": [
+      {
+        "ref": "ci:validate-skills.yml",
+        "token": "validate-skills.yml"
+      },
+      {
+        "ref": "ci:validate-skills",
+        "token": "validate-skills"
+      },
+      {
+        "ref": "ci:gate-guard",
+        "token": "gate-guard"
+      },
+      {
+        "ref": "ci:dco-step",
+        "token": "check_dco"
+      },
+      {
+        "ref": "ci:dco-step",
+        "token": "dco"
+      },
+      {
+        "ref": "repo:branch-protection",
+        "token": "branch protection"
+      },
+      {
+        "ref": "structural:pr-body-template",
+        "token": "pull_request_template"
+      },
+      {
+        "ref": "structural:pr-body-template",
+        "token": "pr template"
+      },
+      {
+        "ref": "structural:pr-body-bound-fields",
+        "token": "bound fields"
+      },
+      {
+        "ref": "structural:pr-body-checker",
+        "token": "check_pr_body"
+      },
+      {
+        "ref": "tool:scripts/aegis_verdict_gate",
+        "token": "aegis_verdict_gate"
+      },
+      {
+        "ref": "tool:scripts",
+        "token": "scripts/"
+      },
+      {
+        "ref": "tool:tools",
+        "token": "tools/"
+      },
+      {
+        "ref": "tool:tools/aegis_preflight",
+        "token": "preflight"
+      },
+      {
+        "ref": "structural:payload-manifest",
+        "token": "manifest"
+      },
+      {
+        "ref": "tool:validator",
+        "token": "validator"
+      },
+      {
+        "ref": "tool:checker",
+        "token": "checker"
+      }
+    ],
+    "unnamed_ref": "unnamed",
+    "version": "1.0.0"
+  },
+  "enforcement_overrides": [],
+  "inventory": {
+    "bytes": 465578,
+    "lf": 8008,
+    "normalization": "CRLF->LF only (repository text policy); JSON semantics unchanged",
+    "path": "docs/governance/inputs/governance-inventory.json",
+    "sha256": "FCDC04B3AFF8FC117BCF5EC3451A4539D99C4AC0B181DABC9695200199FFEDBC",
+    "source_raw": {
+      "bytes": 473586,
+      "cr": 8008,
+      "encoding": "UTF-8 with CRLF line endings as produced by task-33",
+      "lf": 8008,
+      "sha256": "902E443A33C677BDA0A761B2F91F59FC37CF8CC8F0D55D3F6B2B8516C057C3C3"
+    }
+  },
+  "projection_id": "aegis.required-governance.rule-projection",
+  "projection_version": "1.0.0",
+  "role_mapping": {
+    "base_by_class": {
+      "action-permission": [
+        "source-library"
+      ],
+      "ambiguous": [
+        "source-library"
+      ],
+      "historical": [
+        "source-library"
+      ],
+      "portable-method-adopted": [
+        "source-library",
+        "consumer"
+      ],
+      "portable-method-proposed": [
+        "source-library",
+        "consumer"
+      ],
+      "source-only-method": [
+        "source-library"
+      ]
+    },
+    "overrides": {
+      "AR-23": [
+        "source-library",
+        "consumer"
+      ],
+      "CA-03": [
+        "source-library",
+        "consumer"
+      ],
+      "CL-05": [
+        "source-library",
+        "consumer"
+      ],
+      "CT-16": [
+        "source-library",
+        "consumer"
+      ],
+      "CT-18": [
+        "source-library",
+        "consumer"
+      ],
+      "DR-02": [
+        "source-library",
+        "consumer"
+      ],
+      "DR-04": [
+        "source-library",
+        "consumer"
+      ],
+      "DR-05": [
+        "source-library",
+        "consumer"
+      ],
+      "DW-06": [
+        "source-library",
+        "consumer"
+      ],
+      "DW-12": [
+        "source-library",
+        "consumer"
+      ],
+      "DW-15": [
+        "source-library",
+        "consumer"
+      ],
+      "DW-23": [
+        "source-library",
+        "consumer"
+      ],
+      "SEC-03": [
+        "source-library",
+        "consumer"
+      ]
+    }
+  },
+  "schema": "aegis.rule-projection/1",
+  "source_to_doc_id": {
+    ".github/pull_request_template.md": {
+      "all": [
+        "PR-TEMPLATE"
+      ],
+      "primary": "PR-TEMPLATE"
+    },
+    "AGENTS.md": {
+      "all": [
+        "AGENTS"
+      ],
+      "primary": "AGENTS"
+    },
+    "AGENTS.md + docs/consumer-starter-package.md": {
+      "all": [
+        "AGENTS",
+        "STARTER"
+      ],
+      "primary": "AGENTS"
+    },
+    "AGENTS.md + docs/roadmaps/aegis-maturity-package.md": {
+      "all": [
+        "AGENTS",
+        "MATURITY-PACKAGE"
+      ],
+      "primary": "AGENTS"
+    },
+    "CLAUDE.md": {
+      "all": [
+        "CLAUDE"
+      ],
+      "primary": "CLAUDE"
+    },
+    "CONTRIBUTING.md": {
+      "all": [
+        "CONTRIBUTING"
+      ],
+      "primary": "CONTRIBUTING"
+    },
+    "SECURITY.md": {
+      "all": [
+        "SECURITY"
+      ],
+      "primary": "SECURITY"
+    },
+    "docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md": {
+      "all": [
+        "ZERO-TRUST-DISCIPLINE"
+      ],
+      "primary": "ZERO-TRUST-DISCIPLINE"
+    },
+    "docs/approval-lifecycle-grading.md": {
+      "all": [
+        "APPROVAL-LIFECYCLE-GRADING"
+      ],
+      "primary": "APPROVAL-LIFECYCLE-GRADING"
+    },
+    "docs/approvals/APPROVAL_REGISTER.md": {
+      "all": [
+        "REGISTER"
+      ],
+      "primary": "REGISTER"
+    },
+    "docs/consumer-contract-manual-only.md": {
+      "all": [
+        "CONSUMER-MANUAL-ONLY"
+      ],
+      "primary": "CONSUMER-MANUAL-ONLY"
+    },
+    "docs/consumer-contract-manual-only.md + docs/consumer-status-presentation-v1.md": {
+      "all": [
+        "CONSUMER-MANUAL-ONLY",
+        "STATUS-PRESENTATION"
+      ],
+      "primary": "CONSUMER-MANUAL-ONLY"
+    },
+    "docs/consumer-readiness/consumer-guide-v1.md": {
+      "all": [
+        "READINESS-GUIDE"
+      ],
+      "primary": "READINESS-GUIDE"
+    },
+    "docs/consumer-readiness/support-claims-v1.md + compatibility-matrix-v1.md": {
+      "all": [
+        "SUPPORT-CLAIMS",
+        "COMPATIBILITY-MATRIX"
+      ],
+      "primary": "SUPPORT-CLAIMS"
+    },
+    "docs/consumer-starter-package.md": {
+      "all": [
+        "STARTER"
+      ],
+      "primary": "STARTER"
+    },
+    "docs/consumer-starter-package.md + AGENTS.md": {
+      "all": [
+        "STARTER",
+        "AGENTS"
+      ],
+      "primary": "STARTER"
+    },
+    "docs/consumer-status-presentation-v1.md": {
+      "all": [
+        "STATUS-PRESENTATION"
+      ],
+      "primary": "STATUS-PRESENTATION"
+    },
+    "docs/delivery-workflow.md": {
+      "all": [
+        "DW"
+      ],
+      "primary": "DW"
+    },
+    "docs/manual-only-policy.md": {
+      "all": [
+        "MANUAL-ONLY-POLICY"
+      ],
+      "primary": "MANUAL-ONLY-POLICY"
+    },
+    "docs/reconciliation/step-0-reconciliation-v4.md": {
+      "all": [
+        "RECONCILIATION"
+      ],
+      "primary": "RECONCILIATION"
+    },
+    "docs/roadmaps/OWNER-DECISIONS-2026-10-15.md": {
+      "all": [
+        "OWNER-DECISIONS"
+      ],
+      "primary": "OWNER-DECISIONS"
+    },
+    "docs/roadmaps/aegis-documentation-readability-backlog.md": {
+      "all": [
+        "READABILITY-BACKLOG"
+      ],
+      "primary": "READABILITY-BACKLOG"
+    },
+    "docs/roadmaps/aegis-execution-metrics.md": {
+      "all": [
+        "EXECUTION-METRICS"
+      ],
+      "primary": "EXECUTION-METRICS"
+    },
+    "docs/roadmaps/aegis-maturity-package.md": {
+      "all": [
+        "MATURITY-PACKAGE"
+      ],
+      "primary": "MATURITY-PACKAGE"
+    },
+    "docs/roadmaps/aegis-open-decisions-2026-09-23.md": {
+      "all": [
+        "OPEN-DECISIONS"
+      ],
+      "primary": "OPEN-DECISIONS"
+    },
+    "docs/skill-generation-standard.md": {
+      "all": [
+        "SKILL-GENERATION-STANDARD"
+      ],
+      "primary": "SKILL-GENERATION-STANDARD"
+    }
+  }
+}
