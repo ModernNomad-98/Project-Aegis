@@ -83,7 +83,7 @@ in-flight navigation).
 5. **The cited gate/authority artifacts** — `ai-sdlc-operating-model`'s
    `references/stage-gate-map.md` (per-stage gate, authority, evidence),
    `change-classification-gate` (per-slice rigor), `human-approval-boundary` +
-   `agent-authorization-matrix` *(not installed)* (the human gate). Read to CITE, never copy.
+   `agent-authorization-matrix` *(not installed)* (the human gate). Read to CITE, never copy. When a cited artifact belongs to an absent skill, it is not in this package: name it as not installed and stop the hop it gates (install it on demand); never cite it as if present.
 
 ## Workflow
 
@@ -99,7 +99,7 @@ in plain language. No repo, or a zero-commit product repo without app files
 or state, means stage zero (nothing started yet) → discovery, which is Stage 1 below. Propose opening `docs/project-state.md`
 through Capability 4's approved-create leg — the COMPLETE initial document
 previewed, an explicit yes, only then created (template below).
-**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` *(not installed)* skill, started by typing `/aegis-setup`; do not run or read it, and start no product discovery before offering that.
+**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` *(not installed)* skill; it must be installed on demand first (the starter package §4.1 copy route), and only after that can the user start it by typing `/aegis-setup`. Do not run or read it, do not tell the user to type it before it is installed, and start no product discovery before offering that.
 
 **Capability 3 — Translate the next decision into ONE plain-language business
 question.** Every technical fork surfaces to the user as a business question
@@ -172,7 +172,7 @@ here.
   Stage 2 snapshot; preview the pending decisions (exact `PS-*` decision-log entries such as `PS-001`, next identifiers (IDs) from the current
   state) with the brief as ONE batch under ONE approval, never claiming the Decision log stays empty;
   the recorded stage advances only after that batch and the next STATE SNAPSHOT are recorded and
-  confirmed (a proposed row is not a recorded row).
+  confirmed (a proposed row is not a recorded row). The Stage 1 acceptance DECISION row carries the requirements brief's path and the SHA-256 of its exact bytes in its `Evidence / next gate` field (template rule 11), so a later reader can verify the recorded expected hash against the brief.
 - **Stage 2 — Define the product.** ALWAYS begins → invoke `product-spec-writer`.
   After the spec, classify the remaining owners **one at a time, in the order
   below, independently by evidence** — exactly ONE per turn (a read-only judgement
@@ -196,7 +196,7 @@ here.
     for one bounded release with no sequencing decision, or a deadline that can
     be assessed without building horizons. A deadline alone does not make it
     applicable. When applicable: → invoke `roadmap-under-uncertainty-planner` *(not installed)*.
-    Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip. *(not installed)*
+    Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip.
   - **Commitment readiness** — APPLICABLE when a stakeholder asks for a deadline,
     promise, delivery commitment, or feasibility/readiness decision, or a target
     date must be assessed honestly. NOT APPLICABLE when nobody asked for a
@@ -258,13 +258,13 @@ here.
   `change-classification-gate`, `docs-first-implementer` *(manual-only; not installed)*,
   `tdd-engineer` *(manual-only; not installed)*, `reviewable-diff-discipline` *(manual-only; not installed)*,
   `local-ci-mirror-preflight` *(manual-only; not installed)*, `code-reviewer`, `security-pr-reviewer` *(not installed)*,
-  `ai-closeout-reporter` *(not installed)*. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none.
+  `ai-closeout-reporter` *(not installed)*. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none. A named enforcer marked *(manual-only; not installed)*, and the Close-stage reporter, is installed on demand and is then invoked only by the human naming it; when that enforcer owns the slice's required gate or stop, stop and name it — the stop is intentional and is never bypassed.
 - **Stage 7 — Prove it works.** → `qa-strategy-architect` *(not installed)* →
   `test-plan-designer`. *By evidence:* `integration-test-designer` *(not installed)*,
   `api-contract-test-designer` *(not installed)*, `playwright-e2e-engineer` *(manual-only; not installed)*,
   `manual-test-case-creator` *(not installed)*,
   `accessibility-test-harness` *(not installed)*, `performance-test-harness` *(not installed)*.
-- **Stage 8 — Get it ready to run.** **First classify hosting applicability from actual approved requirements and artifacts — never from a folder label.** When they explicitly establish that no hosted service, account/tenant backend or infrastructure applies (single operator/browser, local artifact only), take the **local-only release branch before any provider routing**: keep local artifact integrity, persistence, recovery, validation and release verification proportionate, with rollback/recovery steps for the local artifact. This branch may not bypass a hosted requirement or a shared gate; if later approved requirements add hosting, return to the hosted branch below. The local route is explicitly **NOT a deployment, a production operation, or a CI-green claim**; when host applicability is unknown, silent or conflicting, PAUSE and ask the human rather than guessing from a folder/stack label. Minimum local release evidence (not left to 'proportionate'): actual artifact hash + opening command followed, persistence/recovery observation, validation results, rollback/recovery steps, and local data-at-rest security/privacy check, recorded through the applicable existing gates (change-classification-gate; release-readiness-reviewer at Stage 9; security-pr-reviewer where data sensitivity applies), with the shared gates still required. When hosting applies, start with `cloud-architecture-decider` *(not installed)*,
+- **Stage 8 — Get it ready to run.** **First classify hosting applicability from actual approved requirements and artifacts — never from a folder label.** When they explicitly establish that no hosted service, account/tenant backend or infrastructure applies (single operator/browser, local artifact only), take the **local-only release branch before any provider routing**: keep local artifact integrity, persistence, recovery, validation and release verification proportionate, with rollback/recovery steps for the local artifact. This branch may not bypass a hosted requirement or a shared gate; if later approved requirements add hosting, return to the hosted branch below. The local route is explicitly **NOT a deployment, a production operation, or a CI-green claim**; when host applicability is unknown, silent or conflicting, PAUSE and ask the human rather than guessing from a folder/stack label. Minimum local release evidence (not left to 'proportionate'): actual artifact hash + opening command followed, persistence/recovery observation, validation results, rollback/recovery steps, and local data-at-rest security/privacy check, recorded through the applicable existing gates (change-classification-gate; release-readiness-reviewer at Stage 9; security-pr-reviewer where data sensitivity applies), with the shared gates still required. When hosting applies, start with `cloud-architecture-decider` *(not installed)*, When the declared class requires the security lens and the skill is absent, stop and name it and install it on demand; the local route never silently skips a required security review.
   then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect` *(not installed)*; **Azure** → `azure-saas-architect` *(not installed)*; **modern managed tier** (container platform-as-a-service (PaaS), managed
   Jamstack/server-side rendering (SSR), Postgres backend-as-a-service (BaaS), edge-serverless) → follow the tenancy, RLS, cost, and deployment handoffs the decider itself names — no dedicated
   mapper exists by design; **GCP** (Google Cloud Platform) → state plainly that no dedicated GCP
@@ -288,14 +288,15 @@ the orchestrator's own auto-invocation — that would launder a human-triggered
 gate into an automatic hop. Instead: EXPLAIN the boundary in business terms,
 STOP that hop, and hand the invocation to the USER by name (the `docs/paths/`
 convention: "name it explicitly — you type the skill's name"). Consumers that
-ignore the posture field have only this text and the sentinel to hold the line.
-A target marked *(not installed)* is absent from the installed starter package: say
-so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it. Presence in `.claude/skills/<name>/` overrides the marker: verify the directory exists before honouring it; the marker describes the installed starter package, not the consumer's workspace.
+ignore the posture field have only this text and the sentinel to hold the line. A manual-only target that is also marked *(not installed)* cannot be invoked at all until the package is extended by the install-on-demand copy: say so, name it, and hand the invocation to the user only after installation; never present a missing manual-only skill as if the user could type it now.
+
+**The installed-package marker.** A target marked *(not installed)* is absent from the installed starter package: say
+so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it. Presence in `.claude/skills/<name>/` overrides the marker: verify the directory exists before honouring it; the marker describes the installed starter package, not the consumer's workspace. A target marked *(manual-only; not installed)* combines both rules: it cannot be invoked until the package is extended by the install-on-demand copy, and after installation only a human naming it can invoke it.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
 skills are CONDITIONAL — invoke a skill only when the project's actual features
-call for it (a file-upload feature earns `file-upload-storage-architect` *(not installed)*; an
+call for it (a file-upload feature earns `file-upload-storage-architect` *(not installed)*; a
 large language model (LLM) feature earns `prompt-injection-defender` *(not installed)*; a purely internal single-tenant
 tool earns none of the tenancy skills).
 
@@ -308,7 +309,7 @@ a named human's decision; agents never arm auto-merge). Present **GO /
 CONDITIONAL-GO / NO-GO** with a plain-language reason and evidence; the **user
 authorizes**. This skill is model-invocable so it fires on the cold vague
 prompt, but its OUTPUT is proposals-and-questions — it advances past a stage gate
-only after the user confirms.
+only after the user confirms. The manual-only matrix is the standing floor only once it is installed: when it is absent, stop and name it at the irreversible step and install it on demand — the stop is the gate, never a reason to relax it; the installed runtime halt and classification gate still run.
 
 **Capability 4 — Record the outcome (dated) in `docs/project-state.md`, by
 propose → approve → append/refresh (or approved-create at cold start).** Prepare
@@ -392,9 +393,9 @@ scope, users, success, open questions) refreshed at approved checkpoints.
       `NOT-COMMIT-ABLE-recorded`; Stage 3 was proposed only once all four were
       recorded; any NOT COMMIT-ABLE produced no date or promise. Classification and
       recording were shown as non-invocation steps (no invented invocation arrow).
-- [ ] Every irreversible step routed through `human-approval-boundary` +
-      `change-classification-gate` + `agent-authorization-matrix` *(not installed)*; the user
-      authorized; nothing auto-merged or auto-deployed.
+- [ ] Every irreversible step routed through the installed `human-approval-boundary` +
+      `change-classification-gate`; the manual-only `agent-authorization-matrix` *(manual-only; not installed)*,
+      when required, is installed on demand and the human names it; absence stops the step (fail-closed); the user authorized; nothing auto-merged or auto-deployed.
 - [ ] Recording followed propose → approve → append (approved-create at cold start): exact path, ID, date and byte-for-byte content shown BEFORE any write; a current valid grant (ID/issuer/action/path/EXACT content hash; scope never substitutes/issue+expiry/revocation, independently verified, named in the DECISION) is used without repeat consent, otherwise explicit content-specific yes; stale/revoked/conflicting is a hard stop with no explicit-yes fallback.
       After approval the previewed path and byte-for-byte content are UNCHANGED (any change requires new preview/approval); declined/ambiguous or missing/out-of-scope/stale/revoked/conflicting authority wrote nothing; no prior entry overwritten; Stage 2 stayed serial.
 - [ ] **AR-A shared controls held:** product repo distinguished from the skills

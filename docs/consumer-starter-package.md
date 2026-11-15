@@ -383,7 +383,9 @@ install-on-demand rather than a silent gap.
 ### 4.2 If the step's owning skill is missing
 
 When the skill that owns a step is not in the package, one rule decides — split by
-what the missing skill owns. This is the same rule `CLAUDE.md` item 6 states:
+what the missing skill owns. The single authoritative statement of that rule, including
+its operational test, is the installed `AGENTS.md` Role B item 3; this section applies
+it at the install point. `CLAUDE.md` item 6 points to the same rule:
 
 - **If it owns the gate, the stop, or the stage itself: stop.** The fail-closed rule
   applies:

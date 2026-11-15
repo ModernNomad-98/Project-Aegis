@@ -113,7 +113,11 @@ record location the role contract names — which states exactly one of two valu
   whose effective author or committer is the owner is refused.
 An unstated or unrecognised mode in Role B is a stop — ask for it, never default to
 one. When no install record or DECISION exists, ask once; the human's answer is
-recorded as that DECISION so later sessions do not re-ask. **In Role A (the Project Aegis source library), skip the install-mode read** and
+recorded as that DECISION so later sessions do not re-ask. Create or append that entry
+only through the propose → approve → append step (or the approved-create leg when
+`docs/project-state.md` does not exist yet), with an explicit, content-specific yes to
+that exact entry; if the human declines to record it, the mode stays unstated and this
+stop stands — never infer a mode. **In Role A (the Project Aegis source library), skip the install-mode read** and
 apply the owner/agent split directly: the owner may commit under their own identity;
 an agent's commit must use the documented non-owner identity.
 
@@ -203,7 +207,7 @@ provenance remain DS-R1b requirements. Installing the hook is optional; the
 manual presence/owner check and the mandatory provenance step are required.
 **On a `human-only` install the hook must not be installed or activated:** it
 implements only the `agent-commit` fail-closed check, so it would refuse the human's
-own commits, which the gate's required behaviour never does. Install it at the effective hook path. Resolve core.hooksPath FIRST: a relative value resolves from the
+own commits, which the gate's required behaviour never does. **The hook is for agent-only-committer setups**, including an `agent-commit` install in which the owner never commits in that repository. If the owner also commits locally on an `agent-commit` install, do not install it: `git commit --no-verify` is the documented local-hook bypass (a hook bypass, never a gate pass), and the gate's required presence/owner check still applies to every agent commit. Install it at the effective hook path. Resolve core.hooksPath FIRST: a relative value resolves from the
 repository top level and a leading tilde expands to HOME; use git rev-parse
 --git-path hooks/pre-commit ONLY when core.hooksPath is unset. Verify the chosen path
 is executable, and treat hook-file presence as presence, not authenticity (inspect
