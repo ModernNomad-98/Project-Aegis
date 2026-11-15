@@ -106,18 +106,27 @@ agent-authored commits to use the documented repository-local agent identity.
 **In a consumer/product repository (Role B), read the install mode before running the
 check**, from `docs/consumer-install-record.md` ("install mode"); when the sh route
 wrote no record, read the install-mode DECISION in `docs/project-state.md` — the one
-record location the role contract names — which states exactly one of two values:
+record location the role contract names. The mode is exactly one of two values:
 - `human-only`: the agent makes no commit and changes no Git identity, so the
   owner-identity refusal does not run against the human's own commit. If an agent is asked to commit under `human-only`, that is a mode conflict: stop, surface it, and require a new DECISION reclassifying the install to `agent-commit` before any agent commit.
 - `agent-commit`: the fail-closed check below runs for every agent commit; a commit
   whose effective author or committer is the owner is refused.
+
+**Precedence between the two mode records.** The install record and any later mode
+DECISION describe the same configuration. Read the **newest valid entry**: a later mode
+DECISION supersedes the install record and any earlier DECISION, and an explicit record
+update supersedes an earlier DECISION. On reclassification, update the install record or
+record the DECISION naming the record value it supersedes, so the next session resolves
+the same way; until the new entry is recorded through the approve/append step, the
+previous mode governs and the reclassification is pending. Multiple DECISIONs are ordered
+by their recorded dates; the latest valid one wins.
 An unstated or unrecognised mode in Role B is a stop — ask for it, never default to
 one. When no install record or DECISION exists, ask once; the human's answer is
 recorded as that DECISION so later sessions do not re-ask. Create or append that entry
 only through the propose → approve → append step (or the approved-create leg when
 `docs/project-state.md` does not exist yet), with an explicit, content-specific yes to
 that exact entry; if the human declines to record it, the mode stays unstated and this
-stop stands — never infer a mode. **In Role A (the Project Aegis source library), skip the install-mode read** and
+stop stands — never infer a mode. The mode record is configuration evidence, not authority: it tells the gate which identity rule applies, but it never authorises a commit, a merge or any other action; every commit still needs the separate, task-level implementation authority. **In Role A (the Project Aegis source library), skip the install-mode read** and
 apply the owner/agent split directly: the owner may commit under their own identity;
 an agent's commit must use the documented non-owner identity.
 

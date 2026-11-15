@@ -83,7 +83,7 @@ in-flight navigation).
 5. **The cited gate/authority artifacts** — `ai-sdlc-operating-model`'s
    `references/stage-gate-map.md` (per-stage gate, authority, evidence),
    `change-classification-gate` (per-slice rigor), `human-approval-boundary` +
-   `agent-authorization-matrix` *(not installed)* (the human gate). Read to CITE, never copy. When a cited artifact belongs to an absent skill, it is not in this package: name it as not installed and stop the hop it gates (install it on demand); never cite it as if present.
+   `agent-authorization-matrix` *(manual-only; not installed)* (the human gate). Read to CITE, never copy. When a cited artifact belongs to an absent skill, it is not in this package: name it as not installed and stop the hop it gates (install it on demand); never cite it as if present.
 
 ## Workflow
 
@@ -292,7 +292,7 @@ STOP that hop, and hand the invocation to the USER by name (the `docs/paths/`
 convention: "name it explicitly — you type the skill's name"). Consumers that
 ignore the posture field have only this text and the sentinel to hold the line. A manual-only target that is also marked *(not installed)* cannot be invoked at all until the package is extended by the install-on-demand copy: say so, name it, and hand the invocation to the user only after installation; never present a missing manual-only skill as if the user could type it now.
 
-**The installed-package marker.** A target marked *(not installed)* is absent from the installed starter package: say so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it. Presence in `.claude/skills/<name>/` overrides the marker: verify the directory exists before honouring it; the marker describes the installed starter package, not the consumer's workspace. A target marked *(manual-only; not installed)* combines both rules: it cannot be invoked until the package is extended by the install-on-demand copy, and after installation only a human naming it can invoke it.
+**The installed-package marker.** A target marked *(not installed)* is absent from the installed starter package: say so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it. Presence in `.claude/skills/<name>/` overrides the marker **only when that directory is present on the repository's base branch or was explicitly approved by the human in this session** (AGENTS.md Role B item 4): verify the directory exists before honouring it; a skill directory introduced in the change under review never overrides the marker and never grants authority. The marker describes the installed starter package, not the consumer's workspace. A target marked *(manual-only; not installed)* combines both rules: it cannot be invoked until the package is extended by the install-on-demand copy, and after installation only a human naming it can invoke it.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
@@ -394,7 +394,7 @@ scope, users, success, open questions) refreshed at approved checkpoints.
       `NOT-COMMIT-ABLE-recorded`; Stage 3 was proposed only once all four were
       recorded; any NOT COMMIT-ABLE produced no date or promise. Classification and
       recording were shown as non-invocation steps (no invented invocation arrow).
-- [ ] Every irreversible step routed through the installed `human-approval-boundary` +       `change-classification-gate`; the manual-only `agent-authorization-matrix` *(manual-only; not installed)*,
+- [ ] Every irreversible step routed through the installed `human-approval-boundary` + `change-classification-gate`; the manual-only `agent-authorization-matrix` *(manual-only; not installed)*,
       when required, is installed on demand and the human names it; absence stops the step (fail-closed); the user authorized; nothing auto-merged or auto-deployed.
 - [ ] Recording followed propose → approve → append (approved-create at cold start): exact path, ID, date and byte-for-byte content shown BEFORE any write; a current valid grant (ID/issuer/action/path/EXACT content hash; scope never substitutes/issue+expiry/revocation; independently verified by a human or separate authorized agent, or in a one-agent Role B repository by the human's content-specific yes, which stands in for independent verification (references/recording-and-authority.md); named in the DECISION) is used without repeat consent, otherwise explicit content-specific yes; stale/revoked/conflicting is a hard stop with no explicit-yes fallback.
       After approval the previewed path and byte-for-byte content are UNCHANGED (any change requires new preview/approval); declined/ambiguous or missing/out-of-scope/stale/revoked/conflicting authority wrote nothing; no prior entry overwritten; Stage 2 stayed serial.
@@ -433,8 +433,8 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 - **Auto-chaining a manual-only skill.** A manual-only target
   (`disable-model-invocation: true`) exists to be started by a human. The
   orchestrator is auto-invocable, so treating its own firing as license to
-  auto-invoke `ci-pipeline-architect` *(not installed)*, `observability-operator` *(not installed)*,
-  `playwright-e2e-engineer` *(not installed)*, or `prompt-injection-defender` *(not installed)* launders a human
+  auto-invoke `ci-pipeline-architect` *(manual-only; not installed)*, `observability-operator` *(manual-only; not installed)*,
+  `playwright-e2e-engineer` *(manual-only; not installed)*, or `prompt-injection-defender` *(manual-only; not installed)* launders a human
   gate into an automatic hop. Explain the boundary and hand the invocation to
   the user by name.
 - **Acceptance is not authority; a business answer is not write approval.**
