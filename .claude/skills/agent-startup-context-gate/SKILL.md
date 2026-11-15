@@ -108,7 +108,7 @@ check**, from `docs/consumer-install-record.md` ("install mode"); when the sh ro
 wrote no record, read the install-mode DECISION in `docs/project-state.md` — the one
 record location the role contract names — which states exactly one of two values:
 - `human-only`: the agent makes no commit and changes no Git identity, so the
-  owner-identity refusal does not run against the human's own commit.
+  owner-identity refusal does not run against the human's own commit. If an agent is asked to commit under `human-only`, that is a mode conflict: stop, surface it, and require a new DECISION reclassifying the install to `agent-commit` before any agent commit.
 - `agent-commit`: the fail-closed check below runs for every agent commit; a commit
   whose effective author or committer is the owner is refused.
 An unstated or unrecognised mode in Role B is a stop — ask for it, never default to
