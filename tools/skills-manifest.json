@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "66620739818466d3fa9646e7fbf85671284e4ebf",
+  "source_revision": "6abb5c08dc2da00224abdf562195b2f4c6410528",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -86,7 +86,7 @@
     {
       "name": "agent-startup-context-gate",
       "path": ".claude/skills/agent-startup-context-gate/SKILL.md",
-      "sha256": "a157d30d5b8eac48243906d2e46716e6bc37a0591e648b062a0430f7da3c35ee"
+      "sha256": "d92ccbe6554ad5d7ca086d056b2f237cdac40eaa9b18e094ed7ca0d89dc6718e"
     },
     {
       "name": "agent-tool-safety-guard",
@@ -841,7 +841,7 @@
     {
       "name": "project-orchestrator",
       "path": ".claude/skills/project-orchestrator/SKILL.md",
-      "sha256": "811261aaa103178906c69ba2b0b71c3d0d1eaef8fa7f9a4673312269ffcf68f1"
+      "sha256": "c85711f62b4d8dd2dab2be389bbacc4c485d2aa931fa10437f30cabb78953bba"
     },
     {
       "name": "promotion-packet-writer",
