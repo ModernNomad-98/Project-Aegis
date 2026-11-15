@@ -1,0 +1,15 @@
+# Owner time log
+
+Method: owner time is counted at the keyboard, from the times of the owner's messages, in the owner's local time zone (America/Los_Angeles, PST/PDT). A gap longer than 30 minutes between two messages is a break and is not counted; shorter gaps are counted. Where message times are unavailable, the figure is marked estimated and the evidence is named. If more than one chat works on the project, message times are merged into one timeline; they are never added together.
+
+## 2026-11-14 — session entry (estimated)
+
+- Figure: about 4 h 09 min (15,000 s) estimated.
+- How obtained: estimated, from the 17 session timestamps recorded in this chat (19:10:38 through 23:19:52 PST). Consecutive recorded timestamps were treated as an upper-bound keyboard timeline; all observed gaps were under 30 minutes, so no break was deducted. The timestamps include turns caused by helper notifications and tool results, not only the owner's own messages, so the figure is an upper bound rather than a measured figure.
+- Limitation: the exact time of each owner message was not recorded separately from assistant and helper activity; this figure should be replaced by a measured figure when message times are exported.
+- Breaks: none detected above the 30-minute rule in the recorded timestamps.
+- Next update: as new owner messages arrive, recompute and append a dated line; never rewrite an earlier figure.
+
+## Session record (source timestamps, PST)
+
+19:10:38, 19:23:54, 19:34:12, 19:44:17, 19:59:26, 20:18:01, 20:30:42, 20:52:00, 21:02:02, 21:28:41, 21:39:51, 21:54:15, 22:08:13, 22:32:15, 22:44:34, 22:56:22, 23:19:52
