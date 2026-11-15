@@ -10,7 +10,10 @@ Guarantees enforced here:
     target and outside the declared package directories; without it nothing is
     written at all;
   * output is deterministic (no timestamps, durations, host names or absolute
-    paths) so two runs on identical inputs produce identical bytes.
+    paths) so two runs on identical inputs produce identical bytes;
+  * with check_dependencies=True the manifest's declared entry->entry edges are
+    also consumed read-only (duplicate/cycle/class-scope/absent-target findings);
+    the mode adds findings, never a write or a repair.
 
 Exit codes are findings, not authority: 0 clean, 1 findings, 2 usage/invalid/
 unsafe input, 3 internal error. The report never contains an approved,
@@ -24,6 +27,7 @@ import tempfile
 from pathlib import Path
 
 from .manifest import (
+    DEPENDENCY_CLASSES,
     ManifestError,
     payload_directory_prefixes,
     sha256_normalized,
@@ -40,6 +44,146 @@ EXIT_USAGE = 2
 EXIT_INTERNAL = 3
 
 FINDING_CLASSES = ("ABSENT", "CHANGED", "CHANGED_TYPE", "UNRECOGNIZED")
+
+# P0-GOV C1: read-only consumption of the manifest's declared dependency edges.
+# The builder already validates edge structure (entry->entry targets, classes,
+# conditional rules); this mode adds graph-level findings (duplicates, cycles,
+# class/scope contradictions, targets absent from the target tree). It never
+# writes, never repairs and never publishes an approval.
+DEPENDENCY_REPORT_SCHEMA = "aegis.distributed-payload-dependency-report/1"
+DEPENDENCY_FINDING_CLASSES = (
+    "DEPENDENCY_CYCLE",
+    "DEPENDENCY_DUPLICATE",
+    "DEPENDENCY_RULE_MISSING",
+    "DEPENDENCY_SCOPE",
+    "DEPENDENCY_TARGET_ABSENT",
+)
+DEPENDENCY_NON_CLAIMS = (
+    "dependency consumption is a structural read-only check, not an approval or a gate",
+    "only declared entry->entry edges are consumed; the resolution/applicability graph is checked by tools/aegis_preflight, not here",
+    "a clean dependency report proves nothing about authorship, review or runtime enforcement",
+)
+
+
+def _dependency_cycle(edges: list[dict]) -> list[str] | None:
+    adjacency: dict[str, list[str]] = {}
+    for edge in edges:
+        adjacency.setdefault(edge["from"], []).append(edge["to"])
+    for node in adjacency:
+        adjacency[node] = sorted(adjacency[node])
+    white, grey, black = 0, 1, 2
+    colour = {node: white for node in adjacency}
+    stack: list[str] = []
+
+    def visit(node: str) -> list[str] | None:
+        colour[node] = grey
+        stack.append(node)
+        for neighbour in adjacency.get(node, []):
+            if neighbour not in colour:
+                colour[neighbour] = white
+            if colour[neighbour] == grey:
+                return stack[stack.index(neighbour):] + [neighbour]
+            if colour[neighbour] == white:
+                found = visit(neighbour)
+                if found:
+                    return found
+        stack.pop()
+        colour[node] = black
+        return None
+
+    for node in sorted(adjacency):
+        if colour[node] == white:
+            found = visit(node)
+            if found:
+                return found
+    return None
+
+
+def dependency_report(manifest: dict, target_root: Path | None = None) -> dict:
+    """Deterministic read-only dependency-graph report over one validated manifest."""
+    edges = [edge for edge in manifest.get("dependencies", []) if isinstance(edge, dict)]
+    entry_paths = {entry["path"] for entry in manifest.get("entries", []) if isinstance(entry, dict)}
+    findings: list[dict] = []
+    by_pair: dict[tuple[str, str], list[dict]] = {}
+    for edge in edges:
+        by_pair.setdefault((edge["from"], edge["to"]), []).append(edge)
+    for (source, target), group in sorted(by_pair.items()):
+        if len(group) > 1:
+            findings.append({
+                "class": "DEPENDENCY_DUPLICATE",
+                "path": "%s -> %s" % (source, target),
+                "detail": "%d edges declare the same from/to pair" % len(group),
+            })
+        classes = sorted({edge.get("class") for edge in group})
+        if len(classes) > 1:
+            findings.append({
+                "class": "DEPENDENCY_DUPLICATE",
+                "path": "%s -> %s" % (source, target),
+                "detail": "conflicting dependency classes: %s" % ", ".join(str(item) for item in classes),
+            })
+    for edge in sorted(edges, key=lambda item: (item["from"], item["to"], item.get("class", ""))):
+        source = edge["from"]
+        target = edge["to"]
+        relation = "%s -> %s" % (source, target)
+        if edge.get("class") == "conditional" and not edge.get("rule"):
+            findings.append({
+                "class": "DEPENDENCY_RULE_MISSING",
+                "path": relation,
+                "detail": "a conditional edge must carry a named activation rule",
+            })
+        if edge.get("class") == "maintainer-only" and target in entry_paths:
+            findings.append({
+                "class": "DEPENDENCY_SCOPE",
+                "path": relation,
+                "detail": "a maintainer-only edge names a consumer-distributed payload entry; "
+                          "maintainer-only targets are non-distributed",
+            })
+        if edge.get("class") != "maintainer-only":
+            if target not in entry_paths:
+                findings.append({
+                    "class": "DEPENDENCY_TARGET_ABSENT",
+                    "path": relation,
+                    "detail": "the dependency target is not a declared payload entry",
+                })
+            elif target_root is not None and not (Path(target_root) / Path(target)).is_file():
+                findings.append({
+                    "class": "DEPENDENCY_TARGET_ABSENT",
+                    "path": relation,
+                    "detail": "the dependency target is absent from the target tree",
+                })
+    cycle = _dependency_cycle([
+        edge for edge in edges
+        if edge.get("from") in entry_paths and edge.get("to") in entry_paths
+    ])
+    if cycle:
+        findings.append({
+            "class": "DEPENDENCY_CYCLE",
+            "path": " -> ".join(cycle),
+            "detail": "the declared packaging dependency graph contains a cycle",
+        })
+    findings.sort(key=lambda finding: (finding["class"], finding["path"]))
+    class_counts = {name: 0 for name in DEPENDENCY_CLASSES}
+    for edge in edges:
+        class_name = edge.get("class")
+        if class_name in class_counts:
+            class_counts[class_name] += 1
+    return {
+        "schema": DEPENDENCY_REPORT_SCHEMA,
+        "mode": "read-only",
+        "entries": len(entry_paths),
+        "edges": len(edges),
+        "classes": class_counts,
+        "findings": findings,
+        "summary": {
+            "duplicates": sum(1 for finding in findings if finding["class"] == "DEPENDENCY_DUPLICATE"),
+            "cycles": sum(1 for finding in findings if finding["class"] == "DEPENDENCY_CYCLE"),
+            "scope": sum(1 for finding in findings if finding["class"] == "DEPENDENCY_SCOPE"),
+            "absent": sum(1 for finding in findings if finding["class"] == "DEPENDENCY_TARGET_ABSENT"),
+            "rule_missing": sum(1 for finding in findings if finding["class"] == "DEPENDENCY_RULE_MISSING"),
+            "findings": len(findings),
+        },
+        "non_claims": list(DEPENDENCY_NON_CLAIMS),
+    }
 
 
 def load_manifest_document(manifest_path: Path) -> tuple[dict, bytes]:
@@ -166,8 +310,14 @@ def _write_report(report_out: Path, report: dict) -> None:
 
 
 def verify_target(manifest_path: Path, target_root: Path,
-                  report_out: Path | None = None) -> tuple[dict, int]:
-    """Read-only verification. Returns (report, exit_code)."""
+                  report_out: Path | None = None,
+                  check_dependencies: bool = False) -> tuple[dict, int]:
+    """Read-only verification. Returns (report, exit_code).
+
+    With check_dependencies=True the manifest's declared dependency edges are also
+    consumed read-only (duplicates, cycles, class/scope, absent targets).  The
+    mode adds findings; it never writes or repairs.
+    """
     manifest, manifest_bytes = load_manifest_document(manifest_path)
     target = Path(target_root)
     if not target.exists():
@@ -316,9 +466,15 @@ def verify_target(manifest_path: Path, target_root: Path,
         "host_limitations": limitations,
         "repair_available": False,
     }
+    if check_dependencies:
+        dependency = dependency_report(manifest, target)
+        report["dependencies"] = dependency
+        report["summary"]["dependency_findings"] = dependency["summary"]["findings"]
     if planned_report is not None:
         _write_report(planned_report, report)
-    return report, (EXIT_FINDINGS if findings else EXIT_CLEAN)
+    return report, (EXIT_FINDINGS if findings or (
+        check_dependencies and report["dependencies"]["summary"]["findings"] > 0
+    ) else EXIT_CLEAN)
 
 
 def check_manifest(manifest_path: Path) -> dict:

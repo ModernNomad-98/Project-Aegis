@@ -5,7 +5,7 @@ Stdlib-only Python tooling for schema `aegis.distributed-payload-manifest/1`. No
 ## What it does
 
 - `build`: walks a payload root, validates paths/types/duplicates, records raw and CRLF-to-LF-normalized SHA-256 identities, and writes a deterministic manifest to an explicit `--out` path (atomic rename; output must be outside the payload root).
-- `verify`: read-only comparison of a target tree against a manifest. Reports `ABSENT`, `CHANGED`, `CHANGED_TYPE` and `UNRECOGNIZED` with relative paths; exits 0 clean / 1 findings / 2 usage, invalid manifest or unsafe input / 3 internal error. It never writes, deletes, moves, renames or repairs anything in the target.
+- `verify`: read-only comparison of a target tree against a manifest. Reports `ABSENT`, `CHANGED`, `CHANGED_TYPE` and `UNRECOGNIZED` with relative paths; exits 0 clean / 1 findings / 2 usage, invalid manifest or unsafe input / 3 internal error. It never writes, deletes, moves, renames or repairs anything in the target. With `--check-dependencies` it also consumes the manifest's declared dependency edges read-only (see "Dependency consumption" below); the flag adds findings only.
 - `check-manifest`: validates a manifest and prints its detached identity (bytes and SHA-256). An identity is not an approval.
 
 There is deliberately no install, repair, upgrade, uninstall, prune, cleanup or approve verb.
@@ -22,12 +22,27 @@ Each edge is validated against the built entry paths with the same rules as `val
 array is merged into the manifest's `dependencies` field so the builder can emit a dependency closure
 instead of always writing an empty array. Edges are sorted by (from,to,class,rule) before writing so reordered
 input produces byte-identical manifests; self-edges are rejected. Invalid JSON/encoding or an invalid edge is
-exit 2 and writes no output. v1 dependencies are **declared** edges: `verify` does not consume them (closure
-verification is a separate slice).
+exit 2 and writes no output. v1 dependencies are **declared** edges: the default `verify` run does not consume
+them; the P0-GOV C1 `--check-dependencies` mode consumes them read-only without changing the schema, the
+builder, or the three default verbs.
 
 Verify a target read-only; add `--report-out` to write a deterministic JSON report outside the target and the declared package directories:
 
     python -m tools.distributed_payload verify --manifest <manifest.json> --target <target-root> [--report-out <report.json>] [--json]
+
+P0-GOV C1 adds read-only dependency consumption (findings exit 1, never repair):
+
+    python -m tools.distributed_payload verify --manifest <manifest.json> --target <target-root> --check-dependencies [--json]
+
+Finding classes: `DEPENDENCY_DUPLICATE` (exact duplicate edges or conflicting
+classes for one from/to pair), `DEPENDENCY_CYCLE` (a cycle among declared
+entry->entry edges), `DEPENDENCY_SCOPE` (a maintainer-only edge naming a
+distributed payload entry), `DEPENDENCY_RULE_MISSING` (a conditional edge with
+no activation rule) and `DEPENDENCY_TARGET_ABSENT` (a target not declared as a
+payload entry or absent from the target tree). This mode is a structural,
+read-only check: it is not approval, not a gate and not runtime enforcement. The
+logical resolution/applicability graph is checked by tools/aegis_preflight, not
+here, and is never emitted into the manifest.
 
 Validate a manifest and print its identity:
 

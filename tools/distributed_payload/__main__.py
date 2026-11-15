@@ -65,7 +65,8 @@ def _build(args: argparse.Namespace) -> int:
 def _verify(args: argparse.Namespace) -> int:
     report, exit_code = verify_module.verify_target(
         Path(args.manifest), Path(args.target),
-        report_out=Path(args.report_out) if args.report_out else None)
+        report_out=Path(args.report_out) if args.report_out else None,
+        check_dependencies=bool(args.check_dependencies))
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
     else:
@@ -77,6 +78,16 @@ def _verify(args: argparse.Namespace) -> int:
               f"unrecognized={report['summary']['unrecognized']}")
         for finding in report["findings"]:
             print(f"  {finding['class']}: {finding['path']}")
+        if args.check_dependencies:
+            dependency = report["dependencies"]
+            print(f"dependencies: {dependency['edges']} edge(s), "
+                  f"{dependency['summary']['findings']} dependency finding(s); "
+                  f"duplicates={dependency['summary']['duplicates']}, "
+                  f"cycles={dependency['summary']['cycles']}, "
+                  f"scope={dependency['summary']['scope']}, "
+                  f"absent={dependency['summary']['absent']}")
+            for finding in dependency["findings"]:
+                print(f"  {finding['class']}: {finding['path']}")
         if report["host_limitations"]:
             for limitation in report["host_limitations"]:
                 print(f"  host-limitation: {limitation}")
@@ -114,6 +125,9 @@ def build_parser() -> argparse.ArgumentParser:
     verify_parser.add_argument("--report-out", default=None,
                                help="optional JSON report path outside the target and package dirs")
     verify_parser.add_argument("--json", action="store_true", help="print the full JSON report")
+    verify_parser.add_argument("--check-dependencies", action="store_true",
+                               help="also consume the manifest dependency edges read-only "
+                                    "(duplicates/cycles/class-scope/absent targets; findings exit 1)")
     verify_parser.set_defaults(handler=_verify)
 
     check_parser = subparsers.add_parser("check-manifest",
