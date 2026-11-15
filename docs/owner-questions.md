@@ -26,7 +26,7 @@ Owner answer: not recorded — the interactive question hit a tool timeout befor
 
 Question: Which email address should consumers use to send experience and feedback (or should the repository issue tracker be the only route)? This is needed to complete docs/consumer-feedback.md.
 
-Owner answer: not recorded yet.
+Owner answer (2026-11-15 04:43:37 PST, in Q-6): "Feedback: issues only." Consequently the public issue-tracker route is the only route; no email address is published (P-1 resolved in Q-6).
 
 
 ## Q-5 — 2026-11-15 00:24 PST (from the independent tracker accuracy check)
@@ -41,3 +41,6 @@ Owner answer: not recorded yet.
 Question (condensed from the escalation): choose PR-A path A (finish PR-A: fix the new review's real high findings, then Stage D/E/F round 2 and merge) or B (pause PR-A, move to WS2 and the tracker); grant or withhold the known non-required aegis-verdict-gate exception; and give the consumer feedback route.
 
 Owner answer (verbatim): "A, with conditions: grant the verdict-gate exception for #1095 only, recorded as a one-PR exception because that gate is red on every PR by design, and only if validate-skills and gate-guard are green. Do not make post-round findings non-gating blind: list every open finding with its severity in the PR body; if all are minor or info, open one follow-up issue for them and proceed; if any is major, stop and ask me. Post a short body (summary, closure before/after table, reviewer verdicts; link the rest). Feedback: issues only. When PR-A is done: WS2 go r3."
+
+
+Q-4 clarification (2026-11-15): the email address is not needed; the owner chose "issues only", so consumer-feedback.md and its template now name the public issue tracker as the only route.

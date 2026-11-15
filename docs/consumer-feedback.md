@@ -16,8 +16,7 @@ Please do not send: real names, contact details of other people, account details
 
 ## How to send it
 
-- Preferred: open an issue at https://github.com/ModernNomad-98/Project-Aegis/issues and put your experience in it. The issue tracker gives you a record and a reply.
-- Email: the maintainer's feedback address will be published here. Until it is added, use the issue tracker route. (See docs/owner-questions.md Q-4; the address is not yet recorded.)
+- Send it through the repository's public issue tracker: https://github.com/ModernNomad-98/Project-Aegis/issues — open an issue and put your experience in it. This is the only feedback route (owner decision, 2026-11-15); no email address is published.)
 
 ## What happens to it
 

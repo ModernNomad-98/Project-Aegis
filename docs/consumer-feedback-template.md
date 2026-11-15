@@ -13,4 +13,4 @@ Copy this into your message and fill in what applies. Short answers are fine. Le
 9. Host and version, if known (do not include device names or personal paths):
 10. Anything else you want the maintainers to know:
 
-Where to send it: https://github.com/ModernNomad-98/Project-Aegis/issues (preferred) or the maintainer's feedback email when published in docs/consumer-feedback.md.
+Where to send it: the repository's public issue tracker only — https://github.com/ModernNomad-98/Project-Aegis/issues (owner decision: issues only).
