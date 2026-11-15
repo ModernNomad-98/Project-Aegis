@@ -98,20 +98,22 @@ complete-enforcement, verified-identity, readiness or CI-green claim is made.
 
 **Scope of the owner-identity stop — solo owner and `human-only` installs.** The
 owner-identity refusal below applies **only to agent-authored commits**. A commit the
-human makes under their own identity is permitted and is never refused by this gate:
+human makes under their own identity is permitted and is never refused by this gate's required behaviour:
 the solo-owner decision of 2026-10-28 (README, "Solo-owner commit identity — decided")
 allows a solo owner to commit under their own identity, and requires only
 agent-authored commits to use the documented repository-local agent identity.
 
 **In a consumer/product repository (Role B), read the install mode before running the
 check**, from `docs/consumer-install-record.md` ("install mode"); when the sh route
-wrote no record, read the install-mode declaration in the repository's `AGENTS.md`:
+wrote no record, read the install-mode DECISION in `docs/project-state.md` — the one
+record location the role contract names — which states exactly one of two values:
 - `human-only`: the agent makes no commit and changes no Git identity, so the
   owner-identity refusal does not run against the human's own commit.
 - `agent-commit`: the fail-closed check below runs for every agent commit; a commit
   whose effective author or committer is the owner is refused.
 An unstated or unrecognised mode in Role B is a stop — ask for it, never default to
-one. **In Role A (the Project Aegis source library), skip the install-mode read** and
+one. When no install record or DECISION exists, ask once; the human's answer is
+recorded as that DECISION so later sessions do not re-ask. **In Role A (the Project Aegis source library), skip the install-mode read** and
 apply the owner/agent split directly: the owner may commit under their own identity;
 an agent's commit must use the documented non-owner identity.
 
@@ -199,7 +201,9 @@ owner or when that effective identity is missing or empty. It does NOT implement
 the explicit-source provenance step above; strict raw/malformed validation and
 provenance remain DS-R1b requirements. Installing the hook is optional; the
 manual presence/owner check and the mandatory provenance step are required.
-Install it at the effective hook path. Resolve core.hooksPath FIRST: a relative value resolves from the
+**On a `human-only` install the hook must not be installed or activated:** it
+implements only the `agent-commit` fail-closed check, so it would refuse the human's
+own commits, which the gate's required behaviour never does. Install it at the effective hook path. Resolve core.hooksPath FIRST: a relative value resolves from the
 repository top level and a leading tilde expands to HOME; use git rev-parse
 --git-path hooks/pre-commit ONLY when core.hooksPath is unset. Verify the chosen path
 is executable, and treat hook-file presence as presence, not authenticity (inspect
@@ -343,7 +347,7 @@ Verdict: PROCEED | HALTED — <question for the human>
   present only on the check command, not the actual commit; report the mismatch and
   ask the human to fix it, never commit as the owner (see Git Identity Gate and its
   reference matrix). A presence/owner check success is not a full gate pass; strict
-  raw/malformed validation remains a DS-R1b requirement. A human's own commit is never refused by this gate; see the solo owner/`human-only` scope in the Git Identity Gate.
+  raw/malformed validation remains a DS-R1b requirement. A human's own commit is never refused by the gate's required behaviour; see the solo owner/`human-only` scope in the Git Identity Gate, and do not install the optional agent-commit hook on a `human-only` path.
 
 ## Supporting Files
 

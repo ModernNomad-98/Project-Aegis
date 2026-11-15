@@ -149,11 +149,14 @@ this source repository's approvals by copying Aegis files.
   state file. The one separate append-only record is the manual-only override register,
   used only for a MANUAL-ONLY trigger (`docs/consumer-authority-register.md` when the
   starter's install layout is followed).
-- **The domain split between the two records.** The override register governs only
-  manual-only triggers; `A-*` entries in `docs/project-state.md` govern everything else.
-  Where they overlap, the later lifecycle event wins. That ordering is this contract's
-  reading of two documents that do not address each other; if the case is genuinely
-  unclear, stop and ask rather than picking one.
+- **The domain split between the two records — no substitution.** The override register
+  governs only manual-only triggers; `A-*` entries in `docs/project-state.md` govern
+  everything else. An override is an authorization record, not a waiver: it never
+  substitutes for any other required approval or authority, and an `A-*` grant never
+  substitutes for a manual-only override. Both domains must be independently valid for
+  the action to proceed; a later event in one domain cannot revive a revoked, stale or
+  missing authority in the other. Within one domain the later lifecycle event governs.
+  If the case is genuinely unclear, stop and ask rather than picking one.
 
 ## 3. Idempotent and exact recording
 

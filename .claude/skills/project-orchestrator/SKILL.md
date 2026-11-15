@@ -196,7 +196,7 @@ here.
     for one bounded release with no sequencing decision, or a deadline that can
     be assessed without building horizons. A deadline alone does not make it
     applicable. When applicable: → invoke `roadmap-under-uncertainty-planner` *(not installed)*.
-    Either way the turn ends with `roadmap-under-uncertainty-planner` *(not installed)* classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip.
+    Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip. *(not installed)*
   - **Commitment readiness** — APPLICABLE when a stakeholder asks for a deadline,
     promise, delivery commitment, or feasibility/readiness decision, or a target
     date must be assessed honestly. NOT APPLICABLE when nobody asked for a
@@ -290,7 +290,7 @@ STOP that hop, and hand the invocation to the USER by name (the `docs/paths/`
 convention: "name it explicitly — you type the skill's name"). Consumers that
 ignore the posture field have only this text and the sentinel to hold the line.
 A target marked *(not installed)* is absent from the installed starter package: say
-so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it.
+so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it. Presence in `.claude/skills/<name>/` overrides the marker: verify the directory exists before honouring it; the marker describes the installed starter package, not the consumer's workspace.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
