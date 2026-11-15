@@ -34,3 +34,10 @@ Owner answer: not recorded yet.
 Question: two privacy/confirmation items before the tracker's first save: (P-1) may the consumer-feedback document keep the public repository issue-tracker address, which contains the project's public account/repository name, or should the send route be email-only / described generically? (P-2) the anonymized log states that no owner experience level was recorded — please confirm, or state the level so the required one-line context can be added.
 
 Owner answer: not recorded yet.
+
+
+## Q-6 — 2026-11-15 04:43:37 PST (PR-A path / merge conditions; answered after a 4 h 19 min break)
+
+Question (condensed from the escalation): choose PR-A path A (finish PR-A: fix the new review's real high findings, then Stage D/E/F round 2 and merge) or B (pause PR-A, move to WS2 and the tracker); grant or withhold the known non-required aegis-verdict-gate exception; and give the consumer feedback route.
+
+Owner answer (verbatim): "A, with conditions: grant the verdict-gate exception for #1095 only, recorded as a one-PR exception because that gate is red on every PR by design, and only if validate-skills and gate-guard are green. Do not make post-round findings non-gating blind: list every open finding with its severity in the PR body; if all are minor or info, open one follow-up issue for them and proceed; if any is major, stop and ask me. Post a short body (summary, closure before/after table, reviewer verdicts; link the rest). Feedback: issues only. When PR-A is done: WS2 go r3."
