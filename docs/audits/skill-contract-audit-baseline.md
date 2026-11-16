@@ -24,8 +24,8 @@
 > per-new-finding dispositions are recorded in the PR body, not waived by this page.
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `364e41ade913c794d814845a131b4b06c0939002` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: true; dirty scanned surfaces: none)
-- Corpus content hash: `e03e55a761855278626cdfeffc6fa01dcc72aa4cc94bc7eaed1600cb9063cc01` (999 files, 6909544 bytes)
+- Repo SHA: `1fa7edefcadc834091dd5bca2caa9f308066417f` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: true; dirty scanned surfaces: none)
+- Corpus content hash: `958cd2446ba9b69aaed83d4dabeff26f37c5d277f25430a32c727632e6c02e19` (999 files, 6911470 bytes)
 - Skills scanned: **257**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **470** (372 mechanical, 98 semantic-review candidates)
 

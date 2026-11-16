@@ -5654,27 +5654,12 @@
     },
     {
       "from": "qa-orchestrator",
-      "to": "clickthrough-test-engineer",
-      "type": "body-route"
-    },
-    {
-      "from": "qa-orchestrator",
-      "to": "defect-triage-facilitator",
-      "type": "body-route"
-    },
-    {
-      "from": "qa-orchestrator",
-      "to": "exploratory-charter-designer",
-      "type": "body-route"
-    },
-    {
-      "from": "qa-orchestrator",
       "to": "manual-test-case-creator",
       "type": "body-route"
     },
     {
       "from": "qa-orchestrator",
-      "to": "production-safe-smoke-tester",
+      "to": "observability-operator",
       "type": "body-route"
     },
     {
@@ -7778,6 +7763,7 @@
     "context-co-update-ci-gate",
     "cqrs-read-model-designer",
     "data-quality-monitor-designer",
+    "defect-triage-facilitator",
     "demo-tenant-safety-designer",
     "docs-first-implementer",
     "edge-function-designer",
