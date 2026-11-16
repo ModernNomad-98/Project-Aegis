@@ -29,14 +29,17 @@ Root cause is out of scope: `systematic-debugger` is manual-only and never run b
 
 ## Play D — Set up or improve automated tests
 
-1. `test-coverage-mapper` — what existing tests cover, ranked uncovered critical paths.
-2. `qa-strategy-architect` — product-wide strategy (risk inventory, layer split, manual-vs-automated).
-3. `qa-automation-architect` — framework/tooling/parallelization design; its blueprint selects the tools and layers for THIS repo's stack.
-4. `test-data-architect` — deterministic test data per layer (no secrets; non-production only).
-5. `test-tenant-provisioner` *(manual-only)* — ONLY when non-production test accounts must be created, and BEFORE any engineer run that needs them; never production or real customer tenants.
-6. The engineer skill(s) the blueprint SELECTS — for example `vitest-unit-component-engineer` *(manual-only)* and/or `playwright-e2e-engineer` *(manual-only)*, not automatically both; a stack with no browser layer names no browser engineer.
-7. `regression-suite-curator` — what belongs in the regression suite and at which tier.
+With an existing test suite:
 
+1. `test-coverage-mapper` — what the existing suite covers, ranked uncovered critical paths (requires a suite; with no suite this step is skipped).
+2. `qa-strategy-architect` — product-wide strategy (risk inventory, layer split, manual-vs-automated).
+3. `qa-automation-architect` — framework/tooling/parallelization design; its blueprint selects the tools and layers for THIS repo stack.
+4. `test-data-architect` — deterministic test data per layer (no secrets; non-production only).
+5. `test-tenant-provisioner` *(manual-only)* — ONLY when non-production test accounts must be created, and BEFORE any engineer run that needs them.
+6. The engineer skill(s) the blueprint SELECTS — for example `vitest-unit-component-engineer` *(manual-only)* and/or `playwright-e2e-engineer` *(manual-only)*, not automatically both; a stack with no browser layer names no browser engineer.
+7. `regression-suite-curator` — ONLY when the suite has CI history and runtimes; otherwise name the curator as the next action once the suite has run in CI.
+
+With NO test suite, Play D starts at `qa-strategy-architect`: `test-coverage-mapper` is skipped (nothing to map) and `regression-suite-curator` is named as the next action once the suite has run in CI.
 ## Fallback: no browser control (Play A or C)
 
 `manual-test-case-creator` writes the cases → a person runs them → findings go to `defect-triage-facilitator`. Say explicitly that the browser route was unavailable and what is therefore UNKNOWN.
