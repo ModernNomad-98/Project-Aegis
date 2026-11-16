@@ -153,7 +153,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke project-orchestrator: configuring which Aegis helpers to use is not a product idea or a lifecycle stage question, so there is no stage to detect or route.",
-          "Does not auto-invoke, run or read aegis-setup (MANUAL-ONLY); says plainly that setup is the manual-only aegis-setup skill and tells the user to start it by typing `/aegis-setup`, and does not silently substitute project-orchestrator for it.",
+          "Does not auto-invoke, run or read aegis-setup (MANUAL-ONLY); says plainly that setup is the manual-only `aegis-setup` skill; because it is not installed, says it must be installed on demand first (the starter package 4.1 copy route) and only after that can the user start it by typing `/aegis-setup`, and does not silently substitute project-orchestrator for it.",
           "Does not start the requirements interview, create or edit docs/project-state.md, or write any setup state."
         ]
       }
@@ -766,8 +766,8 @@
         "triggers": true,
         "assertions": [
           "First recognises 'Help me set up Aegis' as a request to set up Aegis itself, not a product stage, and says plainly that setup is the manual-only `aegis-setup` skill.",
-          "Tells the user to start it by typing `/aegis-setup`; it does NOT run, read or auto-invoke aegis-setup, and writes no setup state.",
-          "Does NOT start product discovery (no requirements question, no `requirements-gathering-facilitator` invocation, no docs/project-state.md proposal) before offering `/aegis-setup`; it may offer to continue with the product idea afterwards."
+          "Says the manual-only `aegis-setup` skill must be installed on demand first (the starter package 4.1 copy route); only after installation tells the user to start it by typing `/aegis-setup`; it does NOT run, read or auto-invoke aegis-setup, and writes no setup state.",
+          "Does NOT start product discovery (no requirements question, no `requirements-gathering-facilitator` invocation, no docs/project-state.md proposal) before offering the install-on-demand step and `/aegis-setup`; it may offer to continue with the product idea afterwards."
         ]
       }
     },

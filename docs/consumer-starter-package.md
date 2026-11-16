@@ -383,7 +383,9 @@ install-on-demand rather than a silent gap.
 ### 4.2 If the step's owning skill is missing
 
 When the skill that owns a step is not in the package, one rule decides — split by
-what the missing skill owns. This is the same rule `CLAUDE.md` item 6 states:
+what the missing skill owns. This is the same rule `CLAUDE.md` item 6 states at this revision:
+
+The published starter package pin (`2fef11dd`) predates this rule: an install from that pin still carries the previous item 6 and no installed markers until the separate starter re-pin change lands. This page states the rule at this source revision, not the bytes of that pin.
 
 - **If it owns the gate, the stop, or the stage itself: stop.** The fail-closed rule
   applies:

@@ -189,23 +189,23 @@ here.
     initiatives, or release choices; a real ranking or scope-tradeoff decision;
     or genuine unclarity about what matters most. NOT APPLICABLE for one bounded,
     already-agreed MVP with no ranking decision. A requested date alone does not
-    make it applicable. When applicable: → route to `prioritization-frame-picker` *(not installed — advisory)*.
+    make it applicable. When applicable: → route to `prioritization-frame-picker` *(not installed — gate)*.
   - **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; multiple
     horizons or releases; unclarity about what comes first or later; or timing
     pressure that genuinely needs an uncertainty-aware sequence. NOT APPLICABLE
     for one bounded release with no sequencing decision, or a deadline that can
     be assessed without building horizons. A deadline alone does not make it
-    applicable. When applicable: → route to `roadmap-under-uncertainty-planner` *(not installed — advisory)*.
-    Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip. *(not installed — advisory)*
+    applicable. When applicable: → route to `roadmap-under-uncertainty-planner` *(not installed — gate)*.
+    Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip. *(not installed — gate)*
   - **Commitment readiness** — APPLICABLE when a stakeholder asks for a deadline,
     promise, delivery commitment, or feasibility/readiness decision, or a target
     date must be assessed honestly. NOT APPLICABLE when nobody asked for a
     commitment and the project is simply defining the product and moving into
     design. Competing priorities alone do not make it applicable. When
-    applicable: → route to `roadmap-to-commitments-translator` *(not installed — advisory)* (readiness mode).
+    applicable: → route to `roadmap-to-commitments-translator` *(not installed — gate)* (readiness mode).
   - **Order when several apply** (skip any `n/a` owner without invoking it):
-    `prioritization-frame-picker` *(not installed — advisory)* → `roadmap-under-uncertainty-planner` *(not installed — advisory)* →
-    `roadmap-to-commitments-translator` *(not installed — advisory)* (readiness mode).
+    `prioritization-frame-picker` *(not installed — gate)* → `roadmap-under-uncertainty-planner` *(not installed — gate)* →
+    `roadmap-to-commitments-translator` *(not installed — gate)* (readiness mode).
   - **Worked classifications** (each asserted by an eval, a behavior test case in `evals/evals.json`): bounded MVP + deadline
     → only commitment readiness; competing capabilities, no deadline → prioritization
     (+ roadmap if sequencing); all three signals → all in order; bounded MVP, none → `n/a`.
@@ -221,7 +221,7 @@ here.
   COMMIT-ABLE` is a **completed** result — it does NOT trap the project in Stage
   2. Record the reassessment as a deferred next-action tied to its evidence
   milestone; when that milestone is later reached (e.g. architecture recorded at
-  Stage 3), re-invoke `roadmap-to-commitments-translator` *(not installed — advisory)* (readiness mode) — a
+  Stage 3), re-invoke `roadmap-to-commitments-translator` *(not installed — gate)* (readiness mode) — a
   requested date is never left unverified indefinitely.
 
   **Stage 2 exit gate (recorded, not merely reached).** Each owner carries one
@@ -239,8 +239,8 @@ here.
   satisfy an owner. All four must be `*-recorded` before Stage 3 is proposed —
   never while a result awaits its append, never on a silent skip.
 - **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` *(not installed — advisory)* → `architecture-designer` →
-  `adr-writer` *(not installed — advisory)*. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect` *(not installed — advisory)*, `tenant-modeler` *(not installed — advisory)* →
-  `multi-tenant-data-architect` *(not installed — advisory)*, `authorization-matrix-designer` *(not installed — advisory)*. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect` *(not installed — advisory)*, which asks its own flag-store question on a later turn.
+  `adr-writer` *(not installed — advisory)*. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect` *(not installed — gate)*, `tenant-modeler` *(not installed — gate)* →
+  `multi-tenant-data-architect` *(not installed — gate)*, `authorization-matrix-designer` *(not installed — gate)*. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect` *(not installed — advisory)*, which asks its own flag-store question on a later turn.
   The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist` *(not installed — advisory)*.
 - **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` *(not installed — advisory)* / `ai-threat-modeler` *(not installed — advisory)*;
   `tenant-isolation-reviewer` *(not installed — advisory)*, `share-link-access-architect` *(not installed — advisory)*,
@@ -383,8 +383,8 @@ scope, users, success, open questions) refreshed at approved checkpoints.
       `product-spec-writer`; each conditional owner was classified applicable or
       `n/a` (reason) on ITS OWN evidence, never predicted or hedged; when several
       applied the order
-      `prioritization-frame-picker` *(not installed — advisory)* → `roadmap-under-uncertainty-planner` *(not installed — advisory)* →
-      `roadmap-to-commitments-translator` *(not installed — advisory)* held with the roadmap planner invoked
+      `prioritization-frame-picker` *(not installed — gate)* → `roadmap-under-uncertainty-planner` *(not installed — gate)* →
+      `roadmap-to-commitments-translator` *(not installed — gate)* held with the roadmap planner invoked
       at most once; no owner was silently skipped.
 - [ ] **Recorded exit gate:** each terminal result first entered
       `*-awaiting-record`, holding EXIT GATE=BLOCKED with NEXT OWNER named, and
