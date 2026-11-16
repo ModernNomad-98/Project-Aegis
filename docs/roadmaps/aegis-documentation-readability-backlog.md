@@ -2,6 +2,10 @@
 
 ## Start here — current reading
 
+### Paused 2026-11-14
+
+Paused 2026-11-14. Readability batches are paused. Only README.md, docs/consumer-starter-package.md and docs/consumer-readiness/consumer-guide-v1.md resume, after the consumer startup-contract fixes (the PRs replacing #1095, and PR-B) have merged.
+
 As of `410b90aa` on 2026-09-30 Coordinated Universal Time (UTC), this remains
 the active repository-wide documentation acceptance backlog. The latest count
 is in the paragraph for main after #561 (`410b90aa`): 653 tracked Markdown
