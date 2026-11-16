@@ -405,6 +405,8 @@ The published starter package pin (`2fef11dd`) predates this rule: an install fr
   skill; if the gap affects the step's result, record the limitation where the
   step's evidence is recorded.
 
+For any consumer journey outside J1, section 1.2's fail-closed install-on-demand rule still governs every required owner; an advisory marker allows continuing only where that step is genuinely optional, and it never overrides the section 1.2 requirement.
+
 This rule is also the consumer-side answer when an installed skill's routing text
 names one of the excluded skills: the routing text marks such a target
 *(not installed — gate)* or *(not installed — advisory)* (for example

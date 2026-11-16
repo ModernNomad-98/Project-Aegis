@@ -99,7 +99,7 @@ in plain language. No repo, or a zero-commit product repo without app files
 or state, means stage zero (nothing started yet) → discovery, which is Stage 1 below. Propose opening `docs/project-state.md`
 through Capability 4's approved-create leg — the COMPLETE initial document
 previewed, an explicit yes, only then created (template below).
-**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` *(not installed — gate)* skill; it must be installed on demand first (the starter package §4.1 copy route), and only after that can the user start it by typing `/aegis-setup`. Do not run or read it, do not tell the user to type it before it is installed, and start no product discovery before offering that.
+**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` *(not installed — gate)* skill. When it is not present in this copy of the library (the normal case in a consumer repository), it must be installed on demand first (the starter package 4.1 copy route), and only after installation can the user start it by typing `/aegis-setup`; when it is already present, say so and offer the invocation directly. Do not run or read it, and start no product discovery before offering that.
 
 **Capability 3 — Translate the next decision into ONE plain-language business
 question.** Every technical fork surfaces to the user as a business question
@@ -240,15 +240,15 @@ here.
   never while a result awaits its append, never on a silent skip.
 - **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` *(not installed — advisory)* → `architecture-designer` →
   `adr-writer` *(not installed — advisory)*. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect` *(not installed — gate)*, `tenant-modeler` *(not installed — gate)* →
-  `multi-tenant-data-architect` *(not installed — gate)*, `authorization-matrix-designer` *(not installed — gate)*. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect` *(not installed — advisory)*, which asks its own flag-store question on a later turn.
-  The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist` *(not installed — advisory)*.
-- **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` *(not installed — advisory)* / `ai-threat-modeler` *(not installed — advisory)*;
-  `tenant-isolation-reviewer` *(not installed — advisory)*, `share-link-access-architect` *(not installed — advisory)*,
-  `file-upload-storage-architect` *(not installed — advisory)*, `prompt-injection-defender` *(not installed — advisory)*,
-  `structured-output-validator` *(not installed — advisory)*, `ai-cost-guardrail-designer` *(not installed — advisory)*. For AI agent
-  runtimes: `agent-harness-architect` *(not installed — advisory)*, `model-context-designer` *(not installed — advisory)*, conditional
-  `agentic-loop-designer` *(not installed — advisory)* — follow [AI path](../../../docs/paths/add-ai-safely.md).
-- **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` *(not installed — advisory)* →
+  `multi-tenant-data-architect` *(not installed — gate)*, `authorization-matrix-designer` *(not installed — gate)*. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect` *(not installed — gate)*, which asks its own flag-store question on a later turn.
+  The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist` *(not installed — gate)*.
+- **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` *(not installed — advisory)* / `ai-threat-modeler` *(not installed — gate)*;
+  `tenant-isolation-reviewer` *(not installed — gate)*, `share-link-access-architect` *(not installed — advisory)*,
+  `file-upload-storage-architect` *(not installed — advisory)*, `prompt-injection-defender` *(not installed — gate)*,
+  `structured-output-validator` *(not installed — gate)*, `ai-cost-guardrail-designer` *(not installed — gate)*. For AI agent
+  runtimes: `agent-harness-architect` *(not installed — gate)*, `model-context-designer` *(not installed — gate)*, conditional
+  `agentic-loop-designer` *(not installed — gate)* — follow [AI path](../../../docs/paths/add-ai-safely.md).
+- **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` *(not installed — gate)* →
   `phased-work-handoff-designer` → `change-classification-gate` →
   `human-approval-boundary`.
 - **Stage 6 — Build it, one slice at a time.** Hand each slice to
@@ -256,16 +256,16 @@ here.
   implement → validate → review → merge → close). Its `stage-gate-map.md` names
   the enforcers to invoke — `agent-startup-context-gate`,
   `change-classification-gate`, `docs-first-implementer` *(not installed — advisory)*,
-  `tdd-engineer` *(not installed — advisory)*, `reviewable-diff-discipline` *(not installed — advisory)*,
+  `tdd-engineer` *(not installed — advisory)*, `reviewable-diff-discipline` *(not installed — gate)*,
   `local-ci-mirror-preflight` *(not installed — advisory)*, `code-reviewer`, `security-pr-reviewer` *(not installed — gate)*,
   `ai-closeout-reporter` *(not installed — gate)*. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none.
 - **Stage 7 — Prove it works.** → `qa-strategy-architect` *(not installed — advisory)* →
   `test-plan-designer`. *By evidence:* `integration-test-designer` *(not installed — advisory)*,
   `api-contract-test-designer` *(not installed — advisory)*, `playwright-e2e-engineer` *(not installed — advisory)*,
   `manual-test-case-creator` *(not installed — advisory)*,
-  `accessibility-test-harness` *(not installed — advisory)*, `performance-test-harness` *(not installed — advisory)*.
+  `accessibility-test-harness` *(not installed — gate)*, `performance-test-harness` *(not installed — advisory)*.
 - **Stage 8 — Get it ready to run.** **First classify hosting applicability from actual approved requirements and artifacts — never from a folder label.** When they explicitly establish that no hosted service, account/tenant backend or infrastructure applies (single operator/browser, local artifact only), take the **local-only release branch before any provider routing**: keep local artifact integrity, persistence, recovery, validation and release verification proportionate, with rollback/recovery steps for the local artifact. This branch may not bypass a hosted requirement or a shared gate; if later approved requirements add hosting, return to the hosted branch below. The local route is explicitly **NOT a deployment, a production operation, or a CI-green claim**; when host applicability is unknown, silent or conflicting, PAUSE and ask the human rather than guessing from a folder/stack label. Minimum local release evidence (not left to 'proportionate'): actual artifact hash + opening command followed, persistence/recovery observation, validation results, rollback/recovery steps, and local data-at-rest security/privacy check, recorded through the applicable existing gates (change-classification-gate; release-readiness-reviewer at Stage 9; security-pr-reviewer where data sensitivity applies), with the shared gates still required. When hosting applies, start with `cloud-architecture-decider` *(not installed — gate)*,
-  then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect` *(not installed — advisory)*; **Azure** → `azure-saas-architect` *(not installed — advisory)*; **modern managed tier** (container platform-as-a-service (PaaS), managed
+  then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect` *(not installed — gate)*; **Azure** → `azure-saas-architect` *(not installed — gate)*; **modern managed tier** (container platform-as-a-service (PaaS), managed
   Jamstack/server-side rendering (SSR), Postgres backend-as-a-service (BaaS), edge-serverless) → follow the tenancy, RLS, cost, and deployment handoffs the decider itself names — no dedicated
   mapper exists by design; **GCP** (Google Cloud Platform) → state plainly that no dedicated GCP
   mapping skill exists yet and PAUSE the provider-mapping hop for the human's direction (never invent a mapper, never silently reroute to
@@ -277,9 +277,9 @@ here.
   `incident-response-runbook` *(not installed — gate)*. *If merge == deploy on the platform:*
   `merge-is-deploy-governance` *(not installed — gate)*. Route FROM the decider's result; never
   re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md).
-- **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` *(not installed — advisory)* → `sharded-validation-with-resume` *(not installed — advisory)* → `release-readiness-reviewer`
+- **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` *(not installed — gate)* → `sharded-validation-with-resume` *(not installed — advisory)* → `release-readiness-reviewer`
   (and the read-only reviewer subagents in `.claude/agents/` when available and relevant); the reviewer advises and the owner authorizes; Aegis's control plane is synthetic only.
-  *At release, unless the owner has already answered it, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist` *(not installed — advisory)*, preceded by `feature-flag-architect` *(not installed — advisory)* when no flag system exists yet.
+  *At release, unless the owner has already answered it, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist` *(not installed — gate)*, preceded by `feature-flag-architect` *(not installed — gate)* when no flag system exists yet.
 
 **The manual-only routing invariant.** Before routing to ANY skill, check its
 invocation posture. A **manual-only** target (`disable-model-invocation: true`;
@@ -289,14 +289,14 @@ gate into an automatic hop. Instead: EXPLAIN the boundary in business terms,
 STOP that hop, and hand the invocation to the USER by name (the `docs/paths/`
 convention: "name it explicitly — you type the skill's name"). Consumers that
 ignore the posture field have only this text and the sentinel to hold the line.
-A target marked *(not installed — gate)* owns a stage gate, a stop, or the stage itself: stop and name it. A target marked *(not installed — advisory)* is a conditional or optional helper: say plainly that it is not installed and continue with ordinary care.
+A target marked *(not installed — gate)* owns a stage gate, a stop, or the stage itself, or the evidence-triggered route requires its recorded decision or required input: stop and name it. A target marked *(not installed — advisory)* is a conditional or optional helper: say plainly that it is not installed and continue with ordinary care.
 The marker is a claim about this copy of the installed package; installed status is derived from the current skills inventory (`.claude/skills/<name>/`) at use time, not from the marker alone.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
 skills are CONDITIONAL — invoke a skill only when the project's actual features
 call for it (a file-upload feature earns `file-upload-storage-architect` *(not installed — advisory)*; an
-large language model (LLM) feature earns `prompt-injection-defender` *(not installed — advisory)*; a purely internal single-tenant
+large language model (LLM) feature earns `prompt-injection-defender` *(not installed — gate)*; a purely internal single-tenant
 tool earns none of the tenancy skills).
 
 **The human gate (composed, never relaxed).** Before anything irreversible — a
@@ -433,7 +433,7 @@ scope, users, success, open questions) refreshed at approved checkpoints.
   (`disable-model-invocation: true`) exists to be started by a human. The
   orchestrator is auto-invocable, so treating its own firing as license to
   auto-invoke `ci-pipeline-architect` *(not installed — gate)*, `observability-operator` *(not installed — gate)*,
-  `playwright-e2e-engineer` *(not installed — advisory)*, or `prompt-injection-defender` *(not installed — advisory)* launders a human
+  `playwright-e2e-engineer` *(not installed — advisory)*, or `prompt-injection-defender` *(not installed — gate)* launders a human
   gate into an automatic hop. Explain the boundary and hand the invocation to
   the user by name.
 - **Acceptance is not authority; a business answer is not write approval.**
