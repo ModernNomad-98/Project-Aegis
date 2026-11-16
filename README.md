@@ -152,6 +152,7 @@ Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-ag
   cause](docs/paths/something-is-broken.md). Say it in plain words — "users can see someone
   else's data", "I removed someone and they still have access" — and the matching
   specialist takes it from there.
+- **"I want to test my app and find the bugs."** → [Test your app and find the bugs](docs/paths/test-your-app.md): one QA pass through the right skills, what it will and will not cover on a fresh starter install, and what you need to copy first.
 - **"I want to add AI features without opening a security hole."** → [Add AI features
   safely](docs/paths/add-ai-safely.md): threat-model first, then design the guardrails,
   then prove they hold.
