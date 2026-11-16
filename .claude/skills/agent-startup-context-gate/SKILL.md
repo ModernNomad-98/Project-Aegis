@@ -105,7 +105,7 @@ agent-authored commits to use the documented repository-local agent identity.
 
 **In a consumer/product repository (Role B), read the install mode before running the
 check**, from `docs/consumer-install-record.md` ("install mode"); when the sh route
-wrote no record, read the install-mode DECISION in `docs/project-state.md` (the one record location for decisions and approvals): Any fallback install mode is persisted in the record before it is read.
+wrote no record, read the install-mode DECISION in `docs/project-state.md` if that file exists. When neither record exists (for example a failed late `sh` probe in a fresh consumer), re-run the installer so it writes its receipt; if that is not possible, ask the user once for the mode and use the answer for the current session only — record it at the first approved `docs/project-state.md` write, and never infer or default a mode.
 - `human-only`: the agent makes no commit and changes no Git identity, so the
   owner-identity refusal does not run against the human's own commit. An authorized, dated agent-commit transition supersedes a recorded human-only mode.
 - `agent-commit`: the fail-closed check below runs for every agent commit; a commit
@@ -198,7 +198,7 @@ git var, and refuses when the effective author or committer equals the recorded
 owner or when that effective identity is missing or empty. It does NOT implement
 the explicit-source provenance step above; strict raw/malformed validation and
 provenance remain DS-R1b requirements. Installing the hook is optional; the
-manual presence/owner check and the mandatory provenance step are required. The published pre-commit hook is scoped to agent-authored commits only.
+manual presence/owner check and the mandatory provenance step are required. The published pre-commit hook is scoped to agent-authored commits only. Do not install this hook on a `human-only` install or in any workspace where the human commits under the owner identity: the hook cannot distinguish a human commit from an agent commit, so it is only safe where every commit is agent-authored.
 Install it at the effective hook path. Resolve core.hooksPath FIRST: a relative value resolves from the
 repository top level and a leading tilde expands to HOME; use git rev-parse
 --git-path hooks/pre-commit ONLY when core.hooksPath is unset. Verify the chosen path
@@ -343,7 +343,7 @@ Verdict: PROCEED | HALTED — <question for the human>
   present only on the check command, not the actual commit; report the mismatch and
   ask the human to fix it, never commit as the owner (see Git Identity Gate and its
   reference matrix). A presence/owner check success is not a full gate pass; strict
-  raw/malformed validation remains a DS-R1b requirement. A human's own commit is never refused by the gate's required behaviour; see the solo owner/`human-only` scope in the Git Identity Gate.
+  raw/malformed validation remains a DS-R1b requirement. A human's own commit is never refused by the gate's required behaviour; see the solo owner/`human-only` scope in the Git Identity Gate. Do not install the optional agent-commit hook on a `human-only` path.
 
 ## Supporting Files
 
