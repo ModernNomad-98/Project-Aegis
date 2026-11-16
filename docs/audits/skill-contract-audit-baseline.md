@@ -24,8 +24,8 @@
 > per-new-finding dispositions are recorded in the PR body, not waived by this page.
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `9639d20dffad92d4a1b63432c94702e66ae07b05` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `958cd2446ba9b69aaed83d4dabeff26f37c5d277f25430a32c727632e6c02e19` (999 files, 6911470 bytes)
+- Repo SHA: `62d782edbcdb779e27d7638c8841746ee5255c80` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `e3c057ad0bcf138171fe9f939add6e4c2eebe4fec4916e8f279bf674e18c0068` (999 files, 6912432 bytes)
 - Skills scanned: **257**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **470** (372 mechanical, 98 semantic-review candidates)
 
@@ -375,7 +375,7 @@ mechanically proven defects.
 - `promotion-packet-writer`: ready×3
 - `prompt-injection-defender`: accepted×2
 - `pwa-boundary-reviewer`: verified×1
-- `qa-orchestrator`: accepted×1, complete×1, deployed×5, planned×2, ready×2, sequenced×1, verified×1
+- `qa-orchestrator`: accepted×1, complete×1, deployed×5, ready×2, sequenced×1, verified×1
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: estimated×1, planned×1, proposed×1, sequenced×2, verified×2
 - `readme-craftsman`: complete×1, verified×3
