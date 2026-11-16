@@ -866,6 +866,11 @@
       "declares_read_only": false
     },
     {
+      "name": "qa-orchestrator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "qa-strategy-architect",
       "manual_only": false,
       "declares_read_only": false
@@ -5643,6 +5648,61 @@
       "type": "description-mention"
     },
     {
+      "from": "qa-orchestrator",
+      "to": "acceptance-criteria-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "manual-test-case-creator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "production-safe-smoke-tester",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "security-scan-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "test-plan-designer",
+      "type": "body-route"
+    },
+    {
       "from": "qa-strategy-architect",
       "to": "qa-automation-architect",
       "type": "description-mention"
@@ -7718,9 +7778,9 @@
     "model-routing-policy",
     "modernization-cutover-planner",
     "outbound-integration-adapter-designer",
-    "production-safe-smoke-tester",
     "property-based-test-designer",
     "pwa-boundary-reviewer",
+    "qa-orchestrator",
     "retrieval-engineering-designer",
     "role-coverage-test-designer",
     "saas-localization-architect",

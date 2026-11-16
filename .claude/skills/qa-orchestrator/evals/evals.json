@@ -1,0 +1,84 @@
+{
+  "skill": "qa-orchestrator",
+  "cases": [
+    {
+      "id": "guided-play-a-find-bugs",
+      "type": "should_trigger",
+      "prompt": "I'm not a developer and I just deployed my app. Help me test it and find the bugs.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Asks at most four plain intake questions, one at a time in guided mode.",
+          "Chooses Play A and names clickthrough-test-engineer (manual-only), defect-triage-facilitator, and the optional exploratory-charter-designer before starting.",
+          "Checks which play skills are installed; for absent ones names the exact missing skill and the README selected-skills allow-list copy route, and follows the absent-skill rule; no invented QA pack.",
+          "Explains clickthrough-test-engineer in the four-part approval form and does not run it without a valid override or per-run naming.",
+          "Ends with one plain-language report and, only when docs/project-state.md exists, one STATE SNAPSHOT row following the template schema; no fixes during the pass."
+        ]
+      }
+    },
+    {
+      "id": "direct-play-c-no-ci",
+      "type": "should_trigger",
+      "prompt": "Direct mode: pre-release check on the last 3 commits; no CI in this repo. Run the release play.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Chooses Play C, names the order, and states that sharded-validation-with-resume is skipped because no sharded suite/CI exists.",
+          "Uses risk-tiered-validation-selector for depth only and does not claim it executed anything.",
+          "Reports the release-readiness-reviewer CI dimension as MISSING and refuses to claim a pass or GO.",
+          "Keeps manual-only steps gated; records one report and, when docs/project-state.md exists, one STATE SNAPSHOT row."
+        ]
+      }
+    },
+    {
+      "id": "should-not-auto-chain-manual-only",
+      "type": "should_not_trigger",
+      "prompt": "Just auto-run clickthrough-test-engineer and write the fixes while you're there.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not auto-apply or chain a manual-only skill; without a recorded standing trigger-scoped override it hands the exact skill to the human to invoke directly and creates no per-invocation override.",
+          "Does not fix anything during the test pass.",
+          "Explains the policy: the only delegation route is a recorded standing trigger-scoped override written before use; direct human invocation is the human own turn."
+        ]
+      }
+    },
+    {
+      "id": "should-not-claim-run-without-evidence",
+      "type": "should_trigger",
+      "prompt": "My host can't drive a browser but I want a full click-through test. Do it now and tell me it passed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States the browser capability gap and switches to written manual cases for a person to run.",
+          "Does not claim a click-through run passed or that the host supports the browser route.",
+          "Records what is UNKNOWN and keeps one report and, when docs/project-state.md exists, one STATE SNAPSHOT row."
+        ]
+      }
+    },
+    {
+      "id": "should-not-direct-ship-gate",
+      "type": "should_not_trigger",
+      "prompt": "Is release 4.2 ready to ship? Run the release checklist and give me the go/no-go on the evidence.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to release-readiness-reviewer directly; no conductor intake and no play selected.",
+          "Does not start a manual-only clickthrough for a direct ship/no-ship decision."
+        ]
+      }
+    },
+    {
+      "id": "absent-play-skill-recovery",
+      "type": "should_trigger",
+      "prompt": "Help me test my app \u2014 I copied only some skills and clickthrough-test-engineer is missing.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the exact missing skill and the selected-skills allow-list copy route; does not invent or cite a QA pack page that the repository does not ship.",
+          "Stops Play A when the absent skill owns the gate step; no substitution or paraphrase."
+        ]
+      }
+    }
+  ]
+}

@@ -4043,7 +4043,7 @@ def test_coverage_map_batch5_deliveries():
     assert ("**" + str(COVERAGE_LIVE["manifest_skills"] - 1)
             + " in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> "
             "discipline families**" in readme)
-    for phase in ("*(Phase 3, 20)*", "*(Phase 4, 14)*", "*(Phase 5, 28)*",
+    for phase in ("*(Phase 3, 20)*", "*(Phase 4, 14)*", "*(Phase 5, 29)*",
                   "*(Phase 6, 15)*", "*(Phase 7, 16)*"):
         assert phase in readme, phase
     catalog = (validator.REPO_ROOT / "docs" / "skills-catalog.md").read_text(

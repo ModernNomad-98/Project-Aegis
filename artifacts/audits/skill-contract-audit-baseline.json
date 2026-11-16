@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.0",
     "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-    "repo_sha": "48ff9c17353563999d92c1754bb81650d1eb7aae",
-    "branch": "",
+    "repo_sha": "62d782edbcdb779e27d7638c8841746ee5255c80",
+    "branch": "p0/qa-1-qa-orchestrator-2026-11-16",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 995,
-    "audited_byte_count": 6874281,
-    "corpus_content_hash": "1675a7cf2d5c9e3cec318f800b95ccb4bfb81803d5300418c3b40423afec288b",
+    "audited_file_count": 999,
+    "audited_byte_count": 6912432,
+    "corpus_content_hash": "e3c057ad0bcf138171fe9f939add6e4c2eebe4fec4916e8f279bf674e18c0068",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "bb0e415cb0fea22ef6578afd18ba72c8af0dedb2b9c62ab83925b0e6c46c99b4"
+        "sha256": "36fe606cc897135bafe640f6d41f8a9d32576de68ecab3ed4d6d40d8d3123c30"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -39,14 +39,14 @@
         ]
       }
     },
-    "skill_count": 256,
+    "skill_count": 257,
     "rule_count": 28,
-    "finding_count": 466,
+    "finding_count": 470,
     "by_severity": {
       "P0": 3,
-      "P1": 96,
+      "P1": 97,
       "P2": 41,
-      "info": 326
+      "info": 329
     },
     "by_rule": {
       "ARTF-001": 10,
@@ -54,13 +54,13 @@
       "EVAL-003": 3,
       "PARITY-001": 38,
       "REF-003": 1,
-      "ROUTE-002": 326,
-      "SIDE-004": 82,
+      "ROUTE-002": 329,
+      "SIDE-004": 83,
       "STATE-001": 2,
       "STATE-002": 1
     },
-    "mechanical_count": 369,
-    "semantic_review_candidates": 97
+    "mechanical_count": 372,
+    "semantic_review_candidates": 98
   },
   "rule_inventory": [
     {
@@ -133,7 +133,7 @@
         "AEGIS-057"
       ],
       "limits": "covers the \u00a75 classes (source/test/config writes, VCS mutation, install, network, deploy/provision, data-store/live-state writes, spend, unbound doc/state writes) as lexical verb+noun patterns, at most ONE candidate per class per skill; fenced snippets INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; the approved-write exception applies ONLY to the doc-state-write class and ONLY when exact-path + content-preview + approval markers sit within a few lines of the write \u2014 approval language elsewhere never suppresses anything (extra negative fixture: approved-doc-writer)",
-      "hit_count": 82
+      "hit_count": 83
     },
     {
       "id": "SIDE-005",
@@ -355,7 +355,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 326
+      "hit_count": 329
     },
     {
       "id": "ROUTE-003",
@@ -5400,6 +5400,71 @@
       "mechanical": false
     },
     {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/qa-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-orchestrator",
+      "related_skills": [
+        "release-readiness-reviewer"
+      ],
+      "evidence": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "qa-orchestrator",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/qa-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-orchestrator",
+      "related_skills": [
+        "security-scan-orchestrator"
+      ],
+      "evidence": "exclusion toward `security-scan-orchestrator` is not reciprocated (security-scan-orchestrator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "qa-orchestrator",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/qa-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-orchestrator",
+      "related_skills": [
+        "systematic-debugger"
+      ],
+      "evidence": "exclusion toward `systematic-debugger` is not reciprocated (systematic-debugger's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "qa-orchestrator",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/qa-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-orchestrator",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'record entry' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "qa-orchestrator",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "SIDE-004",
       "severity": "P1",
       "file": ".claude/skills/qa-strategy-architect/SKILL.md",
@@ -8253,7 +8318,7 @@
     },
     "agent-startup-context-gate": {
       "accepted": 3,
-      "committed": 4,
+      "committed": 5,
       "complete": 3,
       "ready": 2,
       "released": 1,
@@ -8810,6 +8875,14 @@
       "accepted": 2
     },
     "pwa-boundary-reviewer": {
+      "verified": 1
+    },
+    "qa-orchestrator": {
+      "accepted": 1,
+      "complete": 1,
+      "deployed": 5,
+      "ready": 2,
+      "sequenced": 1,
       "verified": 1
     },
     "qa-strategy-architect": {

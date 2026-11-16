@@ -2,18 +2,18 @@
   "tool": "audit-skill-contracts",
   "version": "1.14.0",
   "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-  "repo_sha": "48ff9c17353563999d92c1754bb81650d1eb7aae",
-  "branch": "",
+  "repo_sha": "62d782edbcdb779e27d7638c8841746ee5255c80",
+  "branch": "p0/qa-1-qa-orchestrator-2026-11-16",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
-  "audited_file_count": 995,
-  "audited_byte_count": 6874281,
-  "corpus_content_hash": "1675a7cf2d5c9e3cec318f800b95ccb4bfb81803d5300418c3b40423afec288b",
+  "audited_file_count": 999,
+  "audited_byte_count": 6912432,
+  "corpus_content_hash": "e3c057ad0bcf138171fe9f939add6e4c2eebe4fec4916e8f279bf674e18c0068",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {
       "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-      "sha256": "bb0e415cb0fea22ef6578afd18ba72c8af0dedb2b9c62ab83925b0e6c46c99b4"
+      "sha256": "36fe606cc897135bafe640f6d41f8a9d32576de68ecab3ed4d6d40d8d3123c30"
     },
     "agent_names_enumerated": {
       "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -38,7 +38,7 @@
       ]
     }
   },
-  "skill_count": 256,
+  "skill_count": 257,
   "skills": [
     {
       "name": "ab-test-designer",
@@ -326,14 +326,14 @@
       "name": "agent-startup-context-gate",
       "skill_md": ".claude/skills/agent-startup-context-gate/SKILL.md",
       "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
-      "description_chars": 636,
+      "description_chars": 832,
       "references": [
         ".claude/skills/agent-startup-context-gate/references/context-source-checklist.md",
         ".claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 9,
+      "eval_cases": 10,
       "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
@@ -3116,6 +3116,24 @@
       "declares_read_only": false,
       "approval_related": false,
       "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "qa-orchestrator",
+      "skill_md": ".claude/skills/qa-orchestrator/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 871,
+      "references": [
+        ".claude/skills/qa-orchestrator/references/play-orders.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 6,
+      "trigger_cases": 8,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
       "writes_artifacts": false
     },
     {
