@@ -382,23 +382,33 @@ install-on-demand rather than a silent gap.
 
 ### 4.2 If the step's owning skill is missing
 
-When the skill that owns a step is not in the package, the fail-closed rule applies:
+When the skill that owns a step is not in the package, one rule decides — split by
+what the missing skill owns. This is the same rule `CLAUDE.md` item 6 states:
 
-1. name the step and the owning skill from the table above;
-2. state that it is not in the package and why (outside J1);
-3. give the exact allow-list copy command and the directory it targets;
-4. require the extension to be recorded as a DECISION in `docs/project-state.md`
-   before the step runs;
-5. **do not** substitute a paraphrase, a different skill, or an `n/a`
-   classification to get past a gate. The orchestrator's own input says the owning
-   skill "already exists; route to it, do not invent a new procedure"
-   (`SKILL.md:81-82, 518-520`), which is why absence must stop the route rather
-   than be improvised around.
+- **If it owns the gate, the stop, or the stage itself: stop.** The fail-closed rule
+  applies:
+  1. name the step and the owning skill from the table above;
+  2. state that it is not in the package and why (outside J1);
+  3. give the exact allow-list copy command and the directory it targets;
+  4. require the extension to be recorded as a DECISION in `docs/project-state.md`
+     before the step runs;
+  5. **do not** substitute a paraphrase, a different skill, or an `n/a`
+     classification to get past a gate. The orchestrator's own input says the owning
+     skill "already exists; route to it, do not invent a new procedure"
+     (`SKILL.md:81-82`), which is why absence must stop the route rather
+     than be improvised around.
+- **If it is advisory — a conditional or optional helper the step can continue
+  without: say so and continue with ordinary care.** Name it plainly as not
+  installed, do not invent it, and do not substitute a paraphrase or a different
+  skill; if the gap affects the step's result, record the limitation where the
+  step's evidence is recorded.
 
 This rule is also the consumer-side answer when an installed skill's routing text
-names one of the excluded skills: the ledger in section 4.1 and this rule are the
-instruction to follow, and the copied `SKILL.md` stays byte-identical (section 3)
-so it cannot carry a local "not installed" note.
+names one of the excluded skills: the routing text marks such a target
+*(not installed — gate)* or *(not installed — advisory)* (for example
+`project-orchestrator`'s absent-skill markers), the ledger in section 4.1 and this
+rule are the instruction to follow, and the copied `SKILL.md` stays byte-identical
+(section 3) — the consumer does not edit it to add a local "not installed" note.
 
 ## 5. Package layout in your repository
 
