@@ -15,23 +15,26 @@ and classifies defects; fixes are separate work.
 
 **Before you start — install the QA skills.** The
 [starter package](../consumer-starter-package.md) does **not** include
-`qa-orchestrator` and installs **no** manual-only skill. Copy the exact
-skills your play needs with the selected-skills allow-list route in
-[Using the skills in your own project](../../README.md#using-the-skills-in-your-own-project);
-that route is also how you extend the starter package. Check
-`.claude/skills/<name>/` for each skill. When a play step needs a skill you
-have not installed, record the extension as a DECISION in
-`docs/project-state.md` (the starter package section 4.2 rule) before the step
-runs; `docs/consumer-install-record.md` is the install receipt written by the
-starter install, not a hand-edit log. The conductor names its order first, so
-you can copy only what the reported order needs.
+`qa-orchestrator` and installs **no** manual-only skill. This is a two-stage
+copy using the selected-skills allow-list route in
+[Using the skills in your own project](../../README.md#using-the-skills-in-your-own-project):
+1) copy `qa-orchestrator` itself; 2) invoke it, and it names the play order
+before starting, so you copy only the play skills that order reports. That
+route is also how you extend the starter package. Check `.claude/skills/<name>/`
+(Claude Code startup mode), or `.agents/skills/<name>/` and
+`~/.agents/skills/<name>/` (native Agent Skills mode), for each skill. When a
+play step needs a skill you have not installed, record the extension as a
+DECISION in `docs/project-state.md` (the starter package section 4.2 rule)
+before the step runs; `docs/consumer-install-record.md` is the install receipt
+written by the starter install, not a hand-edit log.
 
 **How to run it:** open your project in your agent tool (Claude Code, OpenAI's
 Codex command-line interface (CLI), or any Agent Skills tool) and say a plain
 sentence — **Help me test my app** — or name `qa-orchestrator`. For most QA
-steps the named skill selects itself. Any **manual-only** step requires **you**
-to name that exact skill and invoke it; the conductor never runs or chains a
-manual-only skill. (Auto-selection quality varies by tool — see the README's
+steps the named skill selects itself. A **manual-only** step needs a valid
+recorded standing trigger-scoped override covering that exact step; without
+one, **you** name the exact skill and invoke it. The conductor never runs or
+chains a manual-only skill. (Auto-selection quality varies by tool — see the README's
 [tools section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
 
 ## The order
@@ -66,9 +69,9 @@ manual-only skill. (Auto-selection quality varies by tool — see the README's
      triages. That is the play's route, not a substitution and not a skipped
      check; the report states which route ran and what the human route could not
      cover. If `manual-test-case-creator` itself is absent (an applying,
-     non-conditional step), the play **stops**, names the exact skill, gives the
-     selected-skills copy route, and hands the copy plus the extension decision
-     to you (the human).
+     non-conditional step), or no person can run the generated cases, the play
+     **stops**, names the exact skill or the gap, gives the selected-skills copy
+     route, and hands the copy plus the extension decision to you (the human).
    - [`defect-triage-facilitator`](../../.claude/skills/defect-triage-facilitator/SKILL.md)
      closes the play by classifying the findings (residuals need a recorded
      disposition and follow-up identifier).
@@ -86,7 +89,8 @@ manual-only skill. (Auto-selection quality varies by tool — see the README's
    [`clickthrough-test-engineer`](../../.claude/skills/clickthrough-test-engineer/SKILL.md)
    step is **CONDITIONAL** with the same three conditions; when they fail, the
    same **written-walkthrough route** applies (or the play stops if
-   `manual-test-case-creator` is absent), exactly as in Play A. Then
+   `manual-test-case-creator` is absent or no person can run the cases), exactly
+   as in Play A. Then
    [`defect-triage-facilitator`](../../.claude/skills/defect-triage-facilitator/SKILL.md)
    classifies findings and
    [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md)
@@ -98,8 +102,10 @@ manual-only skill. (Auto-selection quality varies by tool — see the README's
    was not and why, the route taken (clickthrough or written-walkthrough) and
    what the human route could not cover, defects classed
    blocking/residual/nit, and the single most important next action. Only when
-   `docs/project-state.md` exists, the conductor appends **one**
-   `STATE SNAPSHOT` row (following the installed template schema). No fixes
+   `docs/project-state.md` exists **and you have explicitly authorized
+   documentation recording** (or given a content-specific single-use approval)
+   does the conductor append **one** `STATE SNAPSHOT` row (following the
+   installed template schema). No fixes
    happen during the pass.
 
 The three clickthrough conditions are always stated explicitly: **installed**,
@@ -118,7 +124,8 @@ pass.
 It is **not** a complete browser regression suite: the starter package installs
 no manual-only skill, so when the clickthrough conditions fail, the route is
 the written-walkthrough route (or a stop if `manual-test-case-creator` is
-missing) — never a claim that the browser was tested. There is no **always
+missing **or no person can run the generated cases**) — never a claim that the
+browser was tested. There is no **always
 stops at clickthrough** rule: a conditional step whose condition fails is
 routed, not stopped. Manual-only steps are never auto-applied, chained, or
 simulated. There is no host-support claim and no readiness claim; readiness
