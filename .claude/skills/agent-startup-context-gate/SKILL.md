@@ -1,6 +1,6 @@
 ---
 name: agent-startup-context-gate
-description: Run at the start of any repository or coding task, before reading or writing code. Verifies the working directory and workspace role from available evidence, reads project instructions and status docs, and separates verified facts from assumptions and missing information. A fresh product repository may have no remote, commits, application files, or project-state document. Use when starting work in a repo, when told to cd into a path and build something there, or when resuming a session whose context may be stale. Ask when the intended location or role is genuinely ambiguous — a path that exists is not proof it is the right repo.
+description: Run at the start of any repository or coding task, before reading or writing code. Verifies the working directory and workspace role from available evidence, reads project instructions and status docs, and separates verified facts from assumptions and missing information. A fresh product repository may have no remote, commits, application files, or project-state document. Use when starting work in a repo, when told to cd into a path and build something there, or when resuming a session whose context may be stale. Ask when the intended location or role is genuinely ambiguous — a path that exists is not proof it is the right repo. The Git Identity Gate instructs a repository-local `git config --local` write of the owner identity for its agent-commit check; that write changes local configuration only and is never committed.
 ---
 
 # Agent Startup Context Gate
@@ -96,6 +96,33 @@ The gate is REQUIRED behavior, not optional, and is not a security boundary,
 verified identity, or unbypassable control. No automatic-enforcement,
 complete-enforcement, verified-identity, readiness or CI-green claim is made.
 
+**Scope of the owner-identity stop — solo owner and `human-only` installs.** The
+owner-identity refusal below applies **only to agent-authored commits**. A commit the
+human makes under their own identity is permitted and is never refused by this gate's required behaviour:
+the solo-owner decision of 2026-10-28 (README, "Solo-owner commit identity — decided")
+allows a solo owner to commit under their own identity, and requires only
+agent-authored commits to use the documented repository-local agent identity.
+
+**In a consumer/product repository (Role B), read the install mode from the ACTIVE
+install receipt before running the check.** Resolve the active receipt first: use the
+receipt path the installer's current procedure documents as current for its version;
+across the documented v1→v2 transition a newer versioned receipt (for example
+`docs/consumer-install-record-v2.md`) supersedes the retained byte-unchanged default
+`docs/consumer-install-record.md`, and a later install-mode DECISION in
+`docs/project-state.md` supersedes either receipt. When no record exists (for example a
+failed late `sh` probe in a fresh consumer), re-run the installer so it writes its
+receipt; if that is not possible, ask the user once for the mode and use the answer for
+the current session only — record it at the first approved `docs/project-state.md`
+write, and never infer or default a mode.
+- `human-only`: the agent makes no commit and changes no Git identity, so the
+  owner-identity refusal does not run against the human's own commit. An authorized, dated agent-commit transition supersedes a recorded human-only mode.
+- `agent-commit`: the fail-closed check below runs for every agent commit; a commit
+  whose effective author or committer is the owner is refused.
+An unstated or unrecognised mode in Role B is a stop — ask for it, never default to
+one. **In Role A (the Project Aegis source library), skip the install-mode read** and
+apply the owner/agent split directly: the owner may commit under their own identity;
+an agent's commit must use the documented non-owner identity.
+
 Effective-identity policy (single source of truth): the identity reported by
 `git var GIT_AUTHOR_IDENT` / `git var GIT_COMMITTER_IDENT` is authoritative. A valid
 non-owner author AND committer exit 0 regardless of whether that identity comes from
@@ -119,7 +146,7 @@ git config --local aegis.ownerName "<owner name>"
 git config --local aegis.ownerEmail "<owner email>"
 ```
 
-Inspect effective identity; initialize MISSING before any check:
+Inspect effective identity for an AGENT-authored commit; initialize MISSING before any check (do not run this snippet against a human's own commit):
 
 ```bash
 MISSING=0
@@ -179,7 +206,7 @@ git var, and refuses when the effective author or committer equals the recorded
 owner or when that effective identity is missing or empty. It does NOT implement
 the explicit-source provenance step above; strict raw/malformed validation and
 provenance remain DS-R1b requirements. Installing the hook is optional; the
-manual presence/owner check and the mandatory provenance step are required.
+manual presence/owner check and the mandatory provenance step are required. The published pre-commit hook is scoped to agent-authored commits only. Do not install this hook on a `human-only` install or in any workspace where the human commits under the owner identity: the hook cannot distinguish a human commit from an agent commit, so it is only safe where every commit is agent-authored.
 Install it at the effective hook path. Resolve core.hooksPath FIRST: a relative value resolves from the
 repository top level and a leading tilde expands to HOME; use git rev-parse
 --git-path hooks/pre-commit ONLY when core.hooksPath is unset. Verify the chosen path
@@ -312,7 +339,8 @@ Verdict: PROCEED | HALTED — <question for the human>
 - Uncommitted changes or an unexpected branch the task does not account for →
   stop and ask before touching the tree.
 - A file the task depends on does not exist → stop and surface it.
-- Effective author or committer identity equals the recorded owner identity, is
+- For an agent-authored commit: effective author or committer identity equals the
+  recorded owner identity, is
   missing or empty, or the mandatory manual provenance step cannot establish an
   acceptable explicit source (full same-scope local/command config user.name+user.email
   pair matching the effective author pair or the effective committer pair; full
@@ -323,7 +351,7 @@ Verdict: PROCEED | HALTED — <question for the human>
   present only on the check command, not the actual commit; report the mismatch and
   ask the human to fix it, never commit as the owner (see Git Identity Gate and its
   reference matrix). A presence/owner check success is not a full gate pass; strict
-  raw/malformed validation remains a DS-R1b requirement.
+  raw/malformed validation remains a DS-R1b requirement. A human's own commit is never refused by the gate's required behaviour; see the solo owner/`human-only` scope in the Git Identity Gate. Do not install the optional agent-commit hook on a `human-only` path.
 
 ## Supporting Files
 
