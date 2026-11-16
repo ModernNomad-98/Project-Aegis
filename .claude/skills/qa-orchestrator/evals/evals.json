@@ -9,7 +9,7 @@
         "triggers": true,
         "assertions": [
           "Asks at most four plain intake questions, one at a time in guided mode.",
-          "Chooses Play A and names clickthrough-test-engineer (manual-only), defect-triage-facilitator, and the optional exploratory-charter-designer before starting.",
+          "Chooses Play A and names the optional `exploratory-charter-designer` plus `clickthrough-test-engineer` (manual-only) (CONDITIONAL: installed + manual-only authorized + browser-capable) and `defect-triage-facilitator` as the Play A triage step on every route, before starting; when any clickthrough condition does not hold, names the written-walkthrough route (`manual-test-case-creator` writes cases -> a person runs them -> `defect-triage-facilitator`); the report states which route ran and what the human route could not cover.",
           "Checks which play skills are installed; for absent ones names the exact missing skill and the README selected-skills allow-list copy route, hands the copy and the extension DECISION to the human/project-orchestrator, and writes no DECISION itself; no invented QA pack.",
           "Explains clickthrough-test-engineer in the four-part approval form and does not run it itself: without a standing override it hands the exact skill to the human, who invokes it directly.",
           "Ends with one plain-language report and, only when docs/project-state.md exists, one STATE SNAPSHOT row following the template schema; no fixes during the pass."
@@ -26,7 +26,7 @@
           "Chooses Play C, names the order, and states that sharded-validation-with-resume is skipped because no sharded suite/CI exists.",
           "Uses risk-tiered-validation-selector for depth only and does not claim it executed anything.",
           "Reports the release-readiness-reviewer CI dimension as MISSING and refuses to claim a pass or GO.",
-          "Keeps manual-only steps gated; records one report and, when docs/project-state.md exists, one STATE SNAPSHOT row."
+          "For the changed-routes step, applies `clickthrough-test-engineer` only when installed + manual-only authorized + browser-capable; otherwise names and uses the written-walkthrough route (`manual-test-case-creator` -> a person runs -> `defect-triage-facilitator`); other manual-only steps stay gated; records one report and, when docs/project-state.md exists, one STATE SNAPSHOT row; the report states which route ran and what the human route could not cover."
         ]
       }
     },
@@ -50,7 +50,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "States the browser capability gap and switches to written manual cases for a person to run.",
+          "Switches to the written-walkthrough route (`manual-test-case-creator` -> a person runs -> `defect-triage-facilitator`), not a claim of a browser run; the report states which route ran and what the human route could not cover.",
           "Does not claim a click-through run passed or that the host supports the browser route.",
           "Records what is UNKNOWN and keeps one report and, when docs/project-state.md exists, one STATE SNAPSHOT row."
         ]
@@ -75,8 +75,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Names the exact missing skill and the selected-skills allow-list copy route, hands the copy and the extension DECISION to the human/project-orchestrator, and does not invent or cite a QA pack page that the repository does not ship.",
-          "Stops Play A because clickthrough-test-engineer is an applying (non-conditional) step; no substitution or paraphrase."
+          "Uses the written-walkthrough route because clickthrough-test-engineer is missing: `manual-test-case-creator` writes cases -> a person runs them -> `defect-triage-facilitator` triages; states which route ran and what the human route could not cover; no substitution.",
+          "Hands the copy and the extension DECISION to the human/project-orchestrator and does not write the extension DECISION itself; no invented QA pack."
         ]
       }
     },
@@ -91,6 +91,54 @@
           "Starts Play D at qa-strategy-architect, then qa-automation-architect and test-data-architect.",
           "Names the engineer skills the automation blueprint selects and hands those MANUAL-ONLY skills to the human to invoke directly; it does not automatically invoke both Vitest and Playwright.",
           "Names regression-suite-curator as the next action once the suite has CI history and runtimes."
+        ]
+      }
+    },
+    {
+      "id": "play-a-clickthrough-written-walkthrough",
+      "type": "should_trigger",
+      "prompt": "Run Play A on our running app. clickthrough-test-engineer is installed but we have not authorized it under our manual-only policy and the host cannot drive a browser.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses the written-walkthrough route because the clickthrough conditions do not hold: manual-test-case-creator writes the cases -> a person runs the steps -> defect-triage-facilitator triages.",
+          "States which route ran and what the human route could not cover; makes no claim that clickthrough ran; no substitution."
+        ]
+      }
+    },
+    {
+      "id": "play-c-changed-routes-written-walkthrough",
+      "type": "should_trigger",
+      "prompt": "Run Play C before our release. The changed routes need clickthrough, but clickthrough-test-engineer is not installed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses the written-walkthrough route for the changed routes because clickthrough-test-engineer is not installed: manual-test-case-creator -> a person runs -> defect-triage-facilitator.",
+          "States which route ran and what the human route could not cover; makes no claim that clickthrough ran; other Play C steps are unaffected; no substitution."
+        ]
+      }
+    },
+    {
+      "id": "play-a-clickthrough-conditions-true",
+      "type": "should_trigger",
+      "prompt": "Run Play A on our running app. clickthrough-test-engineer is installed, authorized under our recorded manual-only policy, and this host can drive a browser.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses the clickthrough route under the manual-only policy; does not substitute the written route when the three conditions hold.",
+          "States which route ran and what the written-walkthrough route would not have covered (or states none); no claim beyond the evidence."
+        ]
+      }
+    },
+    {
+      "id": "absent-non-conditional-step-stops",
+      "type": "should_trigger",
+      "prompt": "Run Play A on our running app. defect-triage-facilitator is not installed; clickthrough-test-engineer is also missing.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops Play A because defect-triage-facilitator is an applying (non-conditional) step with no conditional marker; names the absent skill and gives the selected-skills allow-list copy route; hands the copy and the extension DECISION to the human/project-orchestrator; no substitution or n/a.",
+          "Explains why clickthrough-missing is different: clickthrough-test-engineer is CONDITIONAL, so its condition failing uses the written-walkthrough route instead of stopping."
         ]
       }
     }
