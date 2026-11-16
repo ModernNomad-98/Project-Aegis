@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "fd631824a551e0b96fc1d5dd6f41c2328cc588e9",
+  "source_revision": "3a55163a2f9d574be8590ea441aae1169129a1ef",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -871,7 +871,7 @@
     {
       "name": "qa-orchestrator",
       "path": ".claude/skills/qa-orchestrator/SKILL.md",
-      "sha256": "b8fbc34c7d55264c1a6c91d2002b2cb7bf19379e6c1e3f86882ef8d8bcf0bb74"
+      "sha256": "1414233d55bf1994f8f06e893539bd34eabe891b14b951fd73754aa864a0fef9"
     },
     {
       "name": "qa-strategy-architect",
