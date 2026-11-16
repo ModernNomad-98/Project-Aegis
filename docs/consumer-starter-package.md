@@ -2142,9 +2142,12 @@ Highest first, applied in your product repository:
 ### 10.3 Two records, one domain split
 
 The override register governs only manual-only triggers; `A-*` entries govern
-everything else. Where they overlap, the later lifecycle event wins. That ordering
-is this package's reading of two documents that do not address each other; if the
-case is genuinely unclear, stop and ask rather than picking one.
+everything else. An override is an authorization record, not a waiver: it never
+substitutes for any other required approval or authority, and an `A-*` grant never
+substitutes for a manual-only override. Both domains must be independently valid for
+the action to proceed; a later event in one domain cannot revive a revoked, stale or
+missing authority in the other. Within one domain the later lifecycle event governs.
+If the case is genuinely unclear, stop and ask rather than picking one.
 
 ### 10.4 What a consumer must never import
 
