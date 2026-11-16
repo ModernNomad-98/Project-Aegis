@@ -3,13 +3,13 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.0",
     "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-    "repo_sha": "5c2f13c5bb37a910b5adfd8674abd095ad945878",
+    "repo_sha": "364e41ade913c794d814845a131b4b06c0939002",
     "branch": "p0/qa-1-qa-orchestrator-2026-11-16",
     "working_tree_dirty": true,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 999,
-    "audited_byte_count": 6903615,
-    "corpus_content_hash": "98811bbea0aea7a516d82b8a780c5a876f9d2c12bdd84419e8ea883699c7bbec",
+    "audited_byte_count": 6909544,
+    "corpus_content_hash": "e03e55a761855278626cdfeffc6fa01dcc72aa4cc94bc7eaed1600cb9063cc01",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -41,12 +41,12 @@
     },
     "skill_count": 257,
     "rule_count": 28,
-    "finding_count": 469,
+    "finding_count": 470,
     "by_severity": {
       "P0": 3,
       "P1": 97,
       "P2": 41,
-      "info": 328
+      "info": 329
     },
     "by_rule": {
       "ARTF-001": 10,
@@ -54,12 +54,12 @@
       "EVAL-003": 3,
       "PARITY-001": 38,
       "REF-003": 1,
-      "ROUTE-002": 328,
+      "ROUTE-002": 329,
       "SIDE-004": 83,
       "STATE-001": 2,
       "STATE-002": 1
     },
-    "mechanical_count": 371,
+    "mechanical_count": 372,
     "semantic_review_candidates": 98
   },
   "rule_inventory": [
@@ -355,7 +355,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 328
+      "hit_count": 329
     },
     {
       "id": "ROUTE-003",
@@ -5406,6 +5406,22 @@
       "line": 0,
       "owning_skill": "qa-orchestrator",
       "related_skills": [
+        "release-readiness-reviewer"
+      ],
+      "evidence": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "qa-orchestrator",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/qa-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-orchestrator",
+      "related_skills": [
         "security-scan-orchestrator"
       ],
       "evidence": "exclusion toward `security-scan-orchestrator` is not reciprocated (security-scan-orchestrator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
@@ -5438,7 +5454,7 @@
       "line": 0,
       "owning_skill": "qa-orchestrator",
       "related_skills": [],
-      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'write the plain-language report' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'record entry' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
       "family": "side-effect",
       "aegis_map": [
         "AEGIS-020",
@@ -8865,6 +8881,8 @@
       "accepted": 1,
       "complete": 1,
       "deployed": 5,
+      "planned": 2,
+      "ready": 2,
       "sequenced": 1,
       "verified": 1
     },

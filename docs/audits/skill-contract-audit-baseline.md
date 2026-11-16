@@ -13,11 +13,10 @@
 > line that fails that assertion (verified by running the test before and after
 > the refresh)) with engine
 > v1.14.0 **unchanged**: this is a corpus/baseline refresh, not an engine
-> change (engine v1.14.0 remains the same engine recorded by the prior
-> baseline). The audit runs over the Repo SHA below, a commit on the content
+> change. The audit runs over the Repo SHA below, a commit on the content
 > branch that contains every change the PR makes to the files the audit reads
 > (checkout with `core.autocrlf=false`; the branch field in the generated
-> header records the checkout branch). The previous baseline (256 skills,
+> header records the checkout branch). The previous merged baseline (256 skills,
 > 466 findings, engine v1.14.0 over `48ff9c17353563999d92c1754bb81650d1eb7aae`,
 > regenerated under AEGIS-APR-169/170) is in git history; this page reports the
 > current baseline only.
@@ -25,10 +24,10 @@
 > per-new-finding dispositions are recorded in the PR body, not waived by this page.
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `5c2f13c5bb37a910b5adfd8674abd095ad945878` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: true; dirty scanned surfaces: none)
-- Corpus content hash: `98811bbea0aea7a516d82b8a780c5a876f9d2c12bdd84419e8ea883699c7bbec` (999 files, 6903615 bytes)
+- Repo SHA: `364e41ade913c794d814845a131b4b06c0939002` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: true; dirty scanned surfaces: none)
+- Corpus content hash: `e03e55a761855278626cdfeffc6fa01dcc72aa4cc94bc7eaed1600cb9063cc01` (999 files, 6909544 bytes)
 - Skills scanned: **257**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
-- Findings: **469** (371 mechanical, 98 semantic-review candidates)
+- Findings: **470** (372 mechanical, 98 semantic-review candidates)
 
 Findings are EXPECTED here: this report records the corpus as it is
 at the Repo SHA above, after whatever remediation that commit already
@@ -71,7 +70,7 @@ mechanically proven defects.
 | STATE-005 | P1 | semantic-candidate | narrative approved-state section inside an append-only contract | 0 |
 | ARTF-001 | P1 | semantic-candidate | durability claim without a durability level | 10 |
 | ROUTE-001 | P1 | mechanical | routing reference to a name that is not on disk | 0 |
-| ROUTE-002 | info | mechanical | exclusion toward a neighbor that never reciprocates (CENSUS) | 328 |
+| ROUTE-002 | info | mechanical | exclusion toward a neighbor that never reciprocates (CENSUS) | 329 |
 | ROUTE-003 | P1 | mechanical | a Stage-2 route reaches the commitments skill without a readiness/NOT-COMMIT-ABLE guard ON THAT ROUTE, or the roadmap owner is not independently classified | 0 |
 | VOCAB-002 | P1 | semantic-candidate | committed used as a roadmap horizon label | 0 |
 | VOCAB-003 | P0 | semantic-candidate | approved scope described as a commitment | 0 |
@@ -99,7 +98,7 @@ mechanically proven defects.
 | P0 | 3 |
 | P1 | 97 |
 | P2 | 41 |
-| info | 328 |
+| info | 329 |
 
 | Rule | Count |
 |---|---:|
@@ -108,7 +107,7 @@ mechanically proven defects.
 | EVAL-003 | 3 |
 | PARITY-001 | 38 |
 | REF-003 | 1 |
-| ROUTE-002 | 328 |
+| ROUTE-002 | 329 |
 | SIDE-004 | 83 |
 | STATE-001 | 2 |
 | STATE-002 | 1 |
@@ -175,7 +174,7 @@ mechanically proven defects.
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:187` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:199` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-automation-architect/SKILL.md` (owner: qa-automation-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-orchestrator/SKILL.md` (owner: qa-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'write the plain-language report' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
+- **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-orchestrator/SKILL.md` (owner: qa-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record entry' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-strategy-architect/SKILL.md` (owner: qa-strategy-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeded database' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-strategy-architect/SKILL.md` (owner: qa-strategy-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/realtime-subscription-architect/SKILL.md` (owner: realtime-subscription-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
@@ -220,7 +219,7 @@ mechanically proven defects.
 
 - **EVAL-002** × 3 — e.g. `.claude/skills/complete-project-checkpoint/evals/trigger-evals.json`: trigger-evals case 'authoring-skill' names no expected_skill — unjudgeable as written
 - **PARITY-001** × 38 — e.g. `.claude/skills/application-layer-pattern-advisor/SKILL.md`: Validation Checklist contains no checkbox items — nothing verifiable
-- **ROUTE-002** × 328 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
+- **ROUTE-002** × 329 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
 
 ## Vocabulary census (non-zero skills)
 
@@ -376,7 +375,7 @@ mechanically proven defects.
 - `promotion-packet-writer`: ready×3
 - `prompt-injection-defender`: accepted×2
 - `pwa-boundary-reviewer`: verified×1
-- `qa-orchestrator`: accepted×1, complete×1, deployed×5, sequenced×1, verified×1
+- `qa-orchestrator`: accepted×1, complete×1, deployed×5, planned×2, ready×2, sequenced×1, verified×1
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: estimated×1, planned×1, proposed×1, sequenced×2, verified×2
 - `readme-craftsman`: complete×1, verified×3
