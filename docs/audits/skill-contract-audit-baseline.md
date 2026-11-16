@@ -7,8 +7,11 @@
 > **Regenerated 2026-11-16 under the owner one-time QA-1 grant** (the QA-1
 > PR grant recorded in the [approval register](../approvals/APPROVAL_REGISTER.md)
 > as AEGIS-APR-172; that grant permits one protected test literal and the
-> register append, and this baseline refresh is the unlocked artifacts work
-> the registration needs to pass the validator self-tests) with engine
+> register append. This baseline refresh is unlocked artifacts work that the
+> required validator self-test demands: its T5 README-writer case asserts the
+> exact writer output, and a stale baseline skill count adds an advisory warning
+> line that fails that assertion (verified by running the test before and after
+> the refresh)) with engine
 > v1.14.0 **unchanged**: this is a corpus/baseline refresh, not an engine
 > change (engine v1.14.0 remains the same engine recorded by the prior
 > baseline). The audit runs over the Repo SHA below, a commit on the content
