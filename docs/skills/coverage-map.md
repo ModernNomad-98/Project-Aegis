@@ -28,7 +28,7 @@ The validator enforces the convention and fails closed on an unknown
 skill-shaped shipped-as token, on a malformed/no-token shipped-as phrase,
 and on an unusable manifest.
 
-The shipped library deliberately exceeds and interleaves with the roadmap. 87 of 256 shipped skills are beyond it.
+The shipped library deliberately exceeds and interleaves with the roadmap. 88 of 257 shipped skills are beyond it.
 
 Row-level evidence companion: [audit registers index](../audits/README.md) (read-only reference, not build authorization).
 
@@ -63,9 +63,9 @@ planning-gate decision after the resolved rows are subtracted.
 | none | 0 |
 | P0 / P1 / P2 | 126 / 149 / 25 |
 | P0 / P1 / P2 gaps | 0 / 0 / 0 |
-| Manifest skills | 256 |
+| Manifest skills | 257 |
 | Distinct covering skills | 169 |
-| Beyond-roadmap shipped skills | 87 |
+| Beyond-roadmap shipped skills | 88 |
 | Review pending | 114 |
 
 ## Per-area status

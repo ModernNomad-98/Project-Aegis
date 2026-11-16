@@ -1,0 +1,75 @@
+{
+  "skill": "qa-orchestrator",
+  "description": "Trigger discrimination for the QA conductor (this skill) vs the project journey front door (project-orchestrator), product-wide QA strategy (qa-strategy-architect), a single test plan (test-plan-designer), a security scan (security-scan-orchestrator), and root-cause debugging (systematic-debugger, manual-only).",
+  "overlaps_with": [
+    "project-orchestrator",
+    "qa-strategy-architect",
+    "test-plan-designer",
+    "security-scan-orchestrator",
+    "systematic-debugger"
+  ],
+  "cases": [
+    {
+      "id": "conductor-wins-here",
+      "prompt": "I do not know where to start with testing. Help me test my app end to end and tell me what to fix first.",
+      "expected_skill": "qa-orchestrator",
+      "should_not_trigger": [
+        "project-orchestrator",
+        "qa-strategy-architect",
+        "test-plan-designer"
+      ],
+      "note": "PRIMARY \u2014 the user wants the QA work chosen and sequenced, not the whole product journey and not one named QA document.",
+      "reason": "Sequencing a complete QA pass across the fixed plays is the conductor; project-orchestrator routes the product journey, qa-strategy-architect defines product-wide strategy, test-plan-designer writes one plan."
+    },
+    {
+      "id": "journey-goes-to-project-orchestrator",
+      "prompt": "I want to build and ship a product from my idea \u2014 what do I do first?",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": [
+        "qa-orchestrator"
+      ],
+      "note": "JOURNEY-vs-QA SEAM \u2014 no testing goal is stated; the request is the whole lifecycle.",
+      "reason": "The beginner journey across stages is project-orchestrator; the QA conductor only runs after there is something to test."
+    },
+    {
+      "id": "strategy-goes-to-qa-strategy-architect",
+      "prompt": "Define our product-wide QA strategy: risk inventory, which layers we automate vs keep manual, and ownership per layer.",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": [
+        "qa-orchestrator"
+      ],
+      "note": "STRATEGY-vs-PLAY SEAM \u2014 product-level rules, not one play.",
+      "reason": "Product-wide QA strategy is qa-strategy-architect; the conductor chooses and runs a play for a testing goal."
+    },
+    {
+      "id": "single-plan-goes-to-test-plan-designer",
+      "prompt": "Write the test plan for the checkout feature only \u2014 scope, layers, exit criteria.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "qa-orchestrator"
+      ],
+      "note": "SCOPED SINGLE SKILL \u2014 the user names the artifact they want.",
+      "reason": "A single feature test plan is test-plan-designer directly; it is play B only when the user needs the play chosen and run."
+    },
+    {
+      "id": "security-scan-goes-to-security-scan-orchestrator",
+      "prompt": "Run a whole-repo security scan and give me one aggregated report of SAST, dependency and secret findings.",
+      "expected_skill": "security-scan-orchestrator",
+      "should_not_trigger": [
+        "qa-orchestrator"
+      ],
+      "note": "SECURITY SCAN vs QA PASS \u2014 static security scanning is a different deliverable.",
+      "reason": "Whole-repo static security scanning/aggregation is security-scan-orchestrator; QA functional testing is the conductor."
+    },
+    {
+      "id": "root-cause-goes-to-systematic-debugger",
+      "prompt": "This bug keeps happening and I need the root cause found and fixed now.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "qa-orchestrator"
+      ],
+      "note": "ROOT CAUSE (manual-only) \u2014 the conductor names and stops.",
+      "reason": "Driving a bug to root cause is systematic-debugger (manual-only); the conductor only routes blockers there and never runs it."
+    }
+  ]
+}
