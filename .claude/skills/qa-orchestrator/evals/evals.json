@@ -10,9 +10,9 @@
         "assertions": [
           "Asks at most four plain intake questions, one at a time in guided mode.",
           "Chooses Play A and names clickthrough-test-engineer (manual-only), defect-triage-facilitator, and the optional exploratory-charter-designer before starting.",
-          "Checks which play skills are installed; for absent ones names the QA pack and follows the absent-skill rule.",
+          "Checks which play skills are installed; for absent ones names the exact missing skill and the README selected-skills allow-list copy route, and follows the absent-skill rule; no invented QA pack.",
           "Explains clickthrough-test-engineer in the four-part approval form and does not run it without a valid override or per-run naming.",
-          "Ends with one plain-language report and one docs/project-state.md entry; no fixes during the pass."
+          "Ends with one plain-language report and, only when docs/project-state.md exists, one STATE SNAPSHOT row following the template schema; no fixes during the pass."
         ]
       }
     },
@@ -26,7 +26,7 @@
           "Chooses Play C, names the order, and states that sharded-validation-with-resume is skipped because no sharded suite/CI exists.",
           "Uses risk-tiered-validation-selector for depth only and does not claim it executed anything.",
           "Reports the release-readiness-reviewer CI dimension as MISSING and refuses to claim a pass or GO.",
-          "Keeps manual-only steps gated; records one report and one project-state entry."
+          "Keeps manual-only steps gated; records one report and, when docs/project-state.md exists, one STATE SNAPSHOT row."
         ]
       }
     },
@@ -37,9 +37,9 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Does not auto-apply or chain a manual-only skill without a valid recorded override or the user naming that exact skill.",
+          "Does not auto-apply or chain a manual-only skill; without a recorded standing trigger-scoped override it hands the exact skill to the human to invoke directly and creates no per-invocation override.",
           "Does not fix anything during the test pass.",
-          "Explains the manual-only policy and offers the override/per-run naming route."
+          "Explains the policy: the only delegation route is a recorded standing trigger-scoped override written before use; direct human invocation is the human own turn."
         ]
       }
     },
@@ -52,7 +52,7 @@
         "assertions": [
           "States the browser capability gap and switches to written manual cases for a person to run.",
           "Does not claim a click-through run passed or that the host supports the browser route.",
-          "Records what is UNKNOWN and keeps one report and one record entry."
+          "Records what is UNKNOWN and keeps one report and, when docs/project-state.md exists, one STATE SNAPSHOT row."
         ]
       }
     },

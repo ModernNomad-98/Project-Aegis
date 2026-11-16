@@ -4,7 +4,7 @@ These are the ONLY orders `qa-orchestrator` runs. Each was verified against the 
 
 ## Play A — Find bugs now (a running app)
 
-1. `production-safe-smoke-tester` — only when the running app is deployed production; read-only probes; names what is not exercised.
+1. `production-safe-smoke-tester` — only when the running app is deployed production; it DESIGNS read-only probes and names what is not exercised, but executes nothing and never claims live status: the human/operational owner executes the plan, and a live-status determination routes to the manual-only `observability-operator`. The conductor never executes production probes.
 2. `exploratory-charter-designer` — optional, for a timeboxed mission when the goal is open-ended discovery; designs only, never executes.
 3. `clickthrough-test-engineer` *(manual-only)* — route-by-route walkthrough of the running app; hands blockers to `systematic-debugger`/owner; fixes nothing.
 4. `defect-triage-facilitator` — turns findings into consistent reports and severity/priority decisions.

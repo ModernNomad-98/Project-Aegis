@@ -1326,7 +1326,7 @@ production-safe smoke delivery #188):
 
 | Skill | What it does | Invocation |
 |---|---|---|
-| `qa-orchestrator` | The QA conductor: one plain entry ("help me test my app"), at most four intake questions, one fixed play (find bugs now / plan tests for a change / pre-release check / set up automated tests) with every skill named in order before starting, absent-skill and manual-only handling through the consumer policy, one bounded fix round, and ONE plain-language report plus one `docs/project-state.md` STATE SNAPSHOT entry. Runs no app, writes no tests, fixes nothing. | auto + manual |
+| `qa-orchestrator` | The QA conductor: one plain entry ("help me test my app"), at most four intake questions, one fixed play (find bugs now / plan tests for a change / pre-release check / set up automated tests) with every skill named in order before starting, absent-skill and manual-only handling through the consumer policy, one bounded fix round, and ONE plain-language report plus, when `docs/project-state.md` exists, one STATE SNAPSHOT row. Runs no app, writes no tests, fixes nothing. | auto + manual |
 | `export-qa-strategy-designer` | Export QA strategy: staged contracts, dataset/edge coverage, partial-failure recovery, idempotency, tenant isolation, expected-result evidence; design-only. | auto + manual |
 | `import-qa-strategy-designer` | Import QA strategy: staged contracts, dataset/edge coverage, partial-failure recovery, idempotency, tenant isolation, expected-result evidence; design-only. | auto + manual |
 | `qa-strategy-architect` | Product-level QA strategy: ranked risk inventory → cheapest-reliable-layer decisions, explicit automation/manual split, evidence per change class, CI gates, ownership. | auto + manual |
