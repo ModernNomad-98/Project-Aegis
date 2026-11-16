@@ -1,6 +1,6 @@
 # Play orders — the four fixed QA plays
 
-These are the ONLY orders `qa-orchestrator` runs. Each was verified against the named skills' own "Use when"/"Do NOT use when"/handoff lines. Do not invent a fifth order; if a goal matches none, ask one scoping question.
+These are the ONLY orders `qa-orchestrator` runs. Do not invent a fifth order; if a goal matches none, ask one scoping question.
 
 ## Play A — Find bugs now (a running app)
 
@@ -35,7 +35,7 @@ With an existing test suite:
 2. `qa-strategy-architect` — product-wide strategy (risk inventory, layer split, manual-vs-automated).
 3. `qa-automation-architect` — framework/tooling/parallelization design; its blueprint selects the tools and layers for THIS repo stack.
 4. `test-data-architect` — deterministic test data per layer (no secrets; non-production only).
-5. `test-tenant-provisioner` *(manual-only)* — ONLY when non-production test accounts must be created, and BEFORE any engineer run that needs them.
+5. `test-tenant-provisioner` *(manual-only)* — ONLY when non-production test accounts are missing, drifted or hand-made, or need validation or repair (including stale auth fixtures); validate-only is the default; BEFORE any engineer run that needs them.
 6. The engineer skill(s) the blueprint SELECTS — for example `vitest-unit-component-engineer` *(manual-only)* and/or `playwright-e2e-engineer` *(manual-only)*, not automatically both; a stack with no browser layer names no browser engineer.
 7. `regression-suite-curator` — ONLY when the suite has CI history and runtimes; otherwise name the curator as the next action once the suite has run in CI.
 
@@ -49,7 +49,7 @@ With NO test suite, Play D starts at `qa-strategy-architect`: `test-coverage-map
 - `production-safe-smoke-tester` — deployed-production safety only.
 - `screenshot-evidence-planner` — evidence conventions when screenshots are captured.
 - `systematic-debugger` *(manual-only)* — root cause, outside the conductor.
-- `test-tenant-provisioner` *(manual-only)* — only with non-production test accounts.
+- `test-tenant-provisioner` *(manual-only)* — only with non-production test accounts (creation, validation or repair; missing, drifted or hand-made accounts; stale auth fixtures; validate-only is the default).
 - `local-ci-mirror-preflight` *(manual-only)* — the execution owner for Play C when the project's route is the local CI mirror; handed to the human, never auto-run.
 
 These are conductor-composed orders. Where two skills do not hand off to each other (notably `test-coverage-mapper` then `qa-strategy-architect`), the order is the conductor's choice, not a skill handoff.
