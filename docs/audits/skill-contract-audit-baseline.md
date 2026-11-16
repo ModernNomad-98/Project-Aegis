@@ -13,18 +13,18 @@
 > line that fails that assertion (verified by running the test before and after
 > the refresh)) with engine
 > v1.14.0 **unchanged**: this is a corpus/baseline refresh, not an engine
-> change. The audit runs over the Repo SHA below, a commit on the content
+> change. The audit runs over the Repo SHA below — a commit on the content
 > branch that contains every change the PR makes to the files the audit reads
-> (checkout with `core.autocrlf=false`; the branch field in the generated
-> header records the checkout branch). The previous merged baseline (256 skills,
-> 466 findings, engine v1.14.0 over `48ff9c17353563999d92c1754bb81650d1eb7aae`,
-> regenerated under AEGIS-APR-169/170) is in git history; this page reports the
-> current baseline only.
+> (checkout with `core.autocrlf=false`; the generated header records
+> `working tree dirty: false`, and the branch field records the checkout branch).
+> The previous merged baseline (256 skills, 466 findings, engine v1.14.0 over
+> `48ff9c17353563999d92c1754bb81650d1eb7aae`, regenerated under AEGIS-APR-169/170)
+> is in git history; this page reports the current baseline only.
 > Structural findings are not behavioral proof. The finding delta and
 > per-new-finding dispositions are recorded in the PR body, not waived by this page.
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `1fa7edefcadc834091dd5bca2caa9f308066417f` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: true; dirty scanned surfaces: none)
+- Repo SHA: `9639d20dffad92d4a1b63432c94702e66ae07b05` (branch `p0/qa-1-qa-orchestrator-2026-11-16`; working tree dirty: false; dirty scanned surfaces: none)
 - Corpus content hash: `958cd2446ba9b69aaed83d4dabeff26f37c5d277f25430a32c727632e6c02e19` (999 files, 6911470 bytes)
 - Skills scanned: **257**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **470** (372 mechanical, 98 semantic-review candidates)
