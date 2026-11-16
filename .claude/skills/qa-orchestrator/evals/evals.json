@@ -55,6 +55,30 @@
           "Records what is UNKNOWN and keeps one report and one record entry."
         ]
       }
+    },
+    {
+      "id": "should-not-direct-ship-gate",
+      "type": "should_not_trigger",
+      "prompt": "Is release 4.2 ready to ship? Run the release checklist and give me the go/no-go on the evidence.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to release-readiness-reviewer directly; no conductor intake and no play selected.",
+          "Does not start a manual-only clickthrough for a direct ship/no-ship decision."
+        ]
+      }
+    },
+    {
+      "id": "absent-play-skill-recovery",
+      "type": "should_trigger",
+      "prompt": "Help me test my app \u2014 I copied only some skills and clickthrough-test-engineer is missing.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the exact missing skill and the selected-skills allow-list copy route; does not invent or cite a QA pack page that the repository does not ship.",
+          "Stops Play A when the absent skill owns the gate step; no substitution or paraphrase."
+        ]
+      }
     }
   ]
 }

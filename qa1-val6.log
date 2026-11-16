@@ -1,0 +1,798 @@
+Self-testing validate-skills.py and check_dco.py ...
+
+test_dsr1b_identity_gate_fallback_justification - DS-R1b: inherited_fallback needs the global value to equal the effective one.
+  PASS  DS-R1b fallback justification requires equality with the effective value
+
+test_dsr1b_identity_gate_owner_semantics - DS-R1b: owner STOP is email equality (case-insensitive) or both fields.
+  PASS  DS-R1b owner STOP uses case-insensitive email equality and raw owner validation
+
+test_dsr1b_identity_gate_command_config - DS-R1b: Git itself decodes command-scope config, including hard quoting.
+  PASS  DS-R1b command-scope config is decoded by Git itself, including hard quoting
+
+test_dsr1b_identity_gate_manual_matrix - DS-R1b: manual gate strict identity/explicit-source/owner behavior.
+  PASS  DS-R1b manual identity gate accepts/rejects explicit-source, owner, duplicate and malformed cases
+
+test_fix942_total_guard_regressions - Fix-forward #942: total-key/copied-total guards and exact surfaces.
+
+test_ds7cfixb_coverage_detector_matrix - DS-7c-fix-b: derived-total parser matrix, nested exact-int, trim, priority.
+
+test_ds7cfixc_priority_forms - DS-7c-fix-c: explicit priority keyword/copula/punctuation forms.
+
+test_ds7cfixc_residual_matrix - DS-7c-fix-c: bounded residual detector forms (implemented cases).
+
+test_ds7cfixc_row_ids_duplicate_and_normalization - DS-7c-fix-c: duplicate ids rejected; canonical names strip+casefold.
+
+test_ds7cc_priority_key_totals - DS-7c-c: priority-key derived totals are count copies, not prose.
+
+test_ds7cc_coverage_row_ids_hardening - DS-7c-c: row-id mapping is unique, complete and fails loudly on drift.
+
+test_strict_yaml_parse - D50: frontmatter must parse under a spec-strict YAML parser.
+  PASS  strict-YAML accepts a single-quoted description containing ': ' (no errors)
+  PASS  strict-YAML rejects an unquoted ': ' (the 67-skill Codex drop, D49/D50)
+        fired: [bad-skill] frontmatter does not parse as strict YAML: mapping values are not allowed here in "<unicode string>", line 2, column ...
+  PASS  non-mapping frontmatter rejected
+        fired: [listy] frontmatter must parse to a YAML mapping, got list
+
+test_description_block_scalar - D50 follow-up: a `description:` block scalar is forbidden pre-parse.
+  PASS  block-scalar description '>' rejected
+        fired: [x] `description:` opens a YAML block scalar ('>') — forbidden by the Portability contract in docs/skill-generation-standard.md (...
+  PASS  block-scalar description '|' rejected
+        fired: [x] `description:` opens a YAML block scalar ('|') — forbidden by the Portability contract in docs/skill-generation-standard.md (...
+  PASS  a single-quoted description is not a block scalar (no errors)
+
+test_manual_only_sentinel_bidirectional - D50: `disable-model-invocation` and the sentinel must agree both ways.
+  PASS  field -> sentinel: manual-only skill missing the sentinel is rejected
+        fired: [x] disable-model-invocation is true but the parsed description does not START with the exact sentinel 'MANUAL-ONLY; never auto-i...
+  PASS  sentinel -> field: sentinel without the field is rejected
+        fired: [x] description claims MANUAL-ONLY (starts with the exact 32-char sentinel) but disable-model-invocation is not set — Claude Code...
+  PASS  field + sentinel agreeing is accepted (no errors)
+  PASS  an ordinary auto-invocable skill is accepted (no errors)
+
+test_readme_count_markers - D43: the marked counts must reconcile with the real skills on disk.
+  PASS  README fixture reconciles (SKILL-COUNT 5, 2+2 families +1) (no errors)
+  PASS  stale SKILL-COUNT marker rejected
+        fired: README SKILL-COUNT marker says 7 but 5 skill(s) exist on disk (update the marked count in the "What's in the library" intro)
+  PASS  roster family counts out of sync rejected
+        fired: README roster family counts sum to 9 + 1 orchestrator = 10, but 5 skill(s) exist on disk (a family's *(Phase/D, N)* count is out ...
+  PASS  roster that no longer matches the disk count is rejected
+        fired: README roster family counts sum to 4 + 1 orchestrator = 5, but 99 skill(s) exist on disk (a family's *(Phase/D, N)* count is out ...
+
+test_coverage_map_clean - Clean map: the live map, and pristine temp copies, validate with no errors.
+  PASS  coverage map: live map passes check_coverage_map (no errors)
+  PASS  coverage map: pristine fixture pair passes (no errors)
+
+test_coverage_map_missing_row - Missing row: a short-entry map fails the exact-row-count rule.
+  PASS  coverage map: missing row rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpsffepe06\coverage-map.json] entries must contain exactly 300 rows (found 299)
+
+test_coverage_map_duplicate_id - Duplicate id: two rows with the same id are rejected.
+  PASS  coverage map: duplicate id rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpuxg6rt2i\coverage-map.json] duplicate entry id(s) present
+
+test_coverage_map_area_range - Area range: an id outside its area's range is rejected.
+  PASS  coverage map: area-range violation rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpsa08831w\coverage-map.json] entry 1: area 02 does not contain its id (range 56-90)
+
+test_coverage_map_doc_fidelity - Doc fidelity: a renamed row or a changed priority is rejected.
+  PASS  coverage map: name mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpcts0bqhe\coverage-map.json] entry 30: name must equal the docs/skills row 'Plugin Bounda...
+  PASS  coverage map: priority mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp0k3btd2q\coverage-map.json] entry 30: priority must equal the docs/skills row (P2)
+
+test_coverage_map_status_grade - Status/grade: invalid values and invalid pairings are rejected.
+  PASS  coverage map: status/grade pairing rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp0l3z08os\coverage-map.json] entry 1: status SHIPPED cannot carry evidence_grade capabili...
+  PASS  coverage map: invalid status rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp35nuk2ls\coverage-map.json] entry 1: status must be one of SHIPPED, COVERED, PARTIAL, GAP
+
+test_coverage_map_unknown_covering_skill - Unknown skill: a covering skill absent from the manifest is rejected.
+  PASS  coverage map: unknown covering skill rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpphf_u4j3\coverage-map.json] entry 10: covering skill 'zzz-not-a-real-skill' is not in to...
+
+test_coverage_map_evidence_rules - Evidence rules: non-GAP requires skill+evidence; GAP requires rationale.
+  PASS  coverage map: non-GAP row without a skill rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpvnev857r\coverage-map.json] entry 10: non-GAP rows require at least one covering skill
+  PASS  coverage map: non-GAP row without evidence rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpf55ljnka\coverage-map.json] entry 10: non-GAP rows require non-empty evidence
+  PASS  coverage map: GAP row with a skill rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp3f4hjgb7\coverage-map.json] entry 234: GAP rows must not list covering skills
+  PASS  coverage map: GAP row without rationale rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmph038oi3i\coverage-map.json] entry 234: GAP rows require a non-empty rationale
+R2-09 base-vs-head differential: corpus=190 base_claims_lost=0
+
+test_coverage_map_totals_mismatch - Totals: a JSON totals field that disagrees with the entries is rejected.
+  PASS  coverage map: JSON totals mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpwz6zr3q7\coverage-map.json] totals.by_status has unexpected key 'GAP'
+
+test_coverage_map_summary_totals_mismatch - T9b: each seeded summary totals/per-area defect is rejected.
+  PASS  coverage map: summary totals mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpe6ids32n\coverage-map.md] summary total 'GAP' is 6, expected 0 (summary totals must equa...
+  PASS  coverage map: summary per-area entries mismatch rejected (area named)
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp34o_8lcj\coverage-map.md] summary per-area row 01: entries is 54, expected 55
+  PASS  coverage map: summary by_grade mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp6joyvayx\coverage-map.md] summary total 'explicit-id' is 172, expected 184 (summary tota...
+  PASS  coverage map: summary priority totals mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpxxfc1l6c\coverage-map.md] summary priority totals must be 126 / 149 / 25
+  PASS  coverage map: summary gap-priority totals mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpztpku6nj\coverage-map.md] summary gap-priority totals must be 0 / 0 / 0
+  PASS  coverage map: summary review_pending mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmps3vfi3iq\coverage-map.md] summary total 'Review pending' is 115, expected 114 (summary t...
+
+test_coverage_map_hygiene - T10: unsorted ids, timestamps, canonical form and pinned totals rejected.
+  PASS  coverage map: unsorted entries rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp_0l8ki4t\coverage-map.json] entries must be sorted by id ascending
+  PASS  coverage map: timestamp rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpbw0op5du\coverage-map.json] must not carry timestamps (deterministic map and summary)
+  PASS  coverage map: beyond-roadmap pinned total mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpji25v7wm\coverage-map.json] totals.beyond_roadmap_skills is 81, expected 88 (recomputed ...
+  PASS  coverage map: manifest pinned total mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp43vyz6tg\coverage-map.json] totals.manifest_skills is 204, expected 257 (recomputed from...
+  PASS  coverage map: distinct-covering pinned total mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmplqncsep_\coverage-map.json] totals.distinct_covering_skills is 123, expected 169 (recomp...
+  PASS  coverage map: entries pinned total mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp4i8froja\coverage-map.json] totals.entries is 299, expected 300 (recomputed from the ent...
+
+test_coverage_map_by_grade_totals - T11: an incorrect by_grade totals field is rejected.
+  PASS  coverage map: by_grade totals mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp5abno6xj\coverage-map.json] totals.by_grade is {'capability-review': 100, 'catalog-decis...
+
+test_coverage_map_review_pending - T12: an incorrect review_pending total is rejected.
+  PASS  coverage map: review_pending mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpo6h2ivoj\coverage-map.json] totals.review_pending is 126, expected 114 (recomputed from ...
+
+test_coverage_map_summary_id_sets - T13: the summary GAP and P0-gap id sets must equal the JSON sets.
+  PASS  coverage map: summary GAP id set mismatch rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmptgblnyo6\coverage-map.md] summary GAP id set must equal the JSON GAP set (all 0 ids)
+  PASS  coverage map: P0 gap set mismatch rejected (empty pinned P0 set after Batch 3)
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpk_rk9lg_\coverage-map.md] summary P0 gap id set must equal the JSON P0 set (all 1 ids)
+
+test_coverage_map_anomaly_rules - T14: the anomaly rows keep their exact recovered covering-skill sets.
+  PASS  coverage map: anomaly row manifest-present wrong set rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpuw25o_p3\coverage-map.json] anomaly row 299 covering_skills must be exactly [ai-cost-gua...
+  PASS  coverage map: anomaly row error reports the observed got set
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpuw25o_p3\coverage-map.json] anomaly row 299 covering_skills must be exactly [ai-cost-gua...
+  PASS  coverage map: dropped candidate as covering rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpqxy7nlyy\coverage-map.json] entry 299: the dropped candidate 'ai-feature-kill-switch-des...
+  PASS  coverage map: #186 wrong covering set rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpzf4la3fz\coverage-map.json] anomaly row 186 covering_skills must be exactly [multi-tenan...
+  PASS  coverage map: anomaly grade change rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpkwng8w95\coverage-map.json] anomaly row 186 must keep evidence_grade catalog-decision
+
+test_coverage_map_optionality_framing - T15: the required optionality phrases and scope_note are enforced.
+  PASS  coverage map: missing scope_note phrase rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpihhdr22d\coverage-map.json] scope_note is missing the required optionality phrase: 'The ...
+  PASS  coverage map: missing summary phrase rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp5kzejcd6\coverage-map.md] missing the required optionality phrase (visible rendered text...
+  PASS  coverage map: absent scope_note rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpctvnnztm\coverage-map.json] missing the required non-empty scope_note (the optionality s...
+
+test_coverage_map_batch1_deliveries - T35: the eight Batch 1 GAPs are SHIPPED/explicit-id; canonical totals tracked for the combined state (batch-specific delivery asserts live in T37).
+
+test_coverage_map_batch2_deliveries - T37: the seven Batch 2 GAPs are SHIPPED/explicit-id on their new skills.
+
+test_coverage_map_batch3_deliveries - T38: the eight Batch 3 frontend GAPs are SHIPPED/explicit-id.
+  PASS  coverage map: unexpected gap-priority key rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpjk_ce1ue\coverage-map.json] totals.gap_by_priority keys must be exactly ['P0', 'P1', 'P2...
+  PASS  coverage map: deleted GAP summary section rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpg7vpga13\coverage-map.md] summary must keep the '## GAP candidates (all 0 ids)' section ...
+  PASS  coverage map: deleted empty P0 summary section rejected (no vacuous pass)
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp8fg4amxa\coverage-map.md] summary must keep the '## P0 gap candidates (all 0 ids)' secti...
+  PASS  coverage map: non-empty summary P0 id list rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp9mhh4caf\coverage-map.md] summary P0 gap id set must equal the JSON P0 set (all 0 ids)
+  PASS  coverage map: empty P0 section body rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpx_pq88ho\coverage-map.md] summary P0 section must state None when the pinned P0 GAP set ...
+
+test_coverage_map_step0_hygiene - T39: the 0-B re-triaged rows, totals, GAP set and Step 0 records.
+
+test_coverage_map_batch4_deliveries - T40: the 13 Batch 4 skills deliver the 22 accepted merged rows.
+ERROR writer: snapshot must be an object (fail closed)
+
+test_coverage_map_rerun_review_regressions - Nine HIGH merged-DS-7c re-run review findings: regressions for fixes 1-8 and D119 wording note.
+
+test_coverage_map_batch5_deliveries - T41: the 7 Batch 5 skills deliver 9 rows + 3 extension bundles covering six extension-only rows.
+
+test_coverage_map_batch5_covering_owner_assumptions - T42: distinct/beyond pins rest on the covering-owner set; no silent drift.
+
+test_skills_manifest_provenance - T36: manifest paths exist AND hash-match at source_revision and tree.
+
+test_coverage_map_planning_gate_resolved - T32: the planning-gate rows are resolved; review_pending is derived.
+  PASS  coverage map: unresolved-row review_pending rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpae2gs_e6\coverage-map.json] totals.review_pending is 124, expected 114 (recomputed from ...
+
+test_coverage_map_malformed_id_does_not_crash - T34: a malformed/unhashable entry id is reported, never a traceback.
+  PASS  coverage map: malformed id reported without a crash
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp0f0l5ueu\coverage-map.json] entry[13] has a non-integer id (an exact integer is required...
+
+test_coverage_map_triage_rows_and_phrase - T33: the planning-gate rows carry the owner decision; the phrase carries derived counts.
+
+test_coverage_map_bool_id_rejected - T16: JSON true/false is not an integer id (exact int required).
+  PASS  coverage map: bool id True rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpsv_ldchj\coverage-map.json] entry[0] has a non-integer id (an exact integer is required;...
+  PASS  coverage map: bool id False rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpbbegch1q\coverage-map.json] entry[0] has a non-integer id (an exact integer is required;...
+
+test_coverage_map_basis_missing_key - T17: every required basis key must be present.
+  PASS  coverage map: missing basis.repo_commit rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp8rbj27ar\coverage-map.json] basis is missing required key 'repo_commit'
+  PASS  coverage map: missing basis.repo_date rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpqk6s8bsv\coverage-map.json] basis is missing required key 'repo_date'
+  PASS  coverage map: missing basis.audit_artifacts rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp7vvsd9l7\coverage-map.json] basis is missing required key 'audit_artifacts'
+  PASS  coverage map: missing basis.source_files rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpyh91d7nz\coverage-map.json] basis is missing required key 'source_files'
+
+test_coverage_map_basis_wrong_digest_or_junk - T18: wrong/missing nested basis values and junk digests are rejected.
+  PASS  coverage map: wrong basis.repo_commit rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp5msx380m\coverage-map.json] basis.repo_commit must be the pinned 40-hex audit commit 9ab...
+  PASS  coverage map: wrong audit-artifact digest rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpeghge17l\coverage-map.json] basis.audit_artifacts.audit_report.sha256 must be the pinned...
+  PASS  coverage map: junk source_files key rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp3ngrbpw6\coverage-map.json] basis.source_files has unexpected key 'not-a-real-source'
+  PASS  coverage map: digest-only junk basis key rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpxkohklaz\coverage-map.json] basis has unexpected key 'sha256'
+  PASS  coverage map: wrong basis.repo_date rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpgca8g12g\coverage-map.json] basis.repo_date must be the pinned audit date 2026-10-20
+  PASS  coverage map: wrong source-file digest rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmppfmj6g1f\coverage-map.json] basis.source_files['docs/skills-catalog.md'] must be the pin...
+  PASS  coverage map: non-string audit digest rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpa12skulf\coverage-map.json] basis.audit_artifacts.audit_report.sha256 must be the pinned...
+  PASS  coverage map: missing nested audit artifact rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpsfto7dkm\coverage-map.json] basis.audit_artifacts is missing required key 'audit_report'
+
+test_coverage_map_optionality_comment_hidden - T19: an optionality phrase hidden in an HTML comment does not count.
+  PASS  coverage map: comment-hidden phrase rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpdzj648jx\coverage-map.md] missing the required optionality phrase (visible rendered text...
+
+test_coverage_map_optionality_fence_hidden - T20: an optionality phrase hidden in a fenced code block does not count.
+  PASS  coverage map: fence-hidden phrase rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpup_wnsc9\coverage-map.md] missing the required optionality phrase (visible rendered text...
+
+test_coverage_map_nan_rejected - T21: NaN in the JSON is rejected at load and never emitted canonically.
+  PASS  coverage map: NaN rejected at load
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpaum7dbfx\coverage-map.json] is not valid JSON: non-finite JSON number 'NaN' is not permi...
+
+test_coverage_map_infinity_rejected - T22: Infinity and -Infinity are rejected at load and on render.
+  PASS  coverage map: inf rejected at load
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpwvifc9ra\coverage-map.json] is not valid JSON: non-finite JSON number 'Infinity' is not ...
+  PASS  coverage map: -inf rejected at load
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpa4zwyl9h\coverage-map.json] is not valid JSON: non-finite JSON number '-Infinity' is not...
+
+test_coverage_map_rendered_visibility_edges - T25: non-rendered regions (Codex 4332227138 fence-close text, blockquote, indent, HTML).
+  PASS  coverage map: indented-code-hidden phrase rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpw3th3zuj\coverage-map.md] missing the required optionality phrase (visible rendered text...
+
+test_coverage_map_exact_int_totals - T26: boolean totals are rejected, never treated as integers.
+  PASS  coverage map: bool totals.manifest_skills rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpcjgug_2u\coverage-map.json] totals.manifest_skills must be an exact integer (booleans, f...
+  PASS  coverage map: bool grouped total rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp1viwqiw4\coverage-map.json] totals.by_status.'SHIPPED' must be an exact integer (boolean...
+
+test_coverage_map_unterminated_comment_hidden - T27: unterminated HTML comment hides the summary (Codex 4332227123).
+  PASS  coverage map: unterminated-comment phrase rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpphoozgsh\coverage-map.md] missing the required optionality phrase (visible rendered text...
+
+test_coverage_map_visible_only_totals_and_ids - T28: hidden totals rows/id sets must not satisfy the summary checks.
+  PASS  coverage map: comment-hidden totals row rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmpupehpzox\coverage-map.md] summary total 'Review pending' is None, expected 114 (summary ...
+  PASS  coverage map: comment-hidden GAP id heading rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp55hxxb_m\coverage-map.md] summary must keep the '## GAP candidates (all 0 ids)' section ...
+
+test_coverage_map_overflowing_float_rejected - T29: parse_float rejects an overflowing literal such as 1e999.
+
+test_coverage_map_fence_prefix_and_visible_pointer - T30: fence-prefix closure and the JSON pointer must be visible text.
+  PASS  coverage map: hidden JSON pointer rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\tmp9hmyqeqa\coverage-map.md] must point at the authoritative coverage-map.json
+
+test_coverage_map_hidden_html_raw_text_blocks - T31: unterminated script/style/template blocks hide trailing text.
+
+test_coverage_map_codex_visible_text_findings - T32: pin both Codex visible-text bypass findings (4332227123/138).
+
+test_skill_end_to_end - The per-skill path over real fixture directories on disk.
+  PASS  the canonical good fixture skill validates end to end (no errors)
+  PASS  a skill missing a required section is rejected
+        fired: [missing-section] missing required section(s): Stop Conditions
+  PASS  a description over the parsed-length ceiling is rejected
+        fired: [long-description] description is 1082 chars (parsed value; must be < 1024)
+  PASS  a skill directory without SKILL.md is rejected
+        fired: [no-such-fixture] missing SKILL.md
+
+test_section_order - D55: the required sections must appear in the canonical order.
+  PASS  canonical section order accepted (no errors)
+  PASS  an optional section (Safety Rules) may interleave freely (no errors)
+  PASS  Gotchas written before Workflow is rejected
+        fired: [x] required sections are out of order: found ['Purpose', 'Use When', 'Inputs to Inspect', 'Gotchas', 'Workflow', 'Output Format'...
+  PASS  a required section written twice is rejected
+        fired: [x] duplicate required section header(s): Workflow
+  PASS  the scrambled fixture skill is rejected end to end
+        fired: [out-of-order-sections] required sections are out of order: found ['Purpose', 'Use When', 'Inputs to Inspect', 'Gotchas', 'Workfl...
+
+test_agents_schema - D55: .claude/agents/*.md must strict-parse and stay read-only.
+  PASS  an agent granting only Read, Grep, Glob is accepted (no errors)
+  PASS  `tools: Read, Write` is rejected as a privilege escalation
+        fired: [scripts/tests/fixtures/agents/widened-tools/widened-agent.md] `tools` grants ['Write'] beyond the read-only set ['Glob', 'Grep',...
+  PASS  an agent whose name disagrees with its file is rejected
+        fired: [scripts/tests/fixtures/agents/name-mismatch/name-mismatch-agent.md] frontmatter name 'some-other-name' != filename stem 'name-mi...
+  PASS  an unrecognised model is rejected
+        fired: [scripts/tests/fixtures/agents/bad-model/bad-model-agent.md] `model` 'turbo-9000' is not one of ['fable', 'haiku', 'inherit', 'op...
+  PASS  an agent declaring `hooks` is rejected
+        fired: [scripts/tests/fixtures/agents/forbidden-hooks/hooks-agent.md] forbidden frontmatter key `hooks`: it runs shell commands on the a...
+  PASS  an agent declaring `mcpServers` is rejected
+        fired: [scripts/tests/fixtures/agents/forbidden-mcpservers/mcp-agent.md] forbidden frontmatter key `mcpServers`: it can start an MCP ser...
+  PASS  an agent declaring `permissionMode` is rejected
+        fired: [scripts/tests/fixtures/agents/forbidden-permissionmode/permission-agent.md] forbidden frontmatter key `permissionMode`: it can s...
+  PASS  an agent key outside the allow-list (`initialPrompt`) is rejected
+        fired: [scripts/tests/fixtures/agents/unknown-key/unknown-key-agent.md] frontmatter key `initialPrompt` is not in the agent allow-list [...
+  PASS  an agent one directory below the agents root is still checked
+        fired: [scripts/tests/fixtures/agents/nested-forbidden/review/nested-hooks-agent.md] forbidden frontmatter key `hooks`: it runs shell co...
+  PASS  an agent repeating `tools` (Bash, then Read) is rejected
+        fired: [scripts/tests/fixtures/agents/duplicate-key/duplicate-key-agent.md] duplicate frontmatter key `tools`: YAML readers disagree on ...
+  PASS  an agent whose `tools` arrives via `<<` is rejected
+        fired: [scripts/tests/fixtures/agents/merge-key/merge-key-agent.md] YAML merge key << in agent frontmatter: readers without merge-key or...
+  PASS  an agent using a YAML anchor is rejected
+        fired: [scripts/tests/fixtures/agents/yaml-alias/yaml-alias-agent.md] YAML anchor &agent_name in agent frontmatter: readers without merg...
+  PASS  an agent using a YAML alias is rejected
+        fired: [scripts/tests/fixtures/agents/yaml-alias/yaml-alias-agent.md] YAML alias *agent_name in agent frontmatter: readers without merge...
+  PASS  an agent whose `!!merge foo:` key merges in `tools` is rejected
+        fired: [scripts/tests/fixtures/agents/merge-tag/merge-tag-agent.md] YAML merge key 'foo' (merge-tagged) in agent frontmatter: readers wi...
+  PASS  an agent using a `!!merge` tag is rejected
+        fired: [scripts/tests/fixtures/agents/merge-tag/merge-tag-agent.md] YAML tag !!merge in agent frontmatter: readers without merge-key or ...
+  PASS  a flow-mapping agent with a verbatim merge-tagged key is rejected
+        fired: [scripts/tests/fixtures/agents/merge-tag-flow/merge-tag-flow-agent.md] YAML merge key 'bar' (merge-tagged) in agent frontmatter: ...
+  PASS  an agent using a verbatim `!<tag:yaml.org,2002:merge>` tag is rejected
+        fired: [scripts/tests/fixtures/agents/merge-tag-flow/merge-tag-flow-agent.md] YAML tag tag:yaml.org,2002:merge in agent frontmatter: rea...
+  PASS  YAML directives and any explicit tag are rejected
+  PASS  nested and case-variant .claude/agents files are flagged
+  PASS  the documented `fable` model alias is accepted (no errors)
+  PASS  the documented `inherit` model alias is accepted (no errors)
+  PASS  an agent using every allow-listed optional key is accepted (no errors)
+  PASS  a missing agents directory degrades quietly (no errors)
+  PASS  all 7 shipped reviewer agents conform (no errors)
+
+test_skill_frontmatter_allow_list - Skill frontmatter keys are allow-listed; hooks, allowed-tools and shell are forbidden.
+  PASS  a skill with frontmatter `hooks` is rejected by name
+        fired: [good-skill] forbidden skill frontmatter key `hooks`: it registers shell-command hooks that keep running for the rest of the sess...
+  PASS  a skill with even a narrow `allowed-tools` grant is rejected by name
+        fired: [good-skill] forbidden skill frontmatter key `allowed-tools`: it pre-approves tools for the invoking turn, and workspace trust do...
+  PASS  a skill with frontmatter `shell` is rejected by name
+        fired: [good-skill] forbidden skill frontmatter key `shell`: it selects the shell that runs the skill's injected commands; shipped skill...
+  PASS  an unreviewed skill frontmatter key is rejected
+        fired: [good-skill] skill frontmatter key `paths` is not in the allow-list ['compatibility', 'description', 'disable-model-invocation', ...
+  PASS  a case variant of `hooks` is rejected as not allow-listed
+        fired: [good-skill] skill frontmatter key `Hooks` is not in the allow-list ['compatibility', 'description', 'disable-model-invocation', ...
+  PASS  a repeated skill frontmatter key is rejected
+        fired: [good-skill] duplicate frontmatter key `description`: YAML readers disagree on which value wins, so the checked value may not be ...
+  PASS  YAML anchors, aliases and merge keys in skill frontmatter are rejected
+        fired: [good-skill] YAML alias *b in skill frontmatter: readers without merge-key, alias or tag support see different keys, so write eac...
+  PASS  a merge-tagged key in skill frontmatter is rejected
+        fired: [good-skill] YAML tag !!merge in skill frontmatter: readers without merge-key, alias or tag support see different keys, so write ...
+  PASS  a `---` inside skill frontmatter (where Claude Code would end it) is rejected
+        fired: [good-skill] `---` inside the frontmatter: Claude Code ends the frontmatter at the first `---`, so it and this validator could re...
+  PASS  a skill using every allow-listed optional key is accepted (no errors)
+
+test_skill_shell_injection - `!`-prefixed shell injection is rejected in every markdown file of a skill.
+  PASS  an inline !`cmd` injection in SKILL.md is rejected
+        fired: [good-skill] SKILL.md:54: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+  PASS  a ```! fenced injection block in SKILL.md is rejected
+        fired: [good-skill] SKILL.md:54: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+  PASS  an indented ~~~ ! fenced injection block is rejected
+        fired: [good-skill] SKILL.md:54: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+  PASS  a blockquoted fence opened with `!` is rejected
+        fired: [good-skill] SKILL.md:54: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+  PASS  a list-item fence opened with `!` is rejected
+        fired: [good-skill] SKILL.md:54: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+  PASS  a four-backtick fence opened with `!` is rejected
+        fired: [good-skill] SKILL.md:54: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+  PASS  a nested tilde fence opened with `!` is rejected
+        fired: [good-skill] SKILL.md:54: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+  PASS  an injection in a reference file is rejected with its file and line
+        fired: [good-skill] references/extra.md:2: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as pr...
+  PASS  `!` after a non-space character, and prose exclamation marks, are accepted (no errors)
+
+test_template_security_checks - `_template` skips the structure checks but not the V1/V2 security checks.
+  PASS  the real _template passes the frontmatter and injection checks (no errors)
+  PASS  a `hooks:` key in _template is rejected
+        fired: [_template] forbidden skill frontmatter key `hooks`: it registers shell-command hooks that keep running for the rest of the sessi...
+  PASS  a ```! fence in _template is rejected
+        fired: [_template] SKILL.md:121: `!`-prefixed command injection runs a shell command when the skill is invoked; write it as prose or esc...
+
+test_config_surface_paths - Plugin, hook, settings and MCP files are rejected over tracked-path lists.
+  PASS  forbidden_config_files finds settings and .mcp.json at any depth only
+  PASS  skill_dir_violations finds plugin, hook, settings and server files only
+  PASS  nested_skill_files finds nested and case-variant skill trees only
+  PASS  check_config_surfaces reports a skill-folder plugin
+        fired: [.claude/skills/x/.claude-plugin/plugin.json] plugin, hook, settings or server file inside a skill folder: it would load as a plu...
+  PASS  check_config_surfaces reports a nested skill tree
+        fired: [docs/.claude/skills/y/SKILL.md] skill file outside the root `.claude/skills/` directory: Claude Code loads every `.claude/skills...
+  PASS  check_config_surfaces reports a tracked .mcp.json
+        fired: [tools/.mcp.json] Claude Code settings or MCP server file: the source library ships no Claude Code settings or MCP servers; addin...
+  PASS  skill_symlinks finds tracked symlinks under .claude/skills only
+  PASS  check_config_surfaces reports a tracked symlink under .claude/skills
+        fired: [.claude/skills/x] symlink under `.claude/skills/`: the path checks here cannot see what it points at, and a copied symlink resol...
+  PASS  the real repository's tracked paths carry no forbidden config surface (no errors)
+  PASS  main() exits non-zero on a faked tracked .mcp.json (check is wired in)
+
+test_docs_paths_links - D55: guided-path and README picker links must resolve. The fixture is
+  PASS  resolving path links and a resolving picker are accepted (no errors)
+  PASS  a dangling SKILL.md link is rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\aegis-paths-jqzhgmqo\paths-tree\docs\paths-dangling\dangling.md] links ../../.claude/skills...
+  PASS  a resolving link whose label names a DIFFERENT skill is rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\aegis-paths-jqzhgmqo\paths-tree\docs\paths-mismatch\mismatch.md] link label `wrong-label` d...
+  PASS  a README picker pointing at a missing path doc is rejected
+        fired: [C:\Users\PETERN~1\AppData\Local\Temp\aegis-paths-jqzhgmqo\paths-tree\README-dangling.md] links docs/paths/does-not-exist.md, whi...
+  PASS  all 67 links across 5 shipped guided paths resolve (no errors)
+
+test_no_cross_skill_file_dependencies - Standard section 1: no cross-skill file dependencies.
+  PASS  delegation to a sibling entrypoint is accepted (no errors)
+  PASS  reaching into a sibling's references/ is rejected
+        fired: [alpha] links into another skill's internals: '../beta/references/detail.md' resolves to 'beta/' -- link to ../beta/SKILL.md and ...
+  PASS  own-directory links and repo-root citations are not this rule's subject (no errors)
+
+test_no_cross_skill_percent_encoded_traversal - Task-5 defect 1: `%2e%2e/` IS `../` once a renderer resolves it.
+  PASS  encoded traversal is rejected: %2e%2e/beta/references/detail.md
+        fired: [alpha] links into another skill's internals: '%2e%2e/beta/references/detail.md' resolves to 'beta/' -- link to ../beta/SKILL.md ...
+  PASS  encoded traversal is rejected: %2e./beta/references/detail.md
+        fired: [alpha] links into another skill's internals: '%2e./beta/references/detail.md' resolves to 'beta/' -- link to ../beta/SKILL.md an...
+  PASS  encoded traversal is rejected: .%2e/beta/references/detail.md
+        fired: [alpha] links into another skill's internals: '.%2e/beta/references/detail.md' resolves to 'beta/' -- link to ../beta/SKILL.md an...
+  PASS  encoded traversal is rejected: %2E%2E/beta/references/detail.md
+        fired: [alpha] links into another skill's internals: '%2E%2E/beta/references/detail.md' resolves to 'beta/' -- link to ../beta/SKILL.md ...
+  PASS  encoded traversal is rejected: %2e%2e%2fbeta%2freferences%2fdetail.md
+        fired: [alpha] links into another skill's internals: '%2e%2e%2fbeta%2freferences%2fdetail.md' resolves to 'beta/' -- link to ../beta/SKI...
+  PASS  encoded traversal is rejected: ..%2fbeta%2freferences%2fdetail.md
+        fired: [alpha] links into another skill's internals: '..%2fbeta%2freferences%2fdetail.md' resolves to 'beta/' -- link to ../beta/SKILL.m...
+  PASS  encoded traversal is rejected: %252e%252e/beta/references/detail.md
+        fired: [alpha] links into another skill's internals: '%252e%252e/beta/references/detail.md' resolves to 'beta/' -- link to ../beta/SKILL...
+  PASS  encoded traversal is rejected: ..%5Cbeta%5Creferences%5Cdetail.md
+        fired: [alpha] links into another skill's internals: '..%5Cbeta%5Creferences%5Cdetail.md' resolves to 'beta/' -- link to ../beta/SKILL.m...
+  PASS  encoded delegation to a sibling entrypoint stays accepted (no errors)
+
+test_no_cross_skill_scan_is_linear - Task-5 defect 2, extended by task-14 for the shapes it missed.
+  PASS  a 64 KB run of unmatched '[' is scanned without stalling (no errors)
+  PASS  64 KB of '[' scanned in 0.013s (bound 2.0s)
+  PASS  a link after a 64 KB run of '[' is still seen (no truncating cap)
+        fired: [alpha] links into another skill's internals: '../beta/references/detail.md' resolves to 'beta/' -- link to ../beta/SKILL.md and ...
+  PASS  65535 bytes of '[a](x' * N scanned in 0.007s (bound 2.0s)
+  PASS  65535 bytes of '[[[](' * N scanned in 0.006s (bound 2.0s)
+  PASS  65536 bytes of ('[a](x' * N) + ' ' scanned in 0.012s (bound 2.0s)
+  PASS  '[a](x' * N scales linearly 32 KB -> 64 KB: 0.003s -> 0.004s
+  PASS  '[[[](' * N scales linearly 32 KB -> 64 KB: 0.002s -> 0.004s
+  PASS  ('[a](x' * N) + ' ' scales linearly 32 KB -> 64 KB: 0.006s -> 0.011s
+  PASS  a link after 64 KB of '[a](x' * N is still seen
+  PASS  a link after 64 KB of '[[[](' * N is still seen
+  PASS  a link after 64 KB of ('[a](x' * N) + ' ' is still seen
+
+test_no_cross_skill_scan_keeps_the_link_a_walked_region_hides - Task-22 / A-05b: resuming a target scan must not move the LABEL bound.
+  PASS  '[a](xx[bb yyy](z)' still yields ['z'] (label bound not advanced)
+  PASS  '[a](xx[bb yyy](z)' yields ['z'] (scanner == old regex)
+  PASS  '[a](x[bb yyy](z)' yields ['z'] (scanner == old regex)
+  PASS  '[a](xx[bb yyy](z)[c](d)' yields ['z', 'd'] (scanner == old regex)
+  PASS  '[](x)[a](xx[bb yyy](z)' yields ['x', 'z'] (scanner == old regex)
+
+test_no_cross_skill_absolute_and_unc_targets - Task-5 defect 3: only a genuine repo-root citation is out of scope.
+  PASS  an absolute path into a sibling's references/ is rejected
+        fired: [alpha] links into another skill's internals: 'C:\Users\PETERN~1\AppData\Local\Temp\aegis-xskill-abs-niiz9nch\.claude\skills\beta...
+  PASS  anchored target outside the repo is rejected: /home/someone/beta/references/detail.md
+        fired: [alpha] links outside the repository: '/home/someone/beta/references/detail.md' resolves to 'C:\home\someone\beta\references\deta...
+  PASS  anchored target outside the repo is rejected: C:/other-repo/.claude/skills/beta/references/detail.md
+        fired: [alpha] links outside the repository: 'C:/other-repo/.claude/skills/beta/references/detail.md' resolves to 'C:\other-repo\.claude...
+  PASS  anchored target outside the repo is rejected: C:\other-repo\beta\references\detail.md
+        fired: [alpha] links outside the repository: 'C:\other-repo\beta\references\detail.md' resolves to 'C:\other-repo\beta\references\detail...
+  PASS  anchored target outside the repo is rejected: \\srv\share\beta\references\detail.md
+        fired: [alpha] links outside the repository: '\\srv\share\beta\references\detail.md' resolves to '\\srv\share\beta\references\detail.md'...
+  PASS  anchored target outside the repo is rejected: //srv/share/beta/references/detail.md
+        fired: [alpha] links outside the repository: '//srv/share/beta/references/detail.md' resolves to '\\srv\share\beta\references\detail.md'...
+  PASS  anchored target outside the repo is rejected: /etc/passwd
+        fired: [alpha] links outside the repository: '/etc/passwd' resolves to 'C:\etc\passwd', which is not under the repository root -- a repo...
+  PASS  a relative repo-root citation stays accepted (no errors)
+
+test_no_cross_skill_drive_relative_targets_are_cwd_independent - Task-14 defect 2: a drive-relative target must not be judged by the CWD.
+  PASS  drive-relative 'C:foo' is an error from both CWDs
+  PASS  drive-relative 'C:./docs/x.md' is an error from both CWDs
+  PASS  drive-relative 'C:../x.md' is an error from both CWDs
+
+test_no_nested_fixture_skill_or_agent_dirs - Gate 2.8: no TRACKED path may nest `.claude/skills/` or `.claude/agents/`
+  PASS  no tracked nested .claude/skills or .claude/agents fixture leaks (git ls-files census)
+  PASS  real root libraries pinned non-empty (258 skills, 7 agents)
+  PASS  neutral paths-tree/dot-claude fixture source is tracked
+
+test_workflows_sha_pinned - D55: every action must be pinned to a full 40-hex commit SHA.
+  PASS  a 40-hex pin with a trailing `# vX.Y.Z`, plus a local action, is accepted (no errors)
+  PASS  a floating tag `@v7` is rejected
+        fired: [scripts/tests/fixtures/workflows/floating/floating.yml:11] `uses: actions/checkout@v7` is not pinned to a full 40-hex commit SHA...
+  PASS  an abbreviated SHA is rejected too
+        fired: [scripts/tests/fixtures/workflows/floating/floating.yml:15] `uses: actions/setup-python@ece7cb0` is not pinned to a full 40-hex c...
+  PASS  all 40 shipped action references are SHA-pinned (no errors)
+
+test_claude_bridge - D61: the repo-root CLAUDE.md startup bridge must exist and stay intact.
+  PASS  a CLAUDE.md importing @AGENTS.md and adding the routing section is accepted (no errors)
+  PASS  a CLAUDE.md whose first line is not the @AGENTS.md import is rejected
+        fired: [scripts/tests/fixtures/claude-bridge/no-import.md] first line is '# CLAUDE', not the required '@AGENTS.md' import — the shared c...
+  PASS  a CLAUDE.md that imports but adds no startup-routing section is rejected
+        fired: [scripts/tests/fixtures/claude-bridge/no-section.md] missing the '## Claude Code — startup routing' section — the bridge must add...
+  PASS  a missing repo-root CLAUDE.md is rejected
+        fired: [scripts/tests/fixtures/claude-bridge/no-such-file.md] the repository root must contain CLAUDE.md — Claude Code reads it at sessi...
+  PASS  the shipped repo-root CLAUDE.md bridge conforms (no errors)
+
+test_dco_signoff_required - D60: every human commit in the range must carry a DCO trailer.
+  PASS  all-signed range accepted (no errors)
+  PASS  one unsigned commit is rejected, naming its hash (a tip-only check would miss it)
+        fired: dddddddddddddddddddddddddddddddddddddddd is NOT signed off - A Contributor <a.contributor@example.com> - "Fix a thing" carries no...
+  PASS  a bare "Signed-off-by:" with no identity is rejected
+        fired: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee is NOT signed off - A Contributor <a.contributor@example.com> - "Fix a thing" carries no...
+  PASS  an empty commit range fails closed rather than passing
+        fired: no commits found in the range - refusing to pass a check that examined nothing (a pull request always has at least one commit, so...
+
+test_dco_bot_exemption - D60: exactly two machine authors are exempt, and no lookalike is.
+  PASS  unsigned bot commits pass (bumps are never blocked) (no errors)
+  PASS  a mixed range fails on the human commit only
+        fired: 4444444444444444444444444444444444444444 is NOT signed off - A Contributor <a.contributor@example.com> - "Fix a thing" carries no...
+  PASS  an unlisted bot address is NOT exempt (the list stays narrow)
+        fired: 5555555555555555555555555555555555555555 is NOT signed off - A Contributor <renovate[bot]@users.noreply.github.com> - "Fix a thin...
+
+test_dco_record_parsing - D60: the git-log record stream round-trips messages with blank lines.
+  PASS  records parsed from the git-log stream feed the rules unchanged (no errors)
+
+test_startup_role_contract - PR #77: the repo-root startup instructions are role-aware (structural).
+  PASS  AGENTS.md: unconditional 'skills library' identity sentence is gone
+  PASS  AGENTS.md: explicit consumer/product-repository rule present
+  PASS  AGENTS.md: copied .claude/skills + AGENTS.md + CLAUDE.md are not source proof
+  PASS  AGENTS.md: names all four source-package landmarks
+  PASS  AGENTS.md: forbids a second/sibling product-folder redirect
+  PASS  CLAUDE.md: role detection precedes skill selection
+  PASS  CLAUDE.md: copied root instructions recognized as consumer install files
+  PASS  CLAUDE.md: copied .claude/skills alone is not source-library evidence
+  PASS  CLAUDE.md: fresh consumer repo stays the current product workspace
+  PASS  CLAUDE.md: no sibling product-folder redirect by default
+  PASS  README.md: consumer install section still instructs copying the startup files
+  PASS  README.md: copying does not convert the product repo into the source library
+  PASS  README.md: tells users to continue in the current product workspace
+  PASS  README.md: references the source-package landmark distinction
+  PASS  evals: both new IDs present exactly once; all 63 IDs unique
+  PASS  evals: consumer case has the fresh-copied-no-landmarks shape and forbids a sibling folder
+  PASS  evals: source case contains every source-package landmark and keeps source-library classification
+
+test_atomic_stage1_question_contract - PR #77: Stage 1 discovery questions are structurally atomic (deterministic).
+  PASS  orchestrator: ATOMIC-QUESTION GATE marker present
+  PASS  orchestrator: independently-answerable-target definition + semantic test
+  PASS  orchestrator: split-to-first-target, no-secondary-request, one-question-then-STOP
+  PASS  orchestrator: exact requirements-gathering-facilitator invocation preserved
+  PASS  orchestrator: cold-start Open-questions projection protected from compound bullets
+  PASS  orchestrator: interview cadence kept (not "one binding question")
+  PASS  facilitator: same one-target definition + semantic test
+  PASS  facilitator: pre-output atomicity check + no secondary answer request
+  PASS  facilitator: names "include" / "also" / "and if you can" secondary-target risks
+  PASS  facilitator: allows same-target alternatives and a single narrative process target
+  PASS  elicitation sheet: 18 atomic cards, each one Target + one single-question Ask
+  PASS  elicitation sheet: cards cover users/workaround/scope/constraints/compliance/deps/success
+  PASS  elicitation sheet: the five compound question-bank entries are gone
+  PASS  elicitation sheet: observed compound present only as an INVALID example, not a card
+  PASS  elicitation sheet: the observed compound's atomic decomposition is shown
+  PASS  evals: project-orchestrator has 63 cases (>= 49), facilitator has 14 (>= 12)
+  PASS  evals: all orchestrator and facilitator eval IDs are unique
+  PASS  evals: the 4 pinned orchestrator IDs and 4 pinned facilitator IDs each appear exactly once
+  PASS  evals: the observed compound wording is represented on both sides
+  PASS  evals: anti-overcorrection process case and same-target-options case present
+
+test_readiness_effective_identity_hook - AI-R01/R02: effective author+committer hook, actual commits as oracle.
+  SKIP  UNRUN: required Linux readiness lane unavailable on win32: effective-identity hook: POSIX sh not available on this host
+
+test_readiness_startup_inspection_valid - C14: valid setup inspection initializes MISSING and exits 0.
+  SKIP  UNRUN: required Linux readiness lane unavailable on win32: startup inspection valid setup: Linux lane unavailable
+
+test_readiness_memory_canonical_tristate - AI-R08: ancestry/content tri-state, UNVERIFIED on errors, no boolean shortcut.
+  SKIP  UNRUN: required Linux readiness lane unavailable on win32: canonical ancestry tri-state: POSIX sh not available on this host
+
+test_dsr1_lock_lifecycle - DS-R1 CL-07/08/09/10/11/14/18/19: portable mkdir lock, tokens, bounded stop and successor safety.
+  SKIP  UNRUN: required Linux readiness lane unavailable on win32: DS-R1 shared-lock lifecycle: Linux POSIX lane unavailable
+
+test_dsr1_fixture_cleanup - DS-R1 CL-12: unique mktemp dir, literal prefix, symlink-safe cleanup with printed exact command.
+  SKIP  UNRUN: required Linux readiness lane unavailable on win32: DS-R1 fixture cleanup: Linux POSIX lane unavailable
+
+test_dsr1_hook_path_resolution - DS-R1 CL-13: core.hooksPath relative/tilde first; git rev-parse --git-path fallback only when unset.
+  SKIP  UNRUN: required Linux readiness lane unavailable on win32: DS-R1 hook-path resolution: Linux POSIX lane unavailable
+
+test_dsr1_lock_platform_and_carries - DS-R1 CL-15/CL-21: platform honesty, no all-skip success, and lock-side residual carries documented.
+  PASS  platform SKIP/UNRUN honesty and lock-side residual carries are published; closure markers exist
+
+test_dsr1_required_omission_accounting - P3-03-02: a required omission is UNRUN and makes the closure and aggregate nonzero.
+  SKIP  synthetic Windows-only fixture [expected platform skip: native win32; not required coverage on linux]
+  PASS  P3-03-02 required-omission accounting: closure and aggregate are nonzero and name the omission, and the root/non-root split is explicit
+
+test_cl2_lost_forms_restored - CL2 AC-CL-01: all 11 pre-#942 copied-total forms are detected again.
+  PASS  CL2: 11/11 pre-#942 copied-total forms detected, exact surfaces
+
+test_cl2_restored_944_surfaces - CL2 AC-CL-02: both #944 surfaces stay flagged, including both counts.
+  PASS  CL2: 2/2 #944 surfaces flagged; long sentence carries both counts
+
+test_cl2_corpus_completeness - CL2 §7.2: the committed corpus covers every derived coverage-test literal.
+  PASS  CL2: 293 derived literals, 304 committed, corpus digest pinned
+
+test_cl2_differential_zero_loss - CL2 AC-CL-03: 304 strings, 118 oracle-flagged, 18 exemptions, 0 lost.
+corpus=304 pre=118 exempt=18 lost=0
+retained=100
+  PASS  CL2: zero pre-#942 detection lost (18 reasoned exemptions, 3 gains)
+
+test_cl2_total_key_wording - CL2 AC-CL-04: every enumerated total-key wording is flagged.
+  PASS  CL2: 8/8 total-key wordings in 4 classes; clean negative does not fire
+
+test_cl2_allowed_deltas - CL2 AC-CL-05: every reasoned delta stays allowed (no false positives).
+  PASS  CL2: 18/18 reasoned update deltas remain clean
+
+test_cl2_denylist_removed - CL2 AC-CL-05: no state-tail denylist survives; unlisted tails flag.
+  PASS  CL2: COVERAGE_STATE_TAIL absent; 8/8 unlisted tails stay flagged
+
+test_cl2_exemptions_exact - CL2 AC-CL-06: the exemption table is the exact measured loss set.
+  PASS  CL2: 18-entry exemption table is set-equal to the measured losses
+
+test_cl2_oracle_identity - CL2 AC-CL-12: the vendored oracle's normalised identity is pinned.
+  PASS  CL2: vendored 2a8bdb5b oracle normalised hash matches; not imported
+
+test_cl2_predicate_perf - CL2 AC-CL-11: bounded window and anchored grammar stay linear.
+  PASS  CL2: adversarial < 100 ms each; 304-string corpus 13.8 ms
+
+test_ds7cb_readme_writer_determinism - DS-7c-b T1: two copies write identical bytes; the real CLI writes nothing.
+  PASS  T1: two independent copies derive identical written bytes (SKILL-COUNT 257)
+  PASS  T1: real CLI prints exactly SKILL-COUNT=257 FAMILY-COUNT=24, exit 0, porcelain byte-identical
+
+test_ds7cb_readme_writer_idempotence_crlf - DS-7c-b T2: a second run is a no-op; a CRLF copy keeps every CRLF.
+  PASS  T2: a second run prints (unchanged) with a stable sha256 and no temp file
+  PASS  T2: a CRLF copy repairs its drifted marker
+  PASS  T2: every CRLF preserved and only the digit bytes changed
+
+test_ds7cb_readme_writer_refuses_missing_marker - DS-7c-b T3: a missing SKILL-COUNT marker is refused, never invented.
+  PASS  T3: a missing SKILL-COUNT marker is refused (R1 literal, no write)
+
+test_ds7cb_readme_writer_refuses_duplicate_marker - DS-7c-b T4: a duplicated SKILL-COUNT marker is refused, not silently used.
+  PASS  T4: a duplicated SKILL-COUNT marker is refused (R2 literal, no write)
+
+test_ds7cb_readme_writer_repairs_drift - DS-7c-b T5: a drifted marker is repaired to the derived value.
+  PASS  T5: a drifted SKILL-COUNT is repaired to the derived value (S1 literal, byte-for-byte fixture restored)
+  PASS  T5: exactly one line differs, only inside the digit run, and the validator passes afterwards
+
+test_ds7cb_readme_writer_refuses_roster_sum - DS-7c-b T6: an inconsistent roster sum is refused, never 'fixed'.
+  PASS  T6: a roster sum of 258 is refused (R7 literal, neither number written)
+
+test_ds7cb_readme_writer_refuses_manifest - DS-7c-b T7: a manifest disagreement is refused (R8).
+  PASS  T7: a dropped manifest entry is refused (R8 literal, no write)
+
+test_ds7cb_readme_writer_advisory_baseline - DS-7c-b T8: the audit baseline is advisory, never blocking.
+  PASS  T8: a stale audit baseline warns (W0 literal) and the correct value is still written
+
+test_ds7cb_default_path_differential - DS-7c-b T9: base and head validators behave identically with no flag.
+  PASS  T9: the no-flag exit code is identical (0) for the base and the changed validator
+  PASS  T9: the no-flag stdout bytes are identical
+
+test_ds7cb_guard_closure - DS-7c-b T10: the guard-clause inventory and the two bodies are unchanged.
+  PASS  T10: the AST guard inventory does not decrease for main and both README checks
+  PASS  T10: both README check source segments hash-equal the base pin
+
+test_ds7cb_atomic_write_failure - DS-7c-b T11: a forced replace failure leaves the original intact.
+  PASS  T11: an injected os.replace failure exits 1 with the R14 literal
+  PASS  T11: README bytes and sha256 unchanged (same length, 0 CR)
+  PASS  T11: no README.md.ds7cb-tmp residue after the failed write
+
+test_ds7cb_prewrite_narrowness - DS-7c-b T12: the skip guard is exactly two calls and nothing recomputes.
+  PASS  T12: exactly one skip guard wraps exactly the two README marker calls; neither name occurs in main()
+  PASS  T12: the write mode's pre-write composition is check_ignored_skill_security then _run_repo_checks(..., skip_readme_markers=True)
+  PASS  T12: the manifest parameters are threaded from main()'s own locals, not recomputed
+
+test_ds7cb_non_readme_failure_refuses - DS-7c-b T13: a non-README check failure still refuses the write (R9).
+  PASS  T13: a non-README check failure refuses the write with the R9 literal
+  PASS  T13: the README is unchanged when the pre-write suite fails
+
+test_consumer_starter_selectors - S1-1: both starter selectors agree; a removed required row fails.
+  PASS  S1-1: the Git-independent selector checks pass before pin resolution
+  PASS  S1-1: the selected skill set matches the 19 skills declared in section 2.2
+  PASS  S1-1: the page names the declared pin 2fef11dd43fe6e943e99c7948ebeaca95d138072
+  PASS  S1-1: the table and the executable array select the same 42 rows
+  PASS  S1-1: both selectors carry the two scoped-approval-register paths
+  PASS  S1-1: the selection closes over 19 skill directories and matches the 40 skill files in the pinned allow-list closure at 2fef11dd43fe6e943e99c7948ebeaca95d138072
+  PASS  S1-1: removing .claude/skills/scoped-approval-register/SKILL.md from the table selector fails deliberately
+  PASS  S1-1: removing .claude/skills/scoped-approval-register/SKILL.md from the array selector fails deliberately
+  PASS  S1-1: removing .claude/skills/scoped-approval-register/references/register-format.md from the table selector fails deliberately
+  PASS  S1-1: removing .claude/skills/scoped-approval-register/references/register-format.md from the array selector fails deliberately
+
+test_consumer_starter_selector_pin_closure - S1-1: pinned closure, SKILL.md membership and eval basenames, frozen.
+  PASS  S1-1 fixture: the frozen pin 71064174c890 and checkout 2b10a90b9ea0 have distinct commit and tree identities
+  PASS  S1-1 fixture: the allow-list closure is read from the pinned tree, not from the differing checkout
+  PASS  S1-1 fixture: a wrong total byte/LF value is rejected
+  PASS  S1-1 fixture: a valid selector pair passes against the pinned closure while the checkout carries a reference the pin does not
+  PASS  S1-1 fixture: an extra non-skill row is refused by both selectors and named exactly
+  PASS  S1-1 fixture: a case-differing non-skill duplicate is refused deterministically and names both spellings
+  PASS  S1-1 fixture: either spelling on its own is accepted as the control
+  PASS  S1-1 fixture: a checkout-only reference is rejected as outside the pinned closure
+  PASS  S1-1 fixture: a SKILL.md missing from the table alone is named with its exact path and selector
+  PASS  S1-1 fixture: a SKILL.md missing from both selectors still fails and names each selector
+  PASS  S1-1 fixture: a pinned reference absent from the checkout is still required in both selectors
+  PASS  S1-1 fixture: evals.json outside evals/ is rejected in both selectors
+  PASS  S1-1 fixture: trigger-evals.json outside evals/ is rejected in both selectors
+  PASS  S1-1 fixture: uppercase eval basenames and segments are refused
+  PASS  S1-1 fixture: the evals/ directory rule fires on a non-eval basename
+  PASS  S1-1 fixture: references/notes.md is not falsely refused as eval content
+  PASS  S1-1 fixture: the existing evals/ directory rejection still fires
+  PASS  S1-1 fixture: eval content in the pinned tree is excluded from the closure and refused only when selected
+  PASS  S1-1 fixture: references/evals-guide.md is not rejected for its name
+  PASS  S1-1 fixture: an unavailable pin and a wrong declared tree both refuse explicitly instead of falling back to the checkout
+  PASS  S1-1 fixture: malformed and unknown pin refusals fail on every platform
+  PASS  S1-1 fixture: a shallow clone refuses the pinned closure explicitly, with no checkout fallback
+  PASS  S1-1 fixture: a replace ref cannot change the pinned closure
+
+test_consumer_starter_git_failure_classes - S1-1 (C2): a Git that cannot be started is classified, never raised.
+  PASS  C2: an OSError from Git is returned as a 127 classification, not raised
+  PASS  C2: the timeout classification (124) is unchanged
+  PASS  C2: the OSError path reaches the PIN-UNAVAILABLE refusal with no checkout fallback
+
+test_consumer_install_mode_gate - S3-1..S3-6: the published P2 install-mode gate is executed as the oracle.
+  PASS  F9: a missing P2 closing fence fails at the section boundary
+  PASS  S3-1: human-only with owner-matching identity exits 0, with 0 commits, 0 files written and byte-identical local Git config
+  PASS  S3-2: agent-commit exits 0 for the measured non-owner identity, and an isolated fixture commit carries that author and committer plus Signed-off-by
+  PASS  S3-3: agent-commit under the owner identity exits 42 on stderr before any commit, with the matched field, resolved values, one question and 0 files
+  PASS  F5: a committer-only owner match prints the committer field and value, not a claim that the author is the owner
+  PASS  F1: padded agent-commit token <SP>agent-commit (leading space) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token agent-commit<SP> (trailing space) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token <SP>agent-commit<SP> (leading and trailing space) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token <TAB>agent-commit<TAB> (TAB) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
+  PASS  F1: padded ' human-only ' is accepted as human-only with 0 files and 0 commits
+  PASS  F4: the gate cannot see a later command-scoped git -c identity and fails closed on the identity it measured (42, no commit)
+  PASS  F2: missing owner/no mode and malformed identity/no mode both exit 43; the mode check precedes both identity records
+  PASS  F9: ident=None exits 42 and a non-git target exits 1, with 0 files
+  PASS  S3-4: missing owner (41), absent/malformed mode and missing authorization (43) and a malformed effective identity (42) all refuse with 0 package files
+  PASS  S3-5: after a human-only acceptance a later agent-commit proposal is re-gated: exit 42 under the owner identity, exit 0 only after the explicit distinct identity, and no commit is made by the check
+  PASS  S3-6: restoring the old unconditional owner-match branch makes the same human-only fixture fail (exit 42 on stderr) while the published branch exits 0
+
+test_consumer_install_mode_native - S3-1/S3-4/S3-5: the published harness installs human-only, then re-gates.
+  PASS  C4: the published harness and its invocation state $PSNativeCommandArgumentPassing = 'Standard' before the first native call
+  PASS  S3-1: the published harness completes a human-only install with 42 files, the mode in the record, 0 commits and byte-identical config
+  PASS  F3: a padded ' human-only ' install records the normalized mode and the human-only policy, with 0 commits and byte-identical config
+  PASS  S3-5: on the installed human-only tree, a later agent-commit proposal exits 42 and creates no commit
+  PASS  S3-4: the published harness with no -Mode exits 43 before reading a source pin, with 0 package files and 0 commits
+  PASS  F1: the published harness refuses padded <SP>agent-commit (leading space) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F1: the published harness refuses padded agent-commit<SP> (trailing space) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F1: the published harness refuses padded <SP>agent-commit<SP> (leading and trailing space) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F1: the published harness refuses padded <TAB>agent-commit<TAB> (TAB) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F9: -ModeGate runs the gate from an explicit path and refuses the padded agent-commit owner identity at 42
+
+test_consumer_install_destination_links - S4-1..S4-11 and S4-19..S4-22: destination reparse points are refused
+  PASS  S4-1: an ordinary clean target still installs 42 files plus the declared record with the containment preflight in place
+  PASS  S4-2: a linked target root exits 23 naming the Junction before any write; the external inventory is unchanged
+  PASS  S4-3: an intermediate junction at the 38th package row exits 23 before the first package file is written; target and external trees unchanged
+  PASS  S4-4: a dangling Junction exits 23 without traversal or inferred safety
+  PASS  S4-5: an install-record path through a Junction exits 23 before any package or record write
+  PASS  S4-6: an ordinary external record path remains allowed and is written at its declared location, with 42 package files in the target
+  PASS  S4-7: the conflicting AGENTS.md refusal still exits 22 with the file unchanged and no package write
+  PASS  S4-8: an identical resume still exits 0, preserves the package files and the prior record, and writes the second record
+  PASS  S4-8b: the second declared record path is refused at 24 when it already exists, is left byte-identical, and no package file is written
+  SKIP  UNRUN: file symbolic-link leaf fixture unavailable on this host: You do not have sufficient privilege to perform this operation.
+  PASS  S4-10: an existing -RecordPath exits 24 before any package write, with the record byte-identical; no silent exit 0 and no missing receipt
+  PASS  S4-11: -AllowExistingRecord keeps the identical-resume behaviour - exit 0, the existing record byte-identical, no package change
+  PASS  S4-19: a record that appears between the preflight and P9 exits 24 without the switch, names the path, preserves its bytes and leaves no temp
+  PASS  S4-20: -AllowExistingRecord no longer skips a record that appears mid-run - it exits 24, preserves the appearing bytes and writes no receipt
+  PASS  S4-21: a junction at -RecordPath exits 23 with and without the switch, writes nothing through the link, and the page states 23
+  SKIP  UNRUN: file symbolic link at -RecordPath unavailable on this host: You do not have sufficient privilege to perform this operation.
+  PASS  S4-23: a junction swapped in at -RecordPath after the preflight is refused at 23 under -AllowExistingRecord, not kept and not a late 25
+  SKIP  UNRUN: file symbolic link at -RecordPath unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmp8xyt58ri\); the reparse re-check is exercised by S4-23 and its code path by the harness text marker, never counted as a pass
+
+test_consumer_install_record_temp_collision - S4-12..S4-14: the record is written through a unique same-directory
+  PASS  S4-12: a stale file at the old predictable <record>.tmp leaf is neither truncated nor consumed; the record is written through a unique temp
+  PASS  S4-13: a hardlink at <record>.tmp keeps its external bytes; the record is written through a unique temp
+  SKIP  UNRUN: file symbolic-link fixture unavailable on this host: [WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmpcljyuo_y\\symlink-sentinel.txt' -> 'C:\\Users\\PE
+
+test_consumer_install_record_write_failure - S4-15: a record-directory creation failure is inside the exit-25 contract -
+  PASS  S4-15: a record-directory creation failure exits 25 with no record at -RecordPath and no temp, not a generic exit 1
+
+test_consumer_install_record_nonfile_switch - S4-16 and S4-18: -AllowExistingRecord only resumes an existing regular
+  PASS  S4-16: -AllowExistingRecord with a directory at -RecordPath exits 24 before any package write instead of a false success without a record
+  PASS  S4-18: -AllowExistingRecord with no existing record still writes a fresh record and leaves no temp
+
+test_consumer_install_record_package_overlap - S4-17 and S4-25: a -RecordPath that equals a package output, or is nested
+  PASS  S4-17: a -RecordPath equal to a package output exits 24 before any package write instead of exit 0 with no receipt
+  PASS  S4-25: a -RecordPath nested under a package output exits 24 before any package write instead of a late exit 25
+
+SKIPPED: 10 test(s) (UNRUN, not passes)
+UNRUN: required case did not run: effective-identity hook: POSIX sh not available on this host
+UNRUN: required case did not run: startup inspection valid setup: Linux lane unavailable
+UNRUN: required case did not run: canonical ancestry tri-state: POSIX sh not available on this host
+UNRUN: required case did not run: DS-R1 shared-lock lifecycle: Linux POSIX lane unavailable
+UNRUN: required case did not run: DS-R1 fixture cleanup: Linux POSIX lane unavailable
+UNRUN: required case did not run: DS-R1 hook-path resolution: Linux POSIX lane unavailable
+OK: 375 gate self-test assertion(s) passed.

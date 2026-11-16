@@ -21,22 +21,21 @@ Root cause is out of scope: `systematic-debugger` is manual-only and never run b
 ## Play C — Check before release
 
 1. `risk-tiered-validation-selector` — machine-classifies the touched files into depth tiers; selects DEPTH only, never executes, fails closed.
-2. `sharded-validation-with-resume` — only when a sharded test suite / CI exists; designs shard map + resume. In a no-CI consumer this is design-only and normally skipped — say why.
-3. `clickthrough-test-engineer` *(manual-only)* — changed routes only.
-4. `defect-triage-facilitator` — classifies and prioritizes findings.
-5. `release-readiness-reviewer` — ship/no-ship gate on EVIDENCE; with no CI it must report the CI dimension MISSING and cannot claim a pass.
+2. `sharded-validation-with-resume` — only when a sharded suite exists; designs the shard map/resume machinery and never executes it.
+3. **Run the selected validation tier through the project's own execution owner.** When that route is the manual-only `local-ci-mirror-preflight`, list it as the EXECUTION OWNER and hand it to the human under the manual-only policy (never auto-run or chain it); otherwise use the project's documented validation command. With no CI evidence, record the CI dimension MISSING and do not claim a pass.
+4. `clickthrough-test-engineer` *(manual-only)* — changed routes only.
+5. `defect-triage-facilitator` — classifies and prioritizes findings; residual needs a recorded disposition + backlog id.
+6. `release-readiness-reviewer` — ship/no-ship gate on EVIDENCE; with no CI it reports the CI dimension MISSING and cannot claim a pass. A direct "is this ready to ship?" request is that skill's own trigger and is routed there, not run as a conductor play.
 
 ## Play D — Set up or improve automated tests
 
 1. `test-coverage-mapper` — what existing tests cover, ranked uncovered critical paths.
 2. `qa-strategy-architect` — product-wide strategy (risk inventory, layer split, manual-vs-automated).
-3. `qa-automation-architect` — framework/tooling/parallelization design.
+3. `qa-automation-architect` — framework/tooling/parallelization design; its blueprint selects the tools and layers for THIS repo's stack.
 4. `test-data-architect` — deterministic test data per layer (no secrets; non-production only).
-5. `vitest-unit-component-engineer` *(manual-only)* and `playwright-e2e-engineer` *(manual-only)* — implementation and runs.
-6. `regression-suite-curator` — what belongs in the regression suite and at which tier.
-7. `test-tenant-provisioner` *(manual-only)* — only if non-production test accounts must be created; never production or real customer tenants.
-
-These are conductor-composed orders. Where two skills do not hand off to each other (notably `test-coverage-mapper` then `qa-strategy-architect`), the order is the conductor's choice, not a skill handoff.
+5. `test-tenant-provisioner` *(manual-only)* — ONLY when non-production test accounts must be created, and BEFORE any engineer run that needs them; never production or real customer tenants.
+6. The engineer skill(s) the blueprint SELECTS — for example `vitest-unit-component-engineer` *(manual-only)* and/or `playwright-e2e-engineer` *(manual-only)*, not automatically both; a stack with no browser layer names no browser engineer.
+7. `regression-suite-curator` — what belongs in the regression suite and at which tier.
 
 ## Fallback: no browser control (Play A or C)
 
@@ -45,6 +44,9 @@ These are conductor-composed orders. Where two skills do not hand off to each ot
 ## Conditional companions (never required, never silently dropped)
 
 - `production-safe-smoke-tester` — deployed-production safety only.
-- `screenshot-evidence-planner` — evidence conventions when screenshots are captured; the skill's conventions govern naming/masking/storage.
+- `screenshot-evidence-planner` — evidence conventions when screenshots are captured.
 - `systematic-debugger` *(manual-only)* — root cause, outside the conductor.
 - `test-tenant-provisioner` *(manual-only)* — only with non-production test accounts.
+- `local-ci-mirror-preflight` *(manual-only)* — the execution owner for Play C when the project's route is the local CI mirror; handed to the human, never auto-run.
+
+These are conductor-composed orders. Where two skills do not hand off to each other (notably `test-coverage-mapper` then `qa-strategy-architect`), the order is the conductor's choice, not a skill handoff.

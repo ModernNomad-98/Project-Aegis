@@ -1,10 +1,11 @@
 {
   "skill": "qa-orchestrator",
-  "description": "Trigger discrimination for the QA conductor (this skill) vs the project journey front door (project-orchestrator), product-wide QA strategy (qa-strategy-architect), a single test plan (test-plan-designer), a security scan (security-scan-orchestrator), and root-cause debugging (systematic-debugger, manual-only).",
+  "description": "Trigger discrimination for the QA conductor (this skill) vs the project journey front door (project-orchestrator), product-wide QA strategy (qa-strategy-architect), a single test plan (test-plan-designer), a direct ship/no-ship gate (release-readiness-reviewer), a security scan (security-scan-orchestrator), and root-cause debugging (systematic-debugger, manual-only).",
   "overlaps_with": [
     "project-orchestrator",
     "qa-strategy-architect",
     "test-plan-designer",
+    "release-readiness-reviewer",
     "security-scan-orchestrator",
     "systematic-debugger"
   ],
@@ -16,19 +17,20 @@
       "should_not_trigger": [
         "project-orchestrator",
         "qa-strategy-architect",
-        "test-plan-designer"
+        "test-plan-designer",
+        "release-readiness-reviewer"
       ],
-      "note": "PRIMARY \u2014 the user wants the QA work chosen and sequenced, not the whole product journey and not one named QA document.",
-      "reason": "Sequencing a complete QA pass across the fixed plays is the conductor; project-orchestrator routes the product journey, qa-strategy-architect defines product-wide strategy, test-plan-designer writes one plan."
+      "note": "PRIMARY — the user wants the QA work chosen and sequenced, not the whole product journey and not one named QA document or a single ship/no-ship decision.",
+      "reason": "Sequencing a complete QA pass across the fixed plays is the conductor; the named neighbours own the journey, policy, one plan and the ship/no-ship gate."
     },
     {
       "id": "journey-goes-to-project-orchestrator",
-      "prompt": "I want to build and ship a product from my idea \u2014 what do I do first?",
+      "prompt": "I want to build and ship a product from my idea — what do I do first?",
       "expected_skill": "project-orchestrator",
       "should_not_trigger": [
         "qa-orchestrator"
       ],
-      "note": "JOURNEY-vs-QA SEAM \u2014 no testing goal is stated; the request is the whole lifecycle.",
+      "note": "JOURNEY-vs-QA SEAM — no testing goal is stated; the request is the whole lifecycle.",
       "reason": "The beginner journey across stages is project-orchestrator; the QA conductor only runs after there is something to test."
     },
     {
@@ -38,18 +40,28 @@
       "should_not_trigger": [
         "qa-orchestrator"
       ],
-      "note": "STRATEGY-vs-PLAY SEAM \u2014 product-level rules, not one play.",
+      "note": "STRATEGY-vs-PLAY SEAM — product-level rules, not one play.",
       "reason": "Product-wide QA strategy is qa-strategy-architect; the conductor chooses and runs a play for a testing goal."
     },
     {
       "id": "single-plan-goes-to-test-plan-designer",
-      "prompt": "Write the test plan for the checkout feature only \u2014 scope, layers, exit criteria.",
+      "prompt": "Write the test plan for the checkout feature only — scope, layers, exit criteria.",
       "expected_skill": "test-plan-designer",
       "should_not_trigger": [
         "qa-orchestrator"
       ],
-      "note": "SCOPED SINGLE SKILL \u2014 the user names the artifact they want.",
+      "note": "SCOPED SINGLE SKILL — the user names the artifact they want.",
       "reason": "A single feature test plan is test-plan-designer directly; it is play B only when the user needs the play chosen and run."
+    },
+    {
+      "id": "direct-ship-gate-goes-to-release-readiness-reviewer",
+      "prompt": "Is release 4.2 ready to ship? Run the release checklist and give me the go/no-go on the evidence.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "qa-orchestrator"
+      ],
+      "note": "DIRECT-SHIP-GATE SEAM — the user asks for the ship/no-ship decision itself, not a QA pass.",
+      "reason": "A direct release gate is release-readiness-reviewer; the conductor only runs Play C's QA pass and hands the gate evidence to that skill."
     },
     {
       "id": "security-scan-goes-to-security-scan-orchestrator",
@@ -58,17 +70,17 @@
       "should_not_trigger": [
         "qa-orchestrator"
       ],
-      "note": "SECURITY SCAN vs QA PASS \u2014 static security scanning is a different deliverable.",
+      "note": "SECURITY SCAN vs QA PASS — static security scanning is a different deliverable.",
       "reason": "Whole-repo static security scanning/aggregation is security-scan-orchestrator; QA functional testing is the conductor."
     },
     {
       "id": "root-cause-goes-to-systematic-debugger",
-      "prompt": "This bug keeps happening and I need the root cause found and fixed now.",
+      "prompt": "Explicitly invoke systematic-debugger. This bug keeps happening and I need the root cause found and fixed now.",
       "expected_skill": "systematic-debugger",
       "should_not_trigger": [
         "qa-orchestrator"
       ],
-      "note": "ROOT CAUSE (manual-only) \u2014 the conductor names and stops.",
+      "note": "ROOT CAUSE (manual-only, explicitly invoked) — the conductor names and stops.",
       "reason": "Driving a bug to root cause is systematic-debugger (manual-only); the conductor only routes blockers there and never runs it."
     }
   ]
