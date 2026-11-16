@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "6e9d121b88eb26ad2b379107f9f8af0fe013ea1c",
+  "source_revision": "05d0040b71d6bdeb8b37860939b2926a7757abde",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -841,7 +841,7 @@
     {
       "name": "project-orchestrator",
       "path": ".claude/skills/project-orchestrator/SKILL.md",
-      "sha256": "859c837b0c0986e0cc21c268314cfe04fbdee259fa27196c5f03a40f631ae987"
+      "sha256": "d1ba2b8425f56016f47a8df904f41143122dde0001a464ae8c0dbb3f8d73b239"
     },
     {
       "name": "promotion-packet-writer",
