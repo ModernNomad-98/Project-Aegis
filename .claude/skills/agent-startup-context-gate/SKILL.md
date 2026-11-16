@@ -103,9 +103,17 @@ the solo-owner decision of 2026-10-28 (README, "Solo-owner commit identity — d
 allows a solo owner to commit under their own identity, and requires only
 agent-authored commits to use the documented repository-local agent identity.
 
-**In a consumer/product repository (Role B), read the install mode before running the
-check**, from `docs/consumer-install-record.md` ("install mode"); when the sh route
-wrote no record, read the install-mode DECISION in `docs/project-state.md` if that file exists. When neither record exists (for example a failed late `sh` probe in a fresh consumer), re-run the installer so it writes its receipt; if that is not possible, ask the user once for the mode and use the answer for the current session only — record it at the first approved `docs/project-state.md` write, and never infer or default a mode.
+**In a consumer/product repository (Role B), read the install mode from the ACTIVE
+install receipt before running the check.** Resolve the active receipt first: use the
+receipt path the installer's current procedure documents as current for its version;
+across the documented v1→v2 transition a newer versioned receipt (for example
+`docs/consumer-install-record-v2.md`) supersedes the retained byte-unchanged default
+`docs/consumer-install-record.md`, and a later install-mode DECISION in
+`docs/project-state.md` supersedes either receipt. When no record exists (for example a
+failed late `sh` probe in a fresh consumer), re-run the installer so it writes its
+receipt; if that is not possible, ask the user once for the mode and use the answer for
+the current session only — record it at the first approved `docs/project-state.md`
+write, and never infer or default a mode.
 - `human-only`: the agent makes no commit and changes no Git identity, so the
   owner-identity refusal does not run against the human's own commit. An authorized, dated agent-commit transition supersedes a recorded human-only mode.
 - `agent-commit`: the fail-closed check below runs for every agent commit; a commit
