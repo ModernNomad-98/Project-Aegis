@@ -866,6 +866,11 @@
       "declares_read_only": false
     },
     {
+      "name": "qa-orchestrator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "qa-strategy-architect",
       "manual_only": false,
       "declares_read_only": false
@@ -5643,6 +5648,141 @@
       "type": "description-mention"
     },
     {
+      "from": "qa-orchestrator",
+      "to": "acceptance-criteria-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "clickthrough-test-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "clickthrough-test-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "defect-triage-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "defect-triage-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "exploratory-charter-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "manual-test-case-creator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "playwright-e2e-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "production-safe-smoke-tester",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "production-safe-smoke-tester",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "qa-automation-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "qa-strategy-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "regression-suite-curator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "risk-tiered-validation-selector",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "security-scan-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "sharded-validation-with-resume",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "test-coverage-mapper",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "test-data-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "test-plan-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "test-tenant-provisioner",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "vitest-unit-component-engineer",
+      "type": "body-route"
+    },
+    {
       "from": "qa-strategy-architect",
       "to": "qa-automation-architect",
       "type": "description-mention"
@@ -7703,7 +7843,6 @@
     "context-co-update-ci-gate",
     "cqrs-read-model-designer",
     "data-quality-monitor-designer",
-    "defect-triage-facilitator",
     "demo-tenant-safety-designer",
     "docs-first-implementer",
     "edge-function-designer",
@@ -7718,9 +7857,9 @@
     "model-routing-policy",
     "modernization-cutover-planner",
     "outbound-integration-adapter-designer",
-    "production-safe-smoke-tester",
     "property-based-test-designer",
     "pwa-boundary-reviewer",
+    "qa-orchestrator",
     "retrieval-engineering-designer",
     "role-coverage-test-designer",
     "saas-localization-architect",
