@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "bed0dee3ce1f21a1bfe2ac2637c1546ecab4a3dc",
+  "source_revision": "f26bd26cd9c3682fe449010dcf0b5c5fb3b1f4a2",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -796,7 +796,7 @@
     {
       "name": "plan-audit-reviewer",
       "path": ".claude/skills/plan-audit-reviewer/SKILL.md",
-      "sha256": "e055fce01fc55371c331ce71af4b0721397d78ec1ba2ca2fe013899846b1af86"
+      "sha256": "1eed51ae77777c264fa417242c9a0856da71ac85f0f312eb464b3576c6dea04e"
     },
     {
       "name": "plan-entitlement-architect",
@@ -806,7 +806,7 @@
     {
       "name": "plan-of-record-author",
       "path": ".claude/skills/plan-of-record-author/SKILL.md",
-      "sha256": "86d2d6e3d52ad96d9f165041a6219c0d0bbce39d1c352b523f0c4ad2dd697634"
+      "sha256": "41ebaf87a9925f15ce2c08599f602a15916cde48a4256095d0abb66af4263437"
     },
     {
       "name": "playwright-e2e-engineer",
