@@ -249,7 +249,10 @@ here.
   runtimes: `agent-harness-architect`, `model-context-designer`, conditional
   `agentic-loop-designer` — follow [AI path](../../../docs/paths/add-ai-safely.md).
 - **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` *(only when the change is too big for one reviewable change)* →
-  `phased-work-handoff-designer` → `change-classification-gate` →
+  `change-classification-gate` *(first: classifies the change and sets validation depth)* → `plan-of-record-author` *(Role A or Role B; the package follows the skill's role-aware write rule)* →
+  `plan-audit-reviewer` *(an independent audit of the classified plan; a separate agent/instance on a different model per `model-routing-policy`, with ACCEPT bound to the captured plan revision required before the stage advances;
+  REVISE/REJECT → revise the plan and re-audit; if the host has one model or no independent instance, the stage stays open and the limitation/audit is surfaced to a human —
+  "say it is not independent and continue" is not allowed)* → `phased-work-handoff-designer` →
   `human-approval-boundary`.
 - **Stage 6 — Build it, one slice at a time.** Hand each slice to
   `ai-sdlc-operating-model`'s **inner lifecycle** (context → classify → plan →
