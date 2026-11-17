@@ -373,6 +373,7 @@ pinned clone — never a recursive tree copy, which would carry `evals/`.
 | Close — the map's Close row, entered on "merged (or work stopped)" | `ai-closeout-reporter` | The stage map's Close row names it (`stage-gate-map.md:24`) and the orchestrator lists it among the Stage-6 enforcers (`project-orchestrator/SKILL.md:255-259`). J1 stops at local delivery and does not merge, so J1 never enters that row. Trigger: the change is merged or the work is stopped and a closeout report is required, including its "intentionally not done" section -> allow-list copy, recorded as a DECISION before the step runs. Never present it as a J1 dependency. |
 | A shared local stack, port, database or fixture set | none | The gate's lock protocol applies only when parallel agents could share a local resource (`SKILL.md:227-249`). J1 is single-agent; on Windows that lane is SKIP/UNRUN by the gate's own platform rule and is never a pass. |
 | Any MANUAL-ONLY skill (for example `clickthrough-test-engineer`, `aegis-setup`, `tdd-engineer`, `agent-authorization-matrix`, `standing-approval-and-auto-advance`, `ci-pipeline-architect`, `observability-operator`, `prompt-injection-defender`, `playwright-e2e-engineer`) | not installed by this package at all | A human names the exact skill for the task; the consumer records a trigger-scoped override in its own append-only register before use (`.claude/skills/human-approval-boundary/references/consumer-manual-only-policy.md:19-27`). This package installs none of them, so the default is a clean refusal, not a latent auto-invocation risk. |
+| Leaving J1 (push/PR) | none | J1 never pushes; a push or PR takes the work outside J1. J1's Implement exit is evidenced by the host agent's explicit staged-file list plus the independent `code-reviewer` verdict (J1 step 7). `docs-first-implementer` and `tdd-engineer` apply only as the work demands; `reviewable-diff-discipline` and `local-ci-mirror-preflight` apply once work leaves J1. |
 
 The Stage-3 set is the one place where a default routing chain names owners this
 package does not install. For a bounded J1 slice the installed pair produces the
@@ -382,23 +383,27 @@ install-on-demand rather than a silent gap.
 
 ### 4.2 If the step's owning skill is missing
 
-When the skill that owns a step is not in the package, the fail-closed rule applies:
+If a step routes to a skill that is not present in this copy of the library (check `.claude/skills/<name>/` at use time), the rule is one value, not a gate/advisory classification: every step applies, except a step the route marks conditional, which applies only when its stated condition holds. If it does not apply, skip it and say so where the workflow asks. If it applies, stop that hop: name the exact skill, say it is not installed, and give the selected-skills copy route (the README "Selected skills" allow-list section; in the source library that is the Project Aegis README in the same pinned source clone). Hand the copy and the extension DECISION to the human / `project-orchestrator` (the DECISION is owned by the starter page §4.2 item 4 rule and is not written by the routing agent; the `project-orchestrator` records it through its existing state-write approval path — preview → explicit approval → append — when it is the state writer). Never invent a skill, substitute another, or call an applicable step `n/a` to get past it. No step is ever "continue without it"; a skill that is present is governed by its own posture, including manual-only.
+
+When the step applies and its skill is not in the package, the fail-closed steps are:
 
 1. name the step and the owning skill from the table above;
 2. state that it is not in the package and why (outside J1);
-3. give the exact allow-list copy command and the directory it targets;
+3. give the exact allow-list copy command from the Project Aegis README section "Using the skills in your own project", in the same pinned source clone (Windows PowerShell block validated; macOS/Linux block marked NOT validated), and the directory it targets;
 4. require the extension to be recorded as a DECISION in `docs/project-state.md`
    before the step runs;
 5. **do not** substitute a paraphrase, a different skill, or an `n/a`
    classification to get past a gate. The orchestrator's own input says the owning
    skill "already exists; route to it, do not invent a new procedure"
-   (`SKILL.md:81-82, 518-520`), which is why absence must stop the route rather
+   (`SKILL.md:81-82`), which is why absence must stop the route rather
    than be improvised around.
 
 This rule is also the consumer-side answer when an installed skill's routing text
 names one of the excluded skills: the ledger in section 4.1 and this rule are the
 instruction to follow, and the copied `SKILL.md` stays byte-identical (section 3)
 so it cannot carry a local "not installed" note.
+
+This rule text in `CLAUDE.md` item 6 and the orchestrator reaches installed copies only at the next starter-package re-pin; this source change does not re-pin the package, so an install from the published pin (`2fef11dd`) still carries the previous item 6 and the previous routing text.
 
 ## 5. Package layout in your repository
 

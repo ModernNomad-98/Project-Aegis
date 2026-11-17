@@ -83,7 +83,7 @@ in-flight navigation).
 5. **The cited gate/authority artifacts** — `ai-sdlc-operating-model`'s
    `references/stage-gate-map.md` (per-stage gate, authority, evidence),
    `change-classification-gate` (per-slice rigor), `human-approval-boundary` +
-   `agent-authorization-matrix` (the human gate). Read to CITE, never copy.
+   `agent-authorization-matrix` *(apply only when a step actually needs the standing authority matrix; manual-only — hand it to the user by name)* (the human gate). Read to CITE, never copy.
 
 ## Workflow
 
@@ -238,8 +238,8 @@ here.
   `n/a-recorded` (reason), and `NOT-COMMIT-ABLE-recorded` (missing evidence)
   satisfy an owner. All four must be `*-recorded` before Stage 3 is proposed —
   never while a result awaits its append, never on a silent skip.
-- **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` → `architecture-designer` →
-  `adr-writer`. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect`, `tenant-modeler` →
+- **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` *(only when the slice makes a significant architecture decision whose style or paradigm is genuinely open)* → `architecture-designer` →
+  `adr-writer` *(only when a decision must be recorded durably as an ADR)*. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect`, `tenant-modeler` →
   `multi-tenant-data-architect`, `authorization-matrix-designer`. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect`, which asks its own flag-store question on a later turn.
   The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist`.
 - **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` / `ai-threat-modeler`;
@@ -248,7 +248,7 @@ here.
   `structured-output-validator`, `ai-cost-guardrail-designer`. For AI agent
   runtimes: `agent-harness-architect`, `model-context-designer`, conditional
   `agentic-loop-designer` — follow [AI path](../../../docs/paths/add-ai-safely.md).
-- **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` →
+- **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` *(only when the change is too big for one reviewable change)* →
   `phased-work-handoff-designer` → `change-classification-gate` →
   `human-approval-boundary`.
 - **Stage 6 — Build it, one slice at a time.** Hand each slice to
@@ -256,10 +256,10 @@ here.
   implement → validate → review → merge → close). Its `stage-gate-map.md` names
   the enforcers to invoke — `agent-startup-context-gate`,
   `change-classification-gate`, `docs-first-implementer` *(manual-only)*,
-  `tdd-engineer` *(manual-only)*, `reviewable-diff-discipline` *(manual-only)*,
-  `local-ci-mirror-preflight` *(manual-only)*, `code-reviewer`, `security-pr-reviewer`,
-  `ai-closeout-reporter`. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none.
-- **Stage 7 — Prove it works.** → `qa-strategy-architect` →
+  `tdd-engineer` *(manual-only)*, `reviewable-diff-discipline` *(manual-only)* *(J1 does not enter this skill — J1's Implement exit is evidenced by the host agent's explicit staged-file list plus the independent `code-reviewer` verdict (J1 step 7); it applies once work leaves J1)*,
+  `local-ci-mirror-preflight` *(manual-only)* *(not part of J1 — J1 never pushes, and a push or PR takes the work outside J1; applies before a push)*, `code-reviewer`, `security-pr-reviewer` *(only when the declared change class requires the security lens)*,
+  `ai-closeout-reporter` *(only when the change is merged or the work is stopped and a closeout report is required)*. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none.
+- **Stage 7 — Prove it works.** → `qa-strategy-architect` *(only when the project needs a test strategy, not just cases)* →
   `test-plan-designer`. *By evidence:* `integration-test-designer`,
   `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only)*,
   `manual-test-case-creator`,
@@ -277,7 +277,7 @@ here.
   `incident-response-runbook`. *If merge == deploy on the platform:*
   `merge-is-deploy-governance`. Route FROM the decider's result; never
   re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md).
-- **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` → `sharded-validation-with-resume` → `release-readiness-reviewer`
+- **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` *(only when the release-with-agents route applies: a multi-reviewer release is in scope)* → `sharded-validation-with-resume` *(same condition; only when the full validation tier is needed)* → `release-readiness-reviewer`
   (and the read-only reviewer subagents in `.claude/agents/` when available and relevant); the reviewer advises and the owner authorizes; Aegis's control plane is synthetic only.
   *At release, unless the owner has already answered it, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist`, preceded by `feature-flag-architect` when no flag system exists yet.
 
@@ -289,6 +289,9 @@ gate into an automatic hop. Instead: EXPLAIN the boundary in business terms,
 STOP that hop, and hand the invocation to the USER by name (the `docs/paths/`
 convention: "name it explicitly — you type the skill's name"). Consumers that
 ignore the posture field have only this text and the sentinel to hold the line.
+If a step routes to a skill that is not present in this copy of the library (check `.claude/skills/<name>/` at use time), the rule is one value, not a gate/advisory classification: every step applies, except a step the route marks conditional, which applies only when its stated condition holds.
+If it does not apply, skip it and say so where the workflow asks. If it applies, stop that hop: name the exact skill, say it is not installed, and give the selected-skills copy route (the README "Selected skills" allow-list section; in the source library that is the Project Aegis README in the same pinned source clone).
+Hand the copy and the extension DECISION to the human / `project-orchestrator` (the DECISION is owned by the starter page §4.2 item 4 rule and is not written by the routing agent; the `project-orchestrator` records it through its existing state-write approval path — preview → explicit approval → append — when it is the state writer). Never invent a skill, substitute another, or call an applicable step `n/a` to get past it. No step is ever "continue without it"; a skill that is present is governed by its own posture, including manual-only.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
