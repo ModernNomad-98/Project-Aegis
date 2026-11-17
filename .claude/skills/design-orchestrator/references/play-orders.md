@@ -6,7 +6,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 
 ## Play A — Design from scratch (new screen or flow)
 
-**Before starting (guide steps 1-3):** step 1 must be verified; this is the guide's "started from a brief" case, so step 2 must be satisfied or handed off to the requirements/specification route first — if the brief already answers audience, the job, "done" and constraints, step 2 continues on the recorded authority and the play records that; step 3's design authority must be recorded. If any is missing, stop-and-hand-off as above; the play does not start.
+**Before starting (guide steps 1-3):** step 1 must be verified; this is the guide's "started from a brief" case, so step 2 must be satisfied or handed off to the requirements/specification route first — if the brief already answers audience, the job, "done" and constraints, step 2 continues on the recorded authority and the play records that; step 3's design authority must be recorded and its recorded revision/snapshot must match the live source at use time; a stale authority stops the play and hands off to `project-orchestrator` naming the authority owner. If any is missing, stop-and-hand-off as above; the play does not start.
 
 1. `ux-design-iteration` — **CONDITIONAL**: applies only when the experience direction is unsettled (a settled design is not iterated merely because no iteration choice is recorded); that skill owns the one up-front offer and the record, and the conductor neither offers nor re-offers it.
 2. `edge-state-ux-designer` — applies (the per-view state matrix for each new view).
@@ -17,7 +17,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 
 ## Play B — Improve existing screens
 
-**Before starting (guide steps 1-3):** step 1 must be verified; step 2 is normally satisfied by the existing accepted spec/design authority — if absent, stop-and-hand-off; step 3's design authority must be recorded. The play does not start otherwise.
+**Before starting (guide steps 1-3):** step 1 must be verified; step 2 is normally satisfied by the existing accepted spec/design authority — if absent, stop-and-hand-off; step 3's design authority must be recorded and its recorded revision/snapshot must match the live source at use time; a stale authority stops the play and hands off to `project-orchestrator` naming the authority owner. The play does not start otherwise.
 
 1. `frontend-architecture-mapper` — **CONDITIONAL** (an existing app with no current route/component/state map; it requires a findable surface inventory and stops and asks when there is none — the conductor reports that stop rather than improvising one).
 2. `ux-design-iteration` — **CONDITIONAL** (same condition as Play A: the experience direction is unsettled (a settled design is not iterated merely because no iteration choice is recorded); the skill owns the offer/record).
@@ -25,11 +25,11 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 4. `mobile-viewport-craft` — **CONDITIONAL** (only on a web/browser-rendered target with a responsive/touch surface in scope; native apps route to their platform owner).
 5. `design-review-facilitator` — **CONDITIONAL**: applies only when a **reviewable technical design proposal** exists (a tech spec/RFC/design doc with problem, proposal, alternatives and cross-cutting concerns, per its Inputs) that skill prepares and circulates the pre-read and frames the decision, so a proposal not yet pre-read still applies; the facilitator reviews the design DOC, not screens. With no such proposal, skip it and record the condition. If it bounces an incomplete design to `tech-spec-writer`, the conductor records the bounce and hands the request to the project's spec route through `project-orchestrator` — it never runs `tech-spec-writer` itself.
 6. `visual-regression-test-designer` — **CONDITIONAL** (only on a web/browser-rendered target; rendered-UI baseline/regression coverage is in scope; native apps route to their platform owner); `screenshot-evidence-planner` — **CONDITIONAL** (captures will be used).
-7. Handoff to the implementation owner (never implemented here).
+7. Handoff to the implementation owner (never implemented here). When the settled direction leaves no design-owning skill, state plainly that no Aegis skill owns the screen design and hand the actual screen improvement to the human design owner (or the implementation owner named by the project's own stage route); never claim a screen was designed.
 
 ## Play C — Audit UI consistency
 
-**Before starting (guide steps 1-3):** step 1 must be verified; step 2 is normally satisfied by the existing spec/design authority — if absent, stop-and-hand-off; step 3's design authority must be recorded. The play does not start otherwise.
+**Before starting (guide steps 1-3):** step 1 must be verified; step 2 is normally satisfied by the existing spec/design authority — if absent, stop-and-hand-off; step 3's design authority must be recorded and its recorded revision/snapshot must match the live source at use time; a stale authority stops the play and hands off to `project-orchestrator` naming the authority owner. The play does not start otherwise.
 
 1. `design-system-token-governor` — applies (token / one-source-of-truth drift; design only).
 2. `edge-state-ux-designer` — applies (state coverage gaps).
@@ -41,7 +41,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 
 ## Play D — Hand off a design-system change
 
-**Before starting (guide steps 1-3):** step 1 must be verified; step 2 is satisfied by the change proposal/specification or handed off; step 3's design authority must be recorded. The play does not start otherwise.
+**Before starting (guide steps 1-3):** step 1 must be verified; step 2 is satisfied by the change proposal/specification or handed off; step 3's design authority must be recorded and its recorded revision/snapshot must match the live source at use time; a stale authority stops the play and hands off to `project-orchestrator` naming the authority owner. The play does not start otherwise.
 
 1. `design-system-token-governor` — applies (change governance and migration design).
 2. `design-review-facilitator` — **CONDITIONAL**: applies only when the design-system change has a **reviewable technical design proposal** (design doc/RFC with proposal, alternatives and cross-cutting concerns); otherwise skip and record the condition; the facilitator prepares and circulates the pre-read, so a proposal not yet pre-read still applies. A bounce to `tech-spec-writer` is recorded and handed to the spec route; the conductor never runs it.
