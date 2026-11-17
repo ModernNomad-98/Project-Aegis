@@ -13,7 +13,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 3. `mobile-viewport-craft` — **CONDITIONAL** (only when the interface runs in a web/browser-rendered target and the target includes small screens / responsive / touch; native mobile/desktop apps route to their platform owner).
 4. `design-system-token-governor` — **CONDITIONAL** (new tokens/components or an existing design system is the authority; governance design only).
 5. `accessibility-test-harness` — **CONDITIONAL** (interactive controls/forms, or an a11y obligation/request exists; otherwise skip with the recorded condition — no silent n/a).
-6. Handoff: the implementation owner selected by the project's own stage route (owned by `project-orchestrator`); the conductor names it and stops. `screenshot-evidence-planner` and `visual-regression-test-designer` are **CONDITIONAL** companions only when evidence/visual-regression design is requested.
+6. Handoff: the implementation owner selected by the project's own stage route (owned by `project-orchestrator`); the conductor names it and stops. When the settled direction leaves no design-owning skill, the conductor says plainly that no Aegis skill owns the screen design and hands the actual screen design to the human design owner (or the implementation owner named by the project's own stage route); it never claims a screen was designed. `screenshot-evidence-planner` and `visual-regression-test-designer` are **CONDITIONAL** companions only when evidence/visual-regression design is requested; visual-regression applies only on a web/browser-rendered target (native apps route to their platform owner).
 
 ## Play B — Improve existing screens
 
@@ -24,7 +24,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 3. `edge-state-ux-designer` — applies.
 4. `mobile-viewport-craft` — **CONDITIONAL** (only on a web/browser-rendered target with a responsive/touch surface in scope; native apps route to their platform owner).
 5. `design-review-facilitator` — **CONDITIONAL**: applies only when a **reviewable technical design proposal** exists (a tech spec/RFC/design doc with problem, proposal, alternatives and cross-cutting concerns, per its Inputs) that skill prepares and circulates the pre-read and frames the decision, so a proposal not yet pre-read still applies; the facilitator reviews the design DOC, not screens. With no such proposal, skip it and record the condition. If it bounces an incomplete design to `tech-spec-writer`, the conductor records the bounce and hands the request to the project's spec route through `project-orchestrator` — it never runs `tech-spec-writer` itself.
-6. `visual-regression-test-designer` — **CONDITIONAL** (rendered-UI baseline/regression coverage is in scope); `screenshot-evidence-planner` — **CONDITIONAL** (captures will be used).
+6. `visual-regression-test-designer` — **CONDITIONAL** (only on a web/browser-rendered target; rendered-UI baseline/regression coverage is in scope; native apps route to their platform owner); `screenshot-evidence-planner` — **CONDITIONAL** (captures will be used).
 7. Handoff to the implementation owner (never implemented here).
 
 ## Play C — Audit UI consistency
@@ -36,7 +36,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 3. `mobile-viewport-craft` — **CONDITIONAL** (only on a web/browser-rendered target with a responsive/touch surface in scope; native apps route to their platform owner).
 4. `accessibility-test-harness` — **CONDITIONAL** (an a11y obligation or verification is requested).
 5. `design-review-facilitator` — **CONDITIONAL**: an audit of existing UI normally has no **reviewable technical design proposal**, so this step is normally skipped with the recorded condition; it applies only if the audit is turned into a reviewable proposal (spec/RFC/design doc with alternatives) before the step. A bounce to `tech-spec-writer` is recorded and handed to the spec route as in Play B.
-6. `visual-regression-test-designer` — **CONDITIONAL**; `screenshot-evidence-planner` — **CONDITIONAL** (evidence will be captured).
+6. `visual-regression-test-designer` — **CONDITIONAL** (only on a web/browser-rendered target; native apps route to their platform owner); `screenshot-evidence-planner` — **CONDITIONAL** (evidence will be captured).
 7. ONE prioritized consistency report; no fixes applied during the pass.
 
 ## Play D — Hand off a design-system change
