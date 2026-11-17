@@ -1487,6 +1487,8 @@ if ($RecordPath) {
 Write-Output 'OK: 42 installed files; closure, pins, siblings, eval and aggregate checks passed'
 exit 0
 ```
+Role B planning: the consumer repository uses the same plan-of-record-author and plan-audit-reviewer contracts; this source change reaches installed copies only at the next starter-package re-pin, so an install from the published pin 2fef11dd still carries the previous contracts.
+J1 step 5 (an independently audited plan) is unchanged and remains the consumer planning route.
 
 If `-RecordPath` already exists, the block stops with **exit 24** before it writes
 any package file or any record, and names the path. The same code refuses a record

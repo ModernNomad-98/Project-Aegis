@@ -78,6 +78,20 @@
           "Declines to audit or approve its own plan; requires an independent auditor (plan-audit-reviewer)."
         ]
       }
+    },
+    {
+      "id": "role-b-consumer-plan-package",
+      "type": "should_trigger",
+      "prompt": "I copied Aegis into my product repository. The feature specification is approved and recorded; write the plan of record for this change and have it independently audited before we build.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Detects Role B (a consumer/product repository that copied the Aegis skills) from the repository evidence and does not assume the source-only registries, read-only allowlist or source approval register.",
+          "Produces the plan-of-record package in the consumer repository's own authorized evidence path, showing the exact path and complete content and applying the documentation-write rule (Exception 1) before writing; if that path/content is not authorized it writes nothing and hands the content over.",
+          "Surfaces owner decisions as the consumer's decisions with defaults and consequences, never deciding them; claims no source approval and no merge authority.",
+          "Hands the captured revision hash to an independent plan auditor and makes no self-approval claim."
+        ]
+      }
     }
   ]
 }

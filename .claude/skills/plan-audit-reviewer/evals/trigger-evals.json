@@ -155,6 +155,16 @@
         "plan-audit-reviewer"
       ],
       "reason": "Merge receipt is a separate stage with its own authority."
+    },
+    {
+      "id": "consumer-plan-reaudit",
+      "prompt": "The consumer product plan-of-record revision was revised after our REVISE. Re-audit the new captured revision against our product repository and its recorded approvals.",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "code-reviewer",
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "A consumer Role B plan re-audit is the same independent Stage-B skill; code review and acceptance-criteria review are different deliverables."
     }
   ]
 }
