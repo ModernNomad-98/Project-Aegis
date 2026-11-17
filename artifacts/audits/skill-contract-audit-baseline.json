@@ -3,13 +3,13 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.0",
     "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-    "repo_sha": "c46be380f8c870374c9f8a8b3923ced70620fe4e",
+    "repo_sha": "9b69bd1b7eae07f991c78411196f4fb7b840e3b7",
     "branch": "p0/design-orchestrator-2026-11-16",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 1003,
-    "audited_byte_count": 6967164,
-    "corpus_content_hash": "4b832e4dfce8927a801f54755e586bc40bcc7a9972569f5b00f6ee5767a9f2b9",
+    "audited_byte_count": 6969370,
+    "corpus_content_hash": "241a2066078f16416e896fdda61ca688f7e50cd15a43560010d94185d8942f0b",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -2788,7 +2788,7 @@
       "line": 0,
       "owning_skill": "design-orchestrator",
       "related_skills": [],
-      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'write a spec, invent a project file' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'recorded revision/snapshot with the live source (the design file' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
       "family": "side-effect",
       "aegis_map": [
         "AEGIS-020",

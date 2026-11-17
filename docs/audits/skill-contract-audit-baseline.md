@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `c46be380f8c870374c9f8a8b3923ced70620fe4e` (branch `p0/design-orchestrator-2026-11-16`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `4b832e4dfce8927a801f54755e586bc40bcc7a9972569f5b00f6ee5767a9f2b9` (1003 files, 6967164 bytes)
+- Repo SHA: `9b69bd1b7eae07f991c78411196f4fb7b840e3b7` (branch `p0/design-orchestrator-2026-11-16`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `241a2066078f16416e896fdda61ca688f7e50cd15a43560010d94185d8942f0b` (1003 files, 6969370 bytes)
 - Skills scanned: **258**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **475** (375 mechanical, 100 semantic-review candidates)
 
@@ -121,7 +121,7 @@ mechanically proven defects.
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/cloud-architecture-decider/SKILL.md` (owner: cloud-architecture-decider; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record to `adr' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/code-reviewer/SKILL.md` (owner: code-reviewer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/demo-tenant-safety-designer/SKILL.md` (owner: demo-tenant-safety-designer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seed policy: fixtures' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/design-orchestrator/SKILL.md` (owner: design-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'write a spec, invent a project file' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
+- **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/design-orchestrator/SKILL.md` (owner: design-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'recorded revision/snapshot with the live source (the design file' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/design-orchestrator/SKILL.md` (owner: design-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'write a spec' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/docs-as-code-architect/SKILL.md` (owner: docs-as-code-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/domain-modeler/SKILL.md` (owner: domain-modeler; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'buy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
