@@ -162,6 +162,7 @@ Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-ag
   where you are (brief, existing app, design file, or a named tool), keep each design decision's
   authority, and hand off between agents without re-explaining. The guide's steps 1-3 come
   first; after them, `design-orchestrator` is the optional invocable door for a whole design pass.
+- **"I know what I want to do — I just don't know which skill."** → [Find a specialist](docs/paths/find-a-specialist.md): name your situation in plain words and the page maps it to the specialist who owns it — data, documentation, analytics, performance — or the next step when you cannot name the goal.
 - **"It works — now I want to launch."** → tell your coding agent: *"My app is built — use
   project-orchestrator to get me ready to release."* It picks up at the deploy-prep stage
   and ends with a plain-language GO / NO-GO that **you** authorize. The
