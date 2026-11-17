@@ -170,6 +170,7 @@ Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-ag
   [release-with-agents path](docs/paths/release-with-agents.md) explains how to
   use independent reviewers when the host supports them, keep one release
   candidate and deployment path, and learn what each invoked skill does.
+- **"It's live — help me keep it healthy."** → [After launch](docs/paths/after-launch.md): learn from an incident, run a routine health check, plan the next version, or retire a feature or customer — each step names the specialist that owns it and what it needs first.
 
 **How Aegis chooses models.** The orchestrator is instructed to route by capability, not by model name: routine text work uses the lightest sufficient model, coding uses a balanced one, architecture and security use an advanced one, and audits or reviews must use an independent verification model and agent. Your assistant host supplies the actual models; this routing policy contains no model names or versions. If your host offers only one model or no model chooser, Aegis says so and records the limitation instead of claiming an independent review. This is a routing contract, not a measured quality or cost claim.
 
