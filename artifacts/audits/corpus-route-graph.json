@@ -3159,6 +3159,11 @@
     },
     {
       "from": "design-orchestrator",
+      "to": "accessibility-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
       "to": "clickthrough-test-engineer",
       "type": "body-route"
     },
@@ -3179,6 +3184,16 @@
     },
     {
       "from": "design-orchestrator",
+      "to": "design-review-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "design-system-token-governor",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
       "to": "design-system-token-governor",
       "type": "body-route"
     },
@@ -3190,6 +3205,31 @@
     {
       "from": "design-orchestrator",
       "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "frontend-architecture-mapper",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "mobile-viewport-craft",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "mobile-viewport-craft",
       "type": "body-route"
     },
     {
@@ -3239,12 +3279,22 @@
     },
     {
       "from": "design-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
       "to": "qa-orchestrator",
       "type": "description-mention"
     },
     {
       "from": "design-orchestrator",
       "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "screenshot-evidence-planner",
       "type": "body-route"
     },
     {
@@ -3270,6 +3320,26 @@
     {
       "from": "design-orchestrator",
       "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "ux-design-iteration",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "ux-design-iteration",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "visual-regression-test-designer",
       "type": "body-route"
     },
     {
