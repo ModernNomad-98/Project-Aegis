@@ -1612,7 +1612,7 @@ Optional design-iteration addition (owner instruction 2026-10-20; not a new fami
 |---|---|---|
 | `ux-design-iteration` | Runs optional bounded design iteration before implementation: one up-front A/B choice, evidence-backed brief, end-to-end story, meaningfully different flows, smallest interactive prototype, independent rendered-UI review, per-evaluation records, disposition/retest, readiness/false-completion gate and reviewed handoff. Composes the nearest owners; advisory: it returns the iteration records to the host/user or project state owner for persistence, and does not write project artefacts, run commands, launch browsers or use the network; any persistence is performed by the host/user or state owner. | auto + manual |
 
-D123 — UX/UI design conductor addition (owner scope decisions D-15/D-16; one skill in family 14, no new family):
+D123 — UX/UI design conductor addition (scope decisions recorded under the standing decision protocol, D-15/D-16; one skill in family 14, no new family):
 
 | Skill | What it does | Invocation |
 |---|---|---|
