@@ -12,7 +12,7 @@
 
 ### Something is wrong right now
 
-**If the product is broken right now, this page adds no steps.** Use the symptom map in [Something's broken](something-is-broken.md): a live incident, live diagnosis and a live status determination stay with the specialists named there — two of them are **manual-only**, so you name them explicitly — and this page never diagnoses, reports live health or runs a probe.
+**If the product is broken right now, this page adds no steps.** Use the symptom map in [Something's broken](something-is-broken.md): a live incident, live diagnosis and a live status determination stay with the specialists named there — `systematic-debugger` is **manual-only** as named there, and a live status determination is `observability-operator` (**manual-only**; see Routine health check below) — and this page never diagnoses, reports live health or runs a probe.
 
 ### Learn from an incident
 
@@ -57,7 +57,7 @@
 
 ## What this is — and isn't
 
-This is a guided map, not a guarantee. Each specialist owns its own how, its own preconditions and its own stop conditions; several are design or advisory only and execute nothing. **Manual-only** specialists are named explicitly and never auto-applied. The starter package installs none of these specialists, so a missing skill is copied through the selected-skills route or the step stops — it is never silently substituted.
+This is a guided map, not a guarantee. Each specialist owns its own how, its own preconditions and its own stop conditions; several are design or advisory only and execute nothing. **Manual-only** specialists are named explicitly and never auto-applied. The starter package installs none of the 10 specialists above, so a missing skill is copied through the selected-skills route or the step stops — it is never silently substituted.
 
 There is no readiness claim, no coverage-percentage claim, no host-support claim, no eval-detection claim and **no live-health-status claim** here: where evidence is missing the page says **UNKNOWN**, and nothing on this page fixes, probes or diagnoses anything. The after-launch conductor is parked and not built: nothing here is a conductor, and the whole journey stays with `project-orchestrator`.
 
