@@ -12,7 +12,8 @@
           "Asks at most four plain-language intake questions, one at a time in guided mode.",
           "Chooses Play A and names ux-design-iteration (conditional on an unsettled experience direction; a settled design is not iterated merely because no choice is recorded), edge-state-ux-designer, and the conditional companions before starting.",
           "Checks which play skills are installed; an absent applying skill stops the hop, names the skill, gives the selected-skills copy route and hands the extension DECISION to the human/project-orchestrator.",
-          "Ends with ONE plain-language design report and no implementation, code writing, browser driving or screenshot capture."
+          "Ends with ONE plain-language design report and no implementation, code writing, browser driving or screenshot capture.",
+          "When the experience direction is settled and no screen-design step applies, says plainly that no Aegis skill owns the screen design and hands the actual screen design to the human design owner (or the implementation owner named by the project's own stage route); it does not claim a screen was designed."
         ]
       }
     },

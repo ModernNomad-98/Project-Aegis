@@ -10,7 +10,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 
 1. `ux-design-iteration` — **CONDITIONAL**: applies only when the experience direction is unsettled (a settled design is not iterated merely because no iteration choice is recorded); that skill owns the one up-front offer and the record, and the conductor neither offers nor re-offers it.
 2. `edge-state-ux-designer` — applies (the per-view state matrix for each new view).
-3. `mobile-viewport-craft` — **CONDITIONAL** (the target includes small screens / responsive / touch).
+3. `mobile-viewport-craft` — **CONDITIONAL** (only when the interface runs in a web/browser-rendered target and the target includes small screens / responsive / touch; native mobile/desktop apps route to their platform owner).
 4. `design-system-token-governor` — **CONDITIONAL** (new tokens/components or an existing design system is the authority; governance design only).
 5. `accessibility-test-harness` — **CONDITIONAL** (interactive controls/forms, or an a11y obligation/request exists; otherwise skip with the recorded condition — no silent n/a).
 6. Handoff: the implementation owner selected by the project's own stage route (owned by `project-orchestrator`); the conductor names it and stops. `screenshot-evidence-planner` and `visual-regression-test-designer` are **CONDITIONAL** companions only when evidence/visual-regression design is requested.
@@ -22,7 +22,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 1. `frontend-architecture-mapper` — **CONDITIONAL** (an existing app with no current route/component/state map; it requires a findable surface inventory and stops and asks when there is none — the conductor reports that stop rather than improvising one).
 2. `ux-design-iteration` — **CONDITIONAL** (same condition as Play A: the experience direction is unsettled (a settled design is not iterated merely because no iteration choice is recorded); the skill owns the offer/record).
 3. `edge-state-ux-designer` — applies.
-4. `mobile-viewport-craft` — **CONDITIONAL** (responsive/touch surface is in scope).
+4. `mobile-viewport-craft` — **CONDITIONAL** (only on a web/browser-rendered target with a responsive/touch surface in scope; native apps route to their platform owner).
 5. `design-review-facilitator` — **CONDITIONAL**: applies only when a **reviewable technical design proposal** exists (a tech spec/RFC/design doc with problem, proposal, alternatives and cross-cutting concerns, per its Inputs) that skill prepares and circulates the pre-read and frames the decision, so a proposal not yet pre-read still applies; the facilitator reviews the design DOC, not screens. With no such proposal, skip it and record the condition. If it bounces an incomplete design to `tech-spec-writer`, the conductor records the bounce and hands the request to the project's spec route through `project-orchestrator` — it never runs `tech-spec-writer` itself.
 6. `visual-regression-test-designer` — **CONDITIONAL** (rendered-UI baseline/regression coverage is in scope); `screenshot-evidence-planner` — **CONDITIONAL** (captures will be used).
 7. Handoff to the implementation owner (never implemented here).
@@ -33,7 +33,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 
 1. `design-system-token-governor` — applies (token / one-source-of-truth drift; design only).
 2. `edge-state-ux-designer` — applies (state coverage gaps).
-3. `mobile-viewport-craft` — **CONDITIONAL** (responsive/touch surface in scope).
+3. `mobile-viewport-craft` — **CONDITIONAL** (only on a web/browser-rendered target with a responsive/touch surface in scope; native apps route to their platform owner).
 4. `accessibility-test-harness` — **CONDITIONAL** (an a11y obligation or verification is requested).
 5. `design-review-facilitator` — **CONDITIONAL**: an audit of existing UI normally has no **reviewable technical design proposal**, so this step is normally skipped with the recorded condition; it applies only if the audit is turned into a reviewable proposal (spec/RFC/design doc with alternatives) before the step. A bounce to `tech-spec-writer` is recorded and handed to the spec route as in Play B.
 6. `visual-regression-test-designer` — **CONDITIONAL**; `screenshot-evidence-planner` — **CONDITIONAL** (evidence will be captured).
@@ -53,6 +53,6 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 
 - A conditional step whose condition does not hold is skipped and named with its condition in the report; it is never claimed as passed and never silently dropped.
 - No routed design skill is manual-only (all routed design steps above are model-invocable and design-only). Manual-only skills appear only as implementation/verification EXECUTION owners and are handed to the human: name the exact skill, state its scope/limits, and let the human invoke it. The conductor never invokes, chains, simulates or claims it ran; no new override authority is created.
-- The consumer's recorded manual-only policy is the only delegation route: one standing trigger-scoped override per project naming each exact manual-only skill it covers, with per-run naming fallback (the human names and invokes the exact skill directly). A business answer is not permission.
+- The conductor never writes an authorization record itself; when the consumer asks for a recording it shows a draft for the human/`project-orchestrator` to record under existing authority. The consumer's recorded manual-only policy is the only delegation route: one standing trigger-scoped override per project naming each exact manual-only skill it covers, with per-run naming fallback (the human names and invokes the exact skill directly). A business answer is not permission.
 - Fallback when a needed routed skill is absent: stop that hop, name the exact skill, give the selected-skills copy route and hand the extension DECISION to the human/`project-orchestrator`.
 - The conductor records what ran, what was skipped conditionally and what remains UNKNOWN; it never claims a design was built, a browser was driven, a screenshot was captured or a manual-only skill ran.
