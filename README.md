@@ -822,6 +822,8 @@ anytime. Literal first prompt to paste:
 > "I run a maintenance company and jobs keep getting missed — I think I need an app but I'm not
 > a developer and don't know where to start. Use the project-orchestrator skill to guide me."
 
+If you are stopping for a while or moving to a new chat and do not want to lose anything, name the manual-only complete-project-checkpoint skill yourself — naming is not authorization: copy it first (it is not in the starter package), record a trigger-scoped override in your consumer-local register and a DECISION before first use (see [Find a specialist](docs/paths/find-a-specialist.md#save-and-resume)), and the ordinary resume path is still the latest STATE SNAPSHOT.
+
 `project-orchestrator` opens your project by handing the discovery step to
 `requirements-gathering-facilitator`. If you already KNOW you need the requirements interview,
 you can name that skill directly instead:
