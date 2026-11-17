@@ -475,25 +475,9 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 
 ## Supporting Files
 
-- [references/project-state-template.md](references/project-state-template.md) —
-  the `docs/project-state.md` schema and copyable template: three append-only
-  dated entry types (STATE SNAPSHOT latest-wins; DECISION with its chosen-over
-  clause; APPROVAL — an `A-*` grant or immutable lifecycle event anchored
-  to immutable evidence), the composed decision-ID + approval-citation patterns,
-  the propose → approve → append (cold-start approved-create) flow, and the
-  immutable-evidence vs mutable-projection split (immutable evidence wins).
-- [references/recording-and-authority.md](references/recording-and-authority.md) —
-  Capability 4's recording + authority discipline: risk-tiered batching of
-  low-risk product decisions, authority kept separate from scope/spec/design
-  acceptance, proposal-fingerprint and already-recorded idempotency, and
-  byte-for-byte exactness. Applied by the contract, not restated in it.
-- `evals/evals.json` — behavior cases: the cold vague-idea happy path, the
-  Stage 1 interactive interview (one question, no question-bank dump,
-  recorded-Stage-1 lag, visible pending-decision batch), the mid-flight
-  state-file edge, the stage-8 decision-driven and Stage 3/9 flag routing edges, and the refusals
-  (no auto-merge, no migration or business-scope decision on inferred consent, a
-  business answer is not write approval).
-- `evals/trigger-evals.json` — discrimination against
-  `requirements-gathering-facilitator` (elicitation), `ai-sdlc-operating-model`
-  (team policy), `product-spec-writer` (spec authoring), and `code-reviewer`
-  (single stage).
+- [references/project-state-template.md](references/project-state-template.md) — the `docs/project-state.md` schema and copyable
+  template: append-only entry types (STATE SNAPSHOT, DECISION, APPROVAL), identifiers, propose → approve → append flow; immutable evidence wins.
+- [references/recording-and-authority.md](references/recording-and-authority.md) — Capability 4's recording and authority
+  discipline: risk-tiered batching, authority kept separate from scope/spec/design, proposal-fingerprint idempotency, exactness; applied by the contract.
+- `evals/evals.json` — behavior cases for the cold-start interview, mid-flight state, stage routing and refusals; static spec only, evals do not run on PRs.
+- `evals/trigger-evals.json` — trigger discrimination against the requirements, AI-SDLC, spec and code-review owners.
