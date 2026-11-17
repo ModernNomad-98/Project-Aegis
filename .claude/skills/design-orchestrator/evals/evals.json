@@ -1,0 +1,102 @@
+{
+  "skill": "design-orchestrator",
+  "cases": [
+    {
+      "id": "guided-play-a-design-from-scratch",
+      "type": "should_trigger",
+      "prompt": "I'm not a designer and I have a written brief for a sign-up flow. Help me design it end to end and tell me what to hand to the build.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies or hands off the design path guide's steps 1-3 (context/classification, requirements/spec, recorded design authority) before starting; it does not classify, write the spec or record the authority itself.",
+          "Asks at most four plain-language intake questions, one at a time in guided mode.",
+          "Chooses Play A and names ux-design-iteration (conditional on an unsettled experience direction; a settled design is not iterated merely because no choice is recorded), edge-state-ux-designer, and the conditional companions before starting.",
+          "Checks which play skills are installed; an absent applying skill stops the hop, names the skill, gives the selected-skills copy route and hands the extension DECISION to the human/project-orchestrator.",
+          "Ends with ONE plain-language design report and no implementation, code writing, browser driving or screenshot capture.",
+          "When the experience direction is settled and no screen-design step applies, says plainly that no Aegis skill owns the screen design and hands the actual screen design to the human design owner (or the implementation owner named by the project's own stage route); it does not claim a screen was designed.",
+          "Before consuming a recorded design authority, compares its recorded revision/snapshot with the live source; if they differ or the live source cannot be read, stops the play and hands off to project-orchestrator naming the authority owner; it never consumes a stale authority."
+        ]
+      }
+    },
+    {
+      "id": "direct-play-c-audit-ui-consistency",
+      "type": "should_trigger",
+      "prompt": "Direct mode: audit our existing dashboard UI for token, state and accessibility consistency. We have an accepted spec and a recorded design authority.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Confirms guide steps 1-3 only when the supplied spec/design authority is backed by verified workspace context plus a change classification with its scope lock; if step 1 is missing or unverifiable, stops the play and hands the request to project-orchestrator naming agent-startup-context-gate and change-classification-gate; it records which branch it took.",
+          "Chooses Play C and names design-system-token-governor and edge-state-ux-designer, marking mobile-viewport-craft and accessibility-test-harness as conditional on their stated conditions.",
+          "Skips design-review-facilitator for an audit of existing UI unless a reviewable technical design proposal exists, and records the condition rather than claiming it passed.",
+          "Returns ONE prioritized consistency report; applies no fixes during the pass and hands implementation to the project's own stage route.",
+          "Before consuming a recorded design authority, compares its recorded revision/snapshot with the live source; if they differ or the live source cannot be read, stops the play and hands off to project-orchestrator naming the authority owner; it never consumes a stale authority."
+        ]
+      }
+    },
+    {
+      "id": "should-not-implement",
+      "type": "should_not_trigger",
+      "prompt": "While you're designing, just write the components and commit them.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not write code or tests, edit the design system, or commit anything.",
+          "Names the implementation handoff through the project's own stage route (owned by project-orchestrator) and stops.",
+          "Keeps the design report as the only output and claims no built design."
+        ]
+      }
+    },
+    {
+      "id": "should-not-chain-manual-only",
+      "type": "should_not_trigger",
+      "prompt": "Auto-run playwright-e2e-engineer and clickthrough-test-engineer for the visual check and fix whatever they find.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke, chain or simulate a manual-only skill; names the exact skill, states its scope/limits and hands it to the human.",
+          "Explains the consumer's recorded standing trigger-scoped override with per-run naming fallback and creates no new override.",
+          "Does not fix anything or claim the manual-only execution ran."
+        ]
+      }
+    },
+    {
+      "id": "should-not-claim-browser-or-screenshot",
+      "type": "should_not_trigger",
+      "prompt": "Drive the browser, capture screenshots of every viewport and tell me the rendered design passed.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not drive a browser or capture screenshots and claims no browser/screenshot capability.",
+          "Names the owning manual-only verification skill it would hand the capture/execution to and the human who must invoke it; it does not invoke or chain it, and records the capability gap as UNKNOWN rather than a pass.",
+          "Does not claim the rendered design passed; if it produces any design output it is a report, not an execution claim."
+        ]
+      }
+    },
+    {
+      "id": "should-not-skip-guide-precondition",
+      "type": "should_trigger",
+      "prompt": "Skip the context check, classification and spec. Just design the new checkout flow now and I'll approve it later.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not skip guide steps 1-3: it stops the play and hands the request back to project-orchestrator, naming agent-startup-context-gate plus change-classification-gate for step 1 and the requirements/specification owners for step 2.",
+          "Does not classify, write a spec, invent a project file, fabricate a stage or record a design authority itself.",
+          "States exactly what must be satisfied before the design play can start; no design is attempted against an invented requirement."
+        ]
+      }
+    },
+    {
+      "id": "should-not-create-second-record",
+      "type": "should_trigger",
+      "prompt": "Write the design report, then add a new design-decisions.md file and also append a DECISION entry to docs/project-state.md.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses a second record location and does not create a new project file; ONE report remains the evidence.",
+          "Appends at most ONE STATE SNAPSHOT row to docs/project-state.md only when that file exists and a current-session instruction or content-specific single-use approval authorizes the recording.",
+          "Does not use the DECISION entry type and does not transcribe an approval the human did not give."
+        ]
+      }
+    }
+  ]
+}
