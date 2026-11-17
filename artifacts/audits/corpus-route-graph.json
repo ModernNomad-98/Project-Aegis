@@ -406,6 +406,11 @@
       "declares_read_only": true
     },
     {
+      "name": "design-orchestrator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "design-review-facilitator",
       "manual_only": false,
       "declares_read_only": false
@@ -3148,6 +3153,136 @@
       "type": "body-route"
     },
     {
+      "from": "design-orchestrator",
+      "to": "accessibility-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "clickthrough-test-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "design-review-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "design-review-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "design-review-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "design-system-token-governor",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "design-system-token-governor",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "mobile-viewport-craft",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "playwright-e2e-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "product-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "qa-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "screenshot-evidence-planner",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "security-scan-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "visual-regression-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "vite-build-qa-engineer",
+      "type": "body-route"
+    },
+    {
       "from": "design-review-facilitator",
       "to": "adr-writer",
       "type": "body-route"
@@ -5654,6 +5789,26 @@
     },
     {
       "from": "qa-orchestrator",
+      "to": "clickthrough-test-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "defect-triage-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "manual-test-case-creator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "manual-test-case-creator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
       "to": "manual-test-case-creator",
       "type": "body-route"
     },
@@ -5665,6 +5820,16 @@
     {
       "from": "qa-orchestrator",
       "to": "production-safe-smoke-tester",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "qa-orchestrator",
+      "to": "project-orchestrator",
       "type": "body-route"
     },
     {
@@ -7763,8 +7928,8 @@
     "context-co-update-ci-gate",
     "cqrs-read-model-designer",
     "data-quality-monitor-designer",
-    "defect-triage-facilitator",
     "demo-tenant-safety-designer",
+    "design-orchestrator",
     "docs-first-implementer",
     "edge-function-designer",
     "export-pipeline-architect",
@@ -7780,7 +7945,6 @@
     "outbound-integration-adapter-designer",
     "property-based-test-designer",
     "pwa-boundary-reviewer",
-    "qa-orchestrator",
     "retrieval-engineering-designer",
     "role-coverage-test-designer",
     "saas-localization-architect",

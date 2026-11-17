@@ -2,18 +2,18 @@
   "tool": "audit-skill-contracts",
   "version": "1.14.0",
   "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-  "repo_sha": "62d782edbcdb779e27d7638c8841746ee5255c80",
-  "branch": "p0/qa-1-qa-orchestrator-2026-11-16",
+  "repo_sha": "9bca10af95f1cdda4a1553282f3c484e5b137535",
+  "branch": "p0/design-orchestrator-2026-11-16",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
-  "audited_file_count": 999,
-  "audited_byte_count": 6912432,
-  "corpus_content_hash": "e3c057ad0bcf138171fe9f939add6e4c2eebe4fec4916e8f279bf674e18c0068",
+  "audited_file_count": 1003,
+  "audited_byte_count": 6963273,
+  "corpus_content_hash": "8cc7add0be6682fe4dc3a17bec0fdff0a7e089893461db0a508f5001fc366aab",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {
       "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-      "sha256": "36fe606cc897135bafe640f6d41f8a9d32576de68ecab3ed4d6d40d8d3123c30"
+      "sha256": "3f0c694164274f8be41b783dac634514c8ec099f4cad04ecf4f12c3722453f58"
     },
     "agent_names_enumerated": {
       "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -34,11 +34,12 @@
         "check-your-app.md",
         "design-and-build-ui.md",
         "release-with-agents.md",
-        "something-is-broken.md"
+        "something-is-broken.md",
+        "test-your-app.md"
       ]
     }
   },
-  "skill_count": 257,
+  "skill_count": 258,
   "skills": [
     {
       "name": "ab-test-designer",
@@ -1480,6 +1481,24 @@
       "declares_read_only": true,
       "approval_related": false,
       "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "design-orchestrator",
+      "skill_md": ".claude/skills/design-orchestrator/SKILL.md",
+      "family": "Skills (D123 \u2014 UX/UI design conductor addition)",
+      "description_chars": 949,
+      "references": [
+        ".claude/skills/design-orchestrator/references/play-orders.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 7,
+      "trigger_cases": 8,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
       "writes_artifacts": false
     },
     {
@@ -3122,13 +3141,13 @@
       "name": "qa-orchestrator",
       "skill_md": ".claude/skills/qa-orchestrator/SKILL.md",
       "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
-      "description_chars": 871,
+      "description_chars": 1010,
       "references": [
         ".claude/skills/qa-orchestrator/references/play-orders.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 6,
+      "eval_cases": 11,
       "trigger_cases": 8,
       "manual_only": false,
       "declares_read_only": false,
@@ -4613,6 +4632,7 @@
     "docs/paths/check-your-app.md",
     "docs/paths/design-and-build-ui.md",
     "docs/paths/release-with-agents.md",
-    "docs/paths/something-is-broken.md"
+    "docs/paths/something-is-broken.md",
+    "docs/paths/test-your-app.md"
   ]
 }

@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.0",
     "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-    "repo_sha": "62d782edbcdb779e27d7638c8841746ee5255c80",
-    "branch": "p0/qa-1-qa-orchestrator-2026-11-16",
+    "repo_sha": "9bca10af95f1cdda4a1553282f3c484e5b137535",
+    "branch": "p0/design-orchestrator-2026-11-16",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 999,
-    "audited_byte_count": 6912432,
-    "corpus_content_hash": "e3c057ad0bcf138171fe9f939add6e4c2eebe4fec4916e8f279bf674e18c0068",
+    "audited_file_count": 1003,
+    "audited_byte_count": 6963273,
+    "corpus_content_hash": "8cc7add0be6682fe4dc3a17bec0fdff0a7e089893461db0a508f5001fc366aab",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "36fe606cc897135bafe640f6d41f8a9d32576de68ecab3ed4d6d40d8d3123c30"
+        "sha256": "3f0c694164274f8be41b783dac634514c8ec099f4cad04ecf4f12c3722453f58"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -35,18 +35,19 @@
           "check-your-app.md",
           "design-and-build-ui.md",
           "release-with-agents.md",
-          "something-is-broken.md"
+          "something-is-broken.md",
+          "test-your-app.md"
         ]
       }
     },
-    "skill_count": 257,
+    "skill_count": 258,
     "rule_count": 28,
-    "finding_count": 470,
+    "finding_count": 475,
     "by_severity": {
       "P0": 3,
-      "P1": 97,
+      "P1": 100,
       "P2": 41,
-      "info": 329
+      "info": 331
     },
     "by_rule": {
       "ARTF-001": 10,
@@ -54,13 +55,14 @@
       "EVAL-003": 3,
       "PARITY-001": 38,
       "REF-003": 1,
-      "ROUTE-002": 329,
-      "SIDE-004": 83,
+      "ROUTE-001": 1,
+      "ROUTE-002": 331,
+      "SIDE-004": 85,
       "STATE-001": 2,
       "STATE-002": 1
     },
-    "mechanical_count": 372,
-    "semantic_review_candidates": 98
+    "mechanical_count": 375,
+    "semantic_review_candidates": 100
   },
   "rule_inventory": [
     {
@@ -133,7 +135,7 @@
         "AEGIS-057"
       ],
       "limits": "covers the \u00a75 classes (source/test/config writes, VCS mutation, install, network, deploy/provision, data-store/live-state writes, spend, unbound doc/state writes) as lexical verb+noun patterns, at most ONE candidate per class per skill; fenced snippets INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; the approved-write exception applies ONLY to the doc-state-write class and ONLY when exact-path + content-preview + approval markers sit within a few lines of the write \u2014 approval language elsewhere never suppresses anything (extra negative fixture: approved-doc-writer)",
-      "hit_count": 83
+      "hit_count": 85
     },
     {
       "id": "SIDE-005",
@@ -340,7 +342,7 @@
         "AEGIS-053"
       ],
       "limits": "curated non-skill allowlist; reviewer agents count as known; unbackticked stale names missed",
-      "hit_count": 0
+      "hit_count": 1
     },
     {
       "id": "ROUTE-002",
@@ -355,7 +357,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 329
+      "hit_count": 331
     },
     {
       "id": "ROUTE-003",
@@ -2746,6 +2748,72 @@
       "remediation_owner": "dependency-direction-guard",
       "confidence": "high",
       "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/design-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "design-orchestrator",
+      "related_skills": [
+        "qa-orchestrator"
+      ],
+      "evidence": "exclusion toward `qa-orchestrator` is not reciprocated (qa-orchestrator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "design-orchestrator",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/design-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "design-orchestrator",
+      "related_skills": [
+        "security-scan-orchestrator"
+      ],
+      "evidence": "exclusion toward `security-scan-orchestrator` is not reciprocated (security-scan-orchestrator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "design-orchestrator",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/design-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "design-orchestrator",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'write a spec, invent a project file' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "design-orchestrator",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/design-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "design-orchestrator",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'write a spec' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "design-orchestrator",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -5398,6 +5466,22 @@
       "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": false
+    },
+    {
+      "rule": "ROUTE-001",
+      "severity": "P1",
+      "file": ".claude/skills/qa-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-orchestrator",
+      "related_skills": [],
+      "evidence": "routing line references `written-walkthrough`, which is not a skill on disk: '**5. Run the play once.** Execute the in-scope steps; for manual-only steps, hand off to the human with exact instructio'",
+      "family": "route",
+      "aegis_map": [
+        "AEGIS-053"
+      ],
+      "remediation_owner": "qa-orchestrator",
+      "confidence": "medium",
+      "mechanical": true
     },
     {
       "rule": "ROUTE-002",
@@ -8572,6 +8656,13 @@
     "demo-tenant-safety-designer": {
       "verified": 1
     },
+    "design-orchestrator": {
+      "accepted": 3,
+      "prioritized": 2,
+      "ready": 1,
+      "sequenced": 1,
+      "verified": 10
+    },
     "design-review-facilitator": {
       "complete": 1,
       "targeted": 1
@@ -8882,8 +8973,7 @@
       "complete": 1,
       "deployed": 5,
       "ready": 2,
-      "sequenced": 1,
-      "verified": 1
+      "sequenced": 1
     },
     "qa-strategy-architect": {
       "deployed": 1
