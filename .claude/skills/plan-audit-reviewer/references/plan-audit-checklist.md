@@ -9,6 +9,9 @@
 6. Owner-decision disclosure: defaults and consequences recorded; no decision taken by the agent.
 7. Evidence binding: identities measured after final edits; non-circular (INDEX no own/binding hash; final neither own nor binding hash).
 
+## Role A vs Role B
+The seven dimensions are unchanged; the surfaces they name depend on the role. **Role A** (Project Aegis source library): dimensions 2-3 use the source repository's registries, protected-path/approval routes and owner decision table, and the source repository's declared read-only command allowlist where it applies. **Role B** (consumer/product repository): dimensions 2-3 substitute the consumer repository's own evidence and recorded authority/approvals; no source registry, source allowlist, source gate-guard protected-path pattern or source approval register is required or assumed (the consumer's own named irreversible surfaces are the evidence); dimensions 4-7 are unchanged, and the auditor re-measures the consumer repository's own checks the plan claims.
+
 ## Verdict rules
 - ACCEPT only when every dimension passes and no material defect remains. ACCEPT is the repository Stage-B exit-gate vocabulary; do not substitute CONFIRM for it.
 - REVISE when a material defect is reproducible and fixable without redesign; enumerate the minimal fixes.
@@ -16,7 +19,7 @@
 - Bind the verdict to the captured revision hash; any post-capture edit voids it.
 
 ## Backlog-input routing
-Findings are evidence for the existing backlog: dedupe first, owner-ordered queue only, never a second queue or execution plan. Record provider, comment/report id, head, disposition and reason.
+Findings are evidence for the existing backlog: dedupe first, owner-ordered queue only, never a second queue or execution plan. Record provider, comment/report id, head, disposition and reason. In Role B the findings go to the consumer's own queue/backlog or are reported, never a second execution plan.
 
 ## What the auditor must not do
 - Do not edit the plan or capture, implement, push, approve or merge.

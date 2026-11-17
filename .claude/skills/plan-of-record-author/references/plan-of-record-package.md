@@ -16,6 +16,9 @@
 4. Minimum-safe action: what is the smallest change satisfying the directive without weakening gates?
 5. Complexity justification: why the selected size is proportionate and alternates are rejected.
 
+## Role A vs Role B
+The package files are the same in both roles. **Role A** writes the package under the source library's `_A/evidence/<item>/` path (the delivery-workflow Stage A artifact, L106-108). **Role B** writes the same package under the consumer repository's own `_A/evidence/<item>/`, relative to that repository, only after showing the exact path and complete content and applying the documentation-write rule (**Exception 1**: a current-session instruction that already authorizes the bounded documentary recording, or content-specific single-use approval); if the path/content is not authorized, hand the content over and ask instead of writing. Role B never writes source-library state, registries, catalog, manifest, coverage or approval files, and its owner decisions come from the consumer's own record; no source-only registry or approval register applies in Role B. The two-PR split example and binding rules below are unchanged in both roles.
+
 ## Two-PR split example
 PR-1: new content plus registrations and count coupling (mechanical, protected count pins disclosed). PR-2: governance prose supersession plus append-only decision entry. Record per-PR closure expectations; never claim one head passes both PRs' checks.
 

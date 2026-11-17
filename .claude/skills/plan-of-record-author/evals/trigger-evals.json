@@ -156,6 +156,17 @@
         "plan-of-record-author"
       ],
       "reason": "Diff review is a code/security reviewer."
+    },
+    {
+      "id": "consumer-plan-of-record-request",
+      "prompt": "I copied Aegis into my product repo and the feature spec is approved. Write the plan of record for this change so a separate reviewer can audit it before implementation.",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "plan-audit-reviewer",
+        "tech-spec-writer",
+        "product-spec-writer"
+      ],
+      "reason": "A consumer-repository plan-of-record request is the same authoring skill in Role B; the spec already exists and the audit is a different skill."
     }
   ]
 }
