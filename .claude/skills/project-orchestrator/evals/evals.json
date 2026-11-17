@@ -793,7 +793,8 @@
         "assertions": [
           "Invokes project-orchestrator and identifies the Stage 6 user-interface slice.",
           "Keeps the core inner lifecycle while routing the UI work through docs/paths/design-and-build-ui.md.",
-          "Names change-classification-gate before any UI implementation work."
+          "Names change-classification-gate before any UI implementation work.",
+          "After the design path's steps 1-3, hands off to design-orchestrator as the optional invocable door for a whole design pass; the route marks the step optional, and if the conductor is absent the absent-skill rule stops that hop instead of silently skipping it."
         ]
       }
     },
