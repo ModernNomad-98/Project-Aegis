@@ -32,6 +32,7 @@ For a live outage, [`incident-response-runbook`](../../.claude/skills/incident-r
 is a skill for *authoring or improving* the procedure after the incident; it
 does not run the live response. [`rollback-runbook-author`](../../.claude/skills/rollback-runbook-author/SKILL.md)
 prepares the next release's rollback plan; it does not execute a live rollback.
+Once the incident is contained, [After launch](after-launch.md) covers learning from it, checking the live product's health and planning what comes next.
 
 ## After the diagnosis
 
