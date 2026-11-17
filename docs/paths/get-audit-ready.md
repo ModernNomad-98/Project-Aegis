@@ -9,7 +9,9 @@ specialist checks before it starts.
 
 **How to run it:** open your project in your agent tool (Claude Code, OpenAI's Codex
 command-line interface (CLI), or any Agent Skills tool) and describe the situation. The
-page names the fixed order for each situation; the experts named are design and
+page names the fixed order for each situation. Paste the order below into the chat so the
+agent has the sequence — describing the situation alone does not hand it over, and the
+starter package does not ship `docs/paths/`. The experts named are design and
 assessment skills — they produce the plan, map, analysis or evidence design and leave
 the decision with you and your auditors.
 
@@ -18,9 +20,11 @@ package](../consumer-starter-package.md) installs none of these nine specialists
 files / 19 skills; manual-only skills are not installed). None of these nine is
 manual-only: all are model-invocable and design or assessment only. Copy each skill you
 need with the **selected-skills allow-list** route in [Using the skills in your own
-project](../../README.md#using-the-skills-in-your-own-project): copy that skill's
-`.claude/skills/<name>/` folder into your repository, then check it is present at use
-time in `.claude/skills/<name>/` or `.agents/skills/<name>/`. If a skill is absent, name
+project](../../README.md#using-the-skills-in-your-own-project): copy the allow-listed
+files for that skill (its `SKILL.md` and `references/`; do not copy `evals/`, which are
+evaluation answer keys), then check it is present at use time in the location your host
+discovers: `.claude/skills/<name>/` for Claude Code project skills, or
+`.agents/skills/<name>/` / `~/.agents/skills/<name>/` for native Agent Skills mode. If a skill is absent, name
 it and copy it — never substitute a different skill. For a starter consumer,
 record the extension as a DECISION in `docs/project-state.md` before first use
 (the starter §4.2 rule). The starter package does not change
@@ -50,6 +54,8 @@ stated audit window.
 
 **3. "Enterprise customers ask for SOC 2."** The order is
 [`compliance-control-foundation`](../../.claude/skills/compliance-control-foundation/SKILL.md)
+→ crosswalk rows (the foundation catalog rows plus the SOC 2 crosswalk rows the mapper
+requires; create them before mapping)
 →
 [`soc2-trust-criteria-mapper`](../../.claude/skills/soc2-trust-criteria-mapper/SKILL.md)
 →
