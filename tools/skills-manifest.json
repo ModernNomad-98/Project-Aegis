@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "44c78f055cbe05f1913f2064e6508e069d0d6279",
+  "source_revision": "332f86780e24d535508e8ff14e2e16d1f1181147",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -411,7 +411,7 @@
     {
       "name": "design-orchestrator",
       "path": ".claude/skills/design-orchestrator/SKILL.md",
-      "sha256": "8eb78a1145253cb1f9bb34ddbd7cf5d20d4f1e9b27e1dd897a13940c835c14fa"
+      "sha256": "1dccbd6574d80be2b0e37b653c390d7e01be463261011e554d44f0da66a4a6bd"
     },
     {
       "name": "design-review-facilitator",
