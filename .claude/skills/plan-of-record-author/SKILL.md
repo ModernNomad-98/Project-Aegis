@@ -33,22 +33,23 @@ Non-trivial changes fail in review when the plan is scattered across chat, guess
 - The consumer's `docs/project-state.md` and its recorded design/build authority and decisions.
 - The consumer's own approvals and authority records — `human-approval-boundary` and `scoped-approval-register` are always installed in the starter package and are used under the consumer's own approval route; the consumer's own validation and closure checks for this change.
 - Explicit: the source library's registries, read-only command allowlist and approval register are **not required and not assumed** in Role B.
+- The change's recorded class from the consumer's `change-classification-gate` (or an explicit "unclassified" record with the reason); classification is recorded in the package, never inferred to skip it.
 
 ## Workflow
 
 1. **Detect the role from repository evidence** (AGENTS.md Role A/Role B landmarks, path, project files). If the role is genuinely ambiguous, ask one question and do not write; never guess a role to unlock a write.
 2. Read the directive and the working base; record the exact commit/tree and worktree cleanliness.
 3. Inventory every surface the change touches. Role A: the source counts that must move, measured with commands. Role B: the product surfaces and the consumer repository's own checks; never claim or require source-only registries.
-4. Draft the plan package: objective, five-question necessity/reuse answers, scope, non-goals, blast radius, exact file list, count/route deltas (Role A) or repository-check deltas (Role B), and gate expectations.
-5. **Write-authority step for the package:** show the exact target path and the complete content before writing, then apply the documentation-write rule (Exception 1: a current-session instruction that already authorizes this bounded documentary recording, or content-specific single-use approval). Role A: the source `_A/evidence/<item>/` path defined by the delivery workflow. Role B: only the consumer repository's own authorized evidence path; no arbitrary path. If the path/content is not authorized, hand the complete package content over in the conversation and ask, or hand the recording decision to `project-orchestrator` — never write anyway.
-6. Write acceptance criteria and executable closures that genuinely fail before the change; record base results.
-7. Surface each residual owner decision with its default and consequences; in Role A that is the source owner's decision, in Role B the consumer's own. Never decide an owner decision yourself.
-8. Bind the artifacts (bytes/LF/sha256) non-circularly; the INDEX may list the final-verification identity and the binding may list both, but neither may embed its own or the binding hash.
+4. Draft the plan package: objective, five-question necessity/reuse answers, scope, non-goals, blast radius, exact file list, count/route deltas (Role A) or repository-check deltas (Role B), and gate expectations; record the change's classification — Role A from `change-classification-gate` (delivery-workflow Stage A rule), Role B the consumer's own classification or an explicit "unclassified" record with the reason.
+5. Write acceptance criteria and executable closures that genuinely fail before the change; record base results.
+6. Surface each residual owner decision with its default and consequences; in Role A that is the source owner's decision, in Role B the consumer's own. Never decide an owner decision yourself.
+7. Bind the artifacts (bytes/LF/sha256) non-circularly; the INDEX may list the final-verification identity and the binding may list both, but neither may embed its own or the binding hash.
+8. **Write-authority step for the package:** with the package complete — including the acceptance criteria and closures, owner decisions and the artifact binding — show the exact target path and the complete final content, then apply the documentation-write rule (Exception 1: a current-session instruction that already authorizes this bounded documentary recording, or content-specific single-use approval). Any content added after approval must be shown and covered by the grant before it is written. Role A: the source `_A/evidence/<item>/` path defined by the delivery workflow. Role B: only the consumer repository's own authorized evidence path; no arbitrary path. If the path/content is not authorized, hand the complete package content over in the conversation and ask, or hand the recording decision to `project-orchestrator` — never write anyway.
 9. Hand the captured revision (hash of the exact text) to an independent plan auditor; no self-approval. Stop at Stage A; do not implement, push or merge.
 
 ## Output Format
 
-A plan-of-record package whose files (PLAN.md, SPECS-ANNEX.md where applicable, A-ROWS.json, IMPACT.md, plan-binding.json, INDEX.md, captures/, final-verification.txt) are the same in both roles; the directory is **relative to the working repository**: Role A `_A/evidence/<item>/` (the delivery-workflow Stage A artifact, L106-108); Role B the consumer repository's own `_A/evidence/<item>/`, with the exact path and complete content shown and authorized under Exception 1 before any write. A Role B change with no skill-spec annex may omit SPECS-ANNEX only if the package says so; do not invent an annex. Plus a one-paragraph handoff naming the captured revision hash.
+A plan-of-record package whose files (PLAN.md, SPECS-ANNEX.md where applicable, A-ROWS.json, IMPACT.md, plan-binding.json, INDEX.md, captures/, final-verification.txt) are the same in both roles; the directory is **relative to the working repository**: Role A `_A/evidence/<item>/` (the delivery-workflow Stage A artifact, L106-108); Role B the consumer repository's own `_A/evidence/<item>/`, with the exact path and complete content shown and authorized under Exception 1 before any write. A Role B change with no skill-spec annex may omit SPECS-ANNEX only if the package says so; do not invent an annex. The package records the change's classification (Role A from `change-classification-gate`; Role B from the consumer's own gate or an explicit "unclassified" record with reason). Plus a one-paragraph handoff naming the captured revision hash.
 
 ## Validation Checklist
 
@@ -57,6 +58,7 @@ A plan-of-record package whose files (PLAN.md, SPECS-ANNEX.md where applicable, 
 - [ ] Role A: source counts and gate expectations are evidence-based, with the command that measured them. Role B: the consumer repository's own checks and authority are named; no source-only registry, allowlist or approval register is claimed or required.
 - [ ] The package write path and complete content were shown and authorized under Exception 1, or nothing was written and the decision was handed over.
 - [ ] Closures are executable and fail before the change (captured), and the expected after-state is explicit.
+- [ ] The plan records the change's classification for its role (Role A from change-classification-gate; Role B the consumer's class or an explicit unclassified record with reason).
 - [ ] Protected paths and approval/authority routes are named for the correct role; no source approval is claimed in Role B; no approval or merge authority is claimed.
 - [ ] Owner decisions are surfaced with defaults, never decided; in Role B they are the consumer's decisions.
 - [ ] Artifact identities are measured and bound non-circularly.
