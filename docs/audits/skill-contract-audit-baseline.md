@@ -1,10 +1,8 @@
 # Skill-contract audit — baseline report
 
-> **Regenerated 2026-11-16 at the content+manifest candidate head `9bca10af95f1cdda4a1553282f3c484e5b137535`** (clean tree; the standing decision protocol (D-15) requires the audit baselines refreshed on a clean tree at the final candidate, QA-1 precedent; these four baseline files are the only change after that head) **with engine v1.14.0 unchanged**: this is a corpus/baseline refresh, not an engine change. The required validator self-test T5's README-writer case asserts the writer's exact output, so a stale baseline skill count adds an advisory warning line and fails that assertion; the refresh was verified with the validator suite before and after. The audit runs over the Repo SHA below, a commit on the content branch that contains every change the PR makes to the files the audit reads. The previous baseline (257 skills, 470 findings, engine v1.14.0 over `62d782edbcdb779e27d7638c8841746ee5255c80`) is in git history; this page reports the current baseline only. Structural findings are not behavioral proof. The finding delta and per-new-finding dispositions are recorded in the PR body, not waived by this page.
-
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `9bca10af95f1cdda4a1553282f3c484e5b137535` (branch `p0/design-orchestrator-2026-11-16`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `8cc7add0be6682fe4dc3a17bec0fdff0a7e089893461db0a508f5001fc366aab` (1003 files, 6963273 bytes)
+- Repo SHA: `5bbe2685c2aefacaa9d51772d028c96f173b5fc1` (branch `p0/design-orchestrator-2026-11-16`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `7e9d4875d207c14242887b8fd5f7c73ca808bf5a157c29dff1198731ed7d14df` (1003 files, 6964951 bytes)
 - Skills scanned: **258**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **475** (375 mechanical, 100 semantic-review candidates)
 
