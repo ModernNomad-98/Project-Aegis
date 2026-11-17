@@ -75,6 +75,19 @@ feature's shape.
    injection risk).* Yields layered defenses for the mapped injection paths.
    Handoff: its red-team cases feed step 6.
 
+*If your feature is an agent that acts on its own:* review it against the agentic risks.
+
+These rows are conditional — run only the rows that match the feature; none is required for every AI feature. If a copy of Aegis does not include a reviewer, copy it with the **selected-skills allow-list** route in [Using the skills in your own project](../../README.md#using-the-skills-in-your-own-project); the starter package installs none of these six.
+
+| Use when the feature… | Reviewer (linked to its SKILL.md) | What it yields (from its own description) | Before it can run (quoted from its own Stop Conditions) |
+|---|---|---|---|
+| has its own identities, credentials or delegated authority | [`agent-identity-privilege-reviewer`](../../.claude/skills/agent-identity-privilege-reviewer/SKILL.md) | least-privilege identity and delegation findings (OWASP Agentic ASI03) | "No identity/credential information is available for the agent system — stop; this skill reviews concrete identity architecture, not intentions." |
+| keeps memory or stored context across sessions | [`memory-context-poisoning-reviewer`](../../.claude/skills/memory-context-poisoning-reviewer/SKILL.md) | whether untrusted content can write into long-term memory (ASI06) | "No persistent memory exists (stateless agent, context window only) — state that ASI06 is mostly not applicable and route any in-context concern to prompt-injection-defender." |
+| has agents talking to other agents or to MCP servers | [`inter-agent-comms-reviewer`](../../.claude/skills/inter-agent-comms-reviewer/SKILL.md) | authentication, integrity and replay findings (ASI07) | "No topology, transport, or protocol details are available — stop; this skill reviews a concrete message layer, not the idea of one." |
+| runs several agents that could cascade or drift | [`agent-containment-reviewer`](../../.claude/skills/agent-containment-reviewer/SKILL.md) | blast-radius and rogue-agent findings (ASI08, ASI10) | "No topology, autonomy, or lifecycle information is available — stop; this skill reviews a concrete agent system, not the concept of containment." |
+| asks humans to approve agent actions | [`human-agent-trust-reviewer`](../../.claude/skills/human-agent-trust-reviewer/SKILL.md) | consent-fatigue and deceptive-approval findings (ASI09) | "No approval flow, UX, or telemetry is available and none can be described — stop; this skill attacks a concrete oversight layer, not the idea of one." |
+| pursues a goal an attacker could redirect | [`agent-goal-hijack-defender`](../../.claude/skills/agent-goal-hijack-defender/SKILL.md) *(manual-only — name it explicitly)* | defenses for goal and plan hijack (ASI01) | "No agent loop/planner implementation or design is available — stop; this skill hardens a concrete multi-step agent, not a description." (manual-only: the proposed diff applies only under a human invocation and an approved step) |
+
 6. **Make it hold over time —
    [`ai-evaluation-harness`](../../.claude/skills/ai-evaluation-harness/SKILL.md)**
    *(manual-only — name it explicitly).* Yields the red-team cases from steps 1 and 5
