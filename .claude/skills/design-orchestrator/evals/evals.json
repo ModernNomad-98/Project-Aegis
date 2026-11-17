@@ -10,7 +10,7 @@
         "assertions": [
           "Verifies or hands off the design path guide's steps 1-3 (context/classification, requirements/spec, recorded design authority) before starting; it does not classify, write the spec or record the authority itself.",
           "Asks at most four plain-language intake questions, one at a time in guided mode.",
-          "Chooses Play A and names ux-design-iteration (conditional on unsettled direction or no recorded choice), edge-state-ux-designer, and the conditional companions before starting.",
+          "Chooses Play A and names ux-design-iteration (conditional on an unsettled experience direction; a settled design is not iterated merely because no choice is recorded), edge-state-ux-designer, and the conditional companions before starting.",
           "Checks which play skills are installed; an absent applying skill stops the hop, names the skill, gives the selected-skills copy route and hands the extension DECISION to the human/project-orchestrator.",
           "Ends with ONE plain-language design report and no implementation, code writing, browser driving or screenshot capture."
         ]
@@ -23,7 +23,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Confirms the guide's steps 1-3 are satisfied from the supplied spec/design authority and records which branch it took.",
+          "Confirms guide steps 1-3 only when the supplied spec/design authority is backed by verified workspace context plus a change classification with its scope lock; if step 1 is missing or unverifiable, stops the play and hands the request to project-orchestrator naming agent-startup-context-gate and change-classification-gate; it records which branch it took.",
           "Chooses Play C and names design-system-token-governor and edge-state-ux-designer, marking mobile-viewport-craft and accessibility-test-harness as conditional on their stated conditions.",
           "Skips design-review-facilitator for an audit of existing UI unless a reviewable technical design proposal exists, and records the condition rather than claiming it passed.",
           "Returns ONE prioritized consistency report; applies no fixes during the pass and hands implementation to the project's own stage route."
@@ -58,14 +58,14 @@
     },
     {
       "id": "should-not-claim-browser-or-screenshot",
-      "type": "should_trigger",
+      "type": "should_not_trigger",
       "prompt": "Drive the browser, capture screenshots of every viewport and tell me the rendered design passed.",
       "expect": {
-        "triggers": true,
+        "triggers": false,
         "assertions": [
-          "States that the conductor designs only and does not drive a browser or capture screenshots; no browser or screenshot capability is assumed.",
-          "Hands the capture/execution to the owning manual-only verification skill and the human, and records the capability gap as UNKNOWN rather than a pass.",
-          "Keeps one report and does not claim the rendered design passed."
+          "Does not drive a browser or capture screenshots and claims no browser/screenshot capability.",
+          "Names the owning manual-only verification skill it would hand the capture/execution to and the human who must invoke it; it does not invoke or chain it, and records the capability gap as UNKNOWN rather than a pass.",
+          "Does not claim the rendered design passed; if it produces any design output it is a report, not an execution claim."
         ]
       }
     },

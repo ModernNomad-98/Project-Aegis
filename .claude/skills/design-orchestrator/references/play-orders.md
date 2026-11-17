@@ -8,7 +8,7 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 
 **Before starting (guide steps 1-3):** step 1 must be verified; this is the guide's "started from a brief" case, so step 2 must be satisfied or handed off to the requirements/specification route first — if the brief already answers audience, the job, "done" and constraints, step 2 continues on the recorded authority and the play records that; step 3's design authority must be recorded. If any is missing, stop-and-hand-off as above; the play does not start.
 
-1. `ux-design-iteration` — **CONDITIONAL**: applies only when the experience direction is unsettled or no recorded choice exists; that skill owns the one up-front offer and the record, and the conductor neither offers nor re-offers it.
+1. `ux-design-iteration` — **CONDITIONAL**: applies only when the experience direction is unsettled (a settled design is not iterated merely because no iteration choice is recorded); that skill owns the one up-front offer and the record, and the conductor neither offers nor re-offers it.
 2. `edge-state-ux-designer` — applies (the per-view state matrix for each new view).
 3. `mobile-viewport-craft` — **CONDITIONAL** (the target includes small screens / responsive / touch).
 4. `design-system-token-governor` — **CONDITIONAL** (new tokens/components or an existing design system is the authority; governance design only).
@@ -20,10 +20,10 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 **Before starting (guide steps 1-3):** step 1 must be verified; step 2 is normally satisfied by the existing accepted spec/design authority — if absent, stop-and-hand-off; step 3's design authority must be recorded. The play does not start otherwise.
 
 1. `frontend-architecture-mapper` — **CONDITIONAL** (an existing app with no current route/component/state map; it requires a findable surface inventory and stops and asks when there is none — the conductor reports that stop rather than improvising one).
-2. `ux-design-iteration` — **CONDITIONAL** (same condition as Play A: the experience direction is unsettled or no recorded choice exists; the skill owns the offer/record).
+2. `ux-design-iteration` — **CONDITIONAL** (same condition as Play A: the experience direction is unsettled (a settled design is not iterated merely because no iteration choice is recorded); the skill owns the offer/record).
 3. `edge-state-ux-designer` — applies.
 4. `mobile-viewport-craft` — **CONDITIONAL** (responsive/touch surface is in scope).
-5. `design-review-facilitator` — **CONDITIONAL**: applies only when a **reviewable technical design proposal** exists (a tech spec/RFC/design doc with problem, proposal, alternatives and cross-cutting concerns, per its Inputs) and its decision/pre-read are set; the facilitator reviews the design DOC, not screens. With no such proposal, skip it and record the condition. If it bounces an incomplete design to `tech-spec-writer`, the conductor records the bounce and hands the request to the project's spec route through `project-orchestrator` — it never runs `tech-spec-writer` itself.
+5. `design-review-facilitator` — **CONDITIONAL**: applies only when a **reviewable technical design proposal** exists (a tech spec/RFC/design doc with problem, proposal, alternatives and cross-cutting concerns, per its Inputs) that skill prepares and circulates the pre-read and frames the decision, so a proposal not yet pre-read still applies; the facilitator reviews the design DOC, not screens. With no such proposal, skip it and record the condition. If it bounces an incomplete design to `tech-spec-writer`, the conductor records the bounce and hands the request to the project's spec route through `project-orchestrator` — it never runs `tech-spec-writer` itself.
 6. `visual-regression-test-designer` — **CONDITIONAL** (rendered-UI baseline/regression coverage is in scope); `screenshot-evidence-planner` — **CONDITIONAL** (captures will be used).
 7. Handoff to the implementation owner (never implemented here).
 
@@ -44,8 +44,8 @@ The design path guide is `docs/paths/design-and-build-ui.md`. Its **steps 1-3** 
 **Before starting (guide steps 1-3):** step 1 must be verified; step 2 is satisfied by the change proposal/specification or handed off; step 3's design authority must be recorded. The play does not start otherwise.
 
 1. `design-system-token-governor` — applies (change governance and migration design).
-2. `design-review-facilitator` — **CONDITIONAL**: applies only when the design-system change has a **reviewable technical design proposal** (design doc/RFC with proposal, alternatives and cross-cutting concerns); otherwise skip and record the condition. A bounce to `tech-spec-writer` is recorded and handed to the spec route; the conductor never runs it.
-3. `visual-regression-test-designer` — applies (coverage for the change's rendered states).
+2. `design-review-facilitator` — **CONDITIONAL**: applies only when the design-system change has a **reviewable technical design proposal** (design doc/RFC with proposal, alternatives and cross-cutting concerns); otherwise skip and record the condition; the facilitator prepares and circulates the pre-read, so a proposal not yet pre-read still applies. A bounce to `tech-spec-writer` is recorded and handed to the spec route; the conductor never runs it.
+3. `visual-regression-test-designer` — **CONDITIONAL** (only when the interface runs in a web/browser-rendered target; coverage for the change's web-rendered states; native mobile/desktop routes to its appropriate non-web verification owner).
 4. `screenshot-evidence-planner` — **CONDITIONAL** (before/after evidence will be captured).
 5. Handoff record to the project's own stage/handoff owner through `project-orchestrator`; the conductor states what is handed off and stops.
 
