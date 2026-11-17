@@ -1201,6 +1201,14 @@ The optional pre-implementation design-iteration method (source: owner instructi
 | --- | --- | --- | --- |
 | `ux-design-iteration` | owner instruction 2026-10-20 | yes | Optional bounded design iteration before implementation: one up-front A/B choice (standard vs explore-and-refine), evidence-backed brief, end-to-end story, at least two non-cosmetic flows, smallest interactive prototype with scope/fixtures, independent reviewer plus rendered-UI check matrix, per-evaluation records, disposition plus independent retest, readiness/false-completion declaration, budget ledger and reviewed handoff. Composes the nearest owners; advisory and auto-invocable: it returns the iteration records to the host/user or project state owner for persistence, and does not write project artefacts, run commands, launch browsers or use the network; any persistence is performed by the host/user or state owner. |
 
+### Skills (D123 — UX/UI design conductor addition)
+
+The user-facing UX/UI design conductor (owner scope decisions D-15/D-16/D-17, 2026-11-16; no new family; one skill added to family 14's roster). It starts only after the design path guide's steps 1-3, chooses one of four fixed plays, names every routed design skill in order before starting, hands requirements/specification/classification/design-authority recording and manual-only execution to their owners, and returns ONE plain-language design report plus at most one STATE SNAPSHOT row under Exception 1. Model-invocable and model-agnostic; no model name; advisory: it routes and records, never implements or drives a browser.
+
+| Skill | Source | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `design-orchestrator` | owner scope decisions D-15/D-16/D-17 (2026-11-16) | yes (writes one report and at most one STATE SNAPSHOT row under Exception 1) | One plain-language door for UX/UI design work: at most four intake questions, exactly one fixed play (design from scratch; improve existing screens; audit UI consistency; hand off a design-system change), every routed design skill named in order before starting, guide steps 1-3 handed to their owners when not met, conditional-step and absent-skill handling, manual-only execution handed to the human, ONE design report plus at most one STATE SNAPSHOT row; never implements, drives a browser or captures evidence. |
+
 ### Skills (D12.4 — technical writing / docs engineering pack)
 
 The 8-skill docs engineering pack (reconciliation §3 D12.4 table, built by

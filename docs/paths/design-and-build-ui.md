@@ -145,6 +145,16 @@ for what materially blocks the next useful action.
    an unanswered offer invents no answer; a later explicit decision changes the
    current status while preserving prior history. None of these outcomes is a pass.
 
+*Optional invocable door — after steps 1-3.* Once the context/classification
+step, the requirements/specification step and the recorded design authority are
+satisfied, [`design-orchestrator`](../../.claude/skills/design-orchestrator/SKILL.md)
+is the optional model-invocable door for a whole design pass: it picks one fixed
+play (design from scratch, improve existing screens, audit UI consistency, hand
+off a design-system change), names every UX/UI skill in order before starting,
+routes the design work to the existing skills named below, and hands
+implementation and manual-only execution to their owners. It never replaces the
+order above and never starts before steps 1-3 are met.
+
 4. **Design the parts teams forget** — use the parts that match the change:
 
    - **Every non-happy state —

@@ -1,0 +1,99 @@
+{
+  "skill": "design-orchestrator",
+  "description": "Trigger discrimination for the design conductor (this skill) vs the project journey front door (project-orchestrator), bounded UX design iteration (ux-design-iteration), the non-happy-state matrix designer (edge-state-ux-designer), the technical design-doc review facilitator (design-review-facilitator), design-token governance (design-system-token-governor), the QA conductor (qa-orchestrator) and security scanning (security-scan-orchestrator).",
+  "overlaps_with": [
+    "project-orchestrator",
+    "ux-design-iteration",
+    "edge-state-ux-designer",
+    "design-review-facilitator",
+    "design-system-token-governor",
+    "qa-orchestrator",
+    "security-scan-orchestrator"
+  ],
+  "cases": [
+    {
+      "id": "conductor-wins-here",
+      "prompt": "I do not know where to start with the UI. Help me design my app's screens end to end and tell me what to hand to the build.",
+      "expected_skill": "design-orchestrator",
+      "should_not_trigger": [
+        "project-orchestrator",
+        "ux-design-iteration",
+        "edge-state-ux-designer",
+        "design-review-facilitator",
+        "design-system-token-governor"
+      ],
+      "note": "PRIMARY — the user wants the design work chosen and sequenced across a whole pass, not the product journey and not one named design skill.",
+      "reason": "Sequencing the design work across the fixed plays is the conductor; the named neighbours own the journey and individual design steps."
+    },
+    {
+      "id": "journey-goes-to-project-orchestrator",
+      "prompt": "I want to build and ship a product from my idea — what do I do first?",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "JOURNEY-vs-DESIGN SEAM — no design goal is stated; the request is the whole lifecycle.",
+      "reason": "The beginner journey across stages is project-orchestrator; the design conductor starts only after the guide's steps 1-3 are met."
+    },
+    {
+      "id": "iteration-goes-to-ux-design-iteration",
+      "prompt": "Offer me the up-front choice between the standard design journey and explore-and-refine, and record my choice.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "ITERATION-vs-PASS SEAM — one bounded iteration method and its offer/record, not a whole pass.",
+      "reason": "The optional bounded iteration method, including its one up-front offer and record, is ux-design-iteration; the conductor never offers or re-offers it."
+    },
+    {
+      "id": "state-matrix-goes-to-edge-state-ux-designer",
+      "prompt": "Design the empty, loading, error and permission-denied state matrix for this one view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "SINGLE DESIGN STEP — the user names the state matrix they want.",
+      "reason": "Per-view non-happy-state design is edge-state-ux-designer; it is play A/B/C only when the user needs the whole pass chosen and sequenced."
+    },
+    {
+      "id": "design-doc-review-goes-to-design-review-facilitator",
+      "prompt": "Review this design doc before our decision meeting: problem, proposal, alternatives and cross-cutting concerns are in it.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "TECHNICAL-DESIGN-DOC REVIEW — a specific reviewable proposal, not a design pass.",
+      "reason": "Facilitating a technical design-doc review is design-review-facilitator; the conductor only marks it conditional when a reviewable technical design proposal exists inside a play."
+    },
+    {
+      "id": "token-governance-goes-to-design-system-token-governor",
+      "prompt": "Govern our design tokens: build the semantic taxonomy and migration rules for this existing design system.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "TOKEN GOVERNANCE — one named design-system capability.",
+      "reason": "Token taxonomy, naming and migration governance is design-system-token-governor; it is one routed step, not the conductor."
+    },
+    {
+      "id": "qa-pass-goes-to-qa-orchestrator",
+      "prompt": "Help me test my app end to end and find the bugs.",
+      "expected_skill": "qa-orchestrator",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "QA-vs-DESIGN SEAM — the goal is testing the running app, not designing its UI.",
+      "reason": "A whole QA pass is qa-orchestrator; the design conductor never drives the app or executes tests."
+    },
+    {
+      "id": "security-scan-goes-to-security-scan-orchestrator",
+      "prompt": "Run a whole-repo security scan and aggregate the SAST, dependency and secret findings.",
+      "expected_skill": "security-scan-orchestrator",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "SECURITY SCAN — a different deliverable.",
+      "reason": "Whole-repo static security scanning/aggregation is security-scan-orchestrator; the design conductor designs UI only."
+    }
+  ]
+}

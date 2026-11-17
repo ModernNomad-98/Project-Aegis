@@ -124,6 +124,7 @@ practical terms, Aegis can make your coding agent act as:
 | **a security and AI-governance audit-readiness advisor** | Gets you audit-ready for what enterprise customers ask for: International Organization for Standardization (ISO) certification for security (27001) and AI governance (42001), and a System and Organization Controls 2 (SOC 2) attestation report. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
 | **a product discovery and specification facilitator** | Interviews you to turn a vague idea into clear written requirements and a spec. | `requirements-gathering-facilitator`, `product-spec-writer` |
 | **a product analytics and experimentation architect** | Decides what to measure and designs and analyzes experiments (honest A/B tests; execution is a separately authorized implementation/operations handoff), so decisions rest on evidence, not guesses. | `product-analytics-instrumenter`, `ab-test-designer` |
+| **a UX/UI design conductor** | Turns "help me design my app's UI" into one guided design pass: picks one of four fixed plays, names every UX/UI skill in order before starting, hands the design path's context/classification, specification and design-authority steps to their owners, and hands implementation and manual-only execution back to you or your project route. It never writes code, drives a browser, captures screenshots or claims a design was built. | `design-orchestrator`, `ux-design-iteration`, `edge-state-ux-designer` |
 | **a technical writer and documentation engineer** | Writes the docs — READMEs, guides, application programming interface (API) references — and keeps them from drifting out of date. | `readme-craftsman`, `docs-as-code-architect` |
 | **a staff+ technical leadership advisor** | Brings the senior-engineer judgment call: what's worth building, how to scope it, when to say no. | `staff-scope-selector`, `tech-spec-writer` |
 | **a full-codebase auditor** | Reads an entire codebase and reports its real health, risks, and technical debt. | `full-codebase-auditor`, `principal-code-analyst` |
@@ -159,7 +160,8 @@ Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-ag
 - **"I want to design or build screens — or extend an app's UI — and keep it
   consistent."** → [Design and build UI](docs/paths/design-and-build-ui.md): start
   where you are (brief, existing app, design file, or a named tool), keep each design decision's
-  authority, and hand off between agents without re-explaining.
+  authority, and hand off between agents without re-explaining. The guide's steps 1-3 come
+  first; after them, `design-orchestrator` is the optional invocable door for a whole design pass.
 - **"It works — now I want to launch."** → tell your coding agent: *"My app is built — use
   project-orchestrator to get me ready to release."* It picks up at the deploy-prep stage
   and ends with a plain-language GO / NO-GO that **you** authorize. The
@@ -885,7 +887,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->257<!-- /SKILL-COUNT --> skills comprise **256 in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->258<!-- /SKILL-COUNT --> skills comprise **257 in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -956,16 +958,17 @@ keeps a human as the approval gate on anything irreversible. See
     plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus performance/load test harnesses. *e.g.*
     `schema-evolution-planner`, `pii-lifecycle-designer`, `query-plan-reader`,
     `n-plus-one-detector`, `load-test-planner`.
-14. **Product, PM & growth** *(D24, 23 + iteration, 24)* — turning product intent into shippable, measured work:
+14. **Product, PM & growth** *(D24, 23 + iteration + design conductor, 25)* — turning product intent into shippable, measured work:
     requirements elicitation feeding specs, then prioritization, flag-gated rollout,
     analytics instrumentation, an optional pre-implementation design-iteration
-    path, and (Batch 3/D110) frontend architecture and client-state craft: maps,
+    path, a UX/UI design conductor for whole design passes, and (Batch 3/D110)
+    frontend architecture and client-state craft: maps,
     component boundaries, route protection, design tokens, server/URL/client state
     and PWA boundaries — see
     [Your first session](#your-first-session) for the entry-point walkthrough.
     *e.g.* `requirements-gathering-facilitator`, `product-spec-writer`,
     `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `event-schema-architect`,
-    `ab-test-designer`, `ux-design-iteration`.
+    `ab-test-designer`, `design-orchestrator`, `ux-design-iteration`.
 15. **Docs engineering** *(D25, 8)* — durable documentation as a discipline: README craft,
     ADR-corpus sequencing, Diátaxis organization, the docs-as-code pipeline, generated API
     reference, onboarding. *e.g.* `readme-craftsman`, `diataxis-doc-organizer`,
@@ -1608,6 +1611,12 @@ Optional design-iteration addition (owner instruction 2026-10-20; not a new fami
 | Skill | What it does | Invocation |
 |---|---|---|
 | `ux-design-iteration` | Runs optional bounded design iteration before implementation: one up-front A/B choice, evidence-backed brief, end-to-end story, meaningfully different flows, smallest interactive prototype, independent rendered-UI review, per-evaluation records, disposition/retest, readiness/false-completion gate and reviewed handoff. Composes the nearest owners; advisory: it returns the iteration records to the host/user or project state owner for persistence, and does not write project artefacts, run commands, launch browsers or use the network; any persistence is performed by the host/user or state owner. | auto + manual |
+
+D123 — UX/UI design conductor addition (owner scope decisions D-15/D-16; one skill in family 14, no new family):
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `design-orchestrator` | The design conductor: one plain-language door after the design path guide's steps 1-3, at most four intake questions, exactly one fixed play (design from scratch / improve existing screens / audit UI consistency / hand off a design-system change) with every UX/UI skill named in order before starting, conditional-step and absent-skill handling, manual-only execution handed to the human, and ONE plain-language design report (plus, only when `docs/project-state.md` exists and recording is authorized, one STATE SNAPSHOT row). Routes and records design work; never implements, drives a browser, captures screenshots or claims a built design. | auto + manual |
 
 D12.4 — technical writing / docs engineering (D25): durable documentation
 as its own discipline. `adr-sequencer` EXTENDS `adr-writer` (longitudinal
