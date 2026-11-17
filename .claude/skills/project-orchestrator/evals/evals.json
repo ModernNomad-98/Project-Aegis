@@ -890,6 +890,34 @@
           "Writes nothing while authority is absent/invalid and keeps Stage 2 serial."
         ]
       }
+    },
+    {
+      "id": "edge-stage5-role-a-classified-plan-and-independent-audit",
+      "type": "should_trigger",
+      "prompt": "I maintain the Project Aegis source library. The product spec for this non-trivial skill-contract change is approved and recorded. Plan it with plan-of-record-author, then have the classified plan independently audited before any build starts.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the change's classification from change-classification-gate before naming plan-of-record-author.",
+          "Routes Stage 5 in order: tech-spec-writer, then ai-task-decomposer only when the change is too big for one reviewable change, then change-classification-gate, then plan-of-record-author, then plan-audit-reviewer, before phased-work-handoff-designer.",
+          "Requires the audit to come from a separate agent/instance on a different model per model-routing-policy, and does not advance Stage 5 without an ACCEPT bound to the captured plan revision.",
+          "On REVISE/REJECT, revises the plan and re-audits the new captured revision instead of advancing; on a one-model host, keeps the stage open and surfaces the independence limitation to the human."
+        ]
+      }
+    },
+    {
+      "id": "edge-stage5-role-b-consumer-classified-plan-and-independent-audit",
+      "type": "should_trigger",
+      "prompt": "I run a two-van dog-grooming business and copied Aegis into my product repository. Our approved feature spec says this change is too big for one reviewable change. Plan it, classify it first, and have the plan independently audited before any build starts; if you cannot get an independent audit, stop and tell me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Detects Role B (consumer/product repository) from repository evidence and does not require the source library's registries or approval register.",
+          "Records the consumer's change classification from change-classification-gate first, then routes plan-of-record-author and plan-audit-reviewer for the classified plan; the plan package is written only to an authorized consumer path under Exception 1.",
+          "Requires an independent audit by a separate agent/instance on a different model per model-routing-policy and advances only on ACCEPT bound to the captured plan revision; REVISE/REJECT returns to revise and re-audit.",
+          "If no independent audit is available (one model/no independent instance), keeps Stage 5 open and hands the limitation/audit to the human; never says the audit is not independent and continues; does not claim the source approval register or merge authority."
+        ]
+      }
     }
   ]
 }

@@ -581,7 +581,7 @@ lines 293-298), quoted in full with no elision:
 > skills)."*
 
 So there is no fixed number of skills you must copy to use this library. A count of the skills
-`project-orchestrator` *mentions* — 63, or 64 with the orchestrator itself — is a count of
+`project-orchestrator` *mentions* — 66, or 67 with the orchestrator itself — is a count of
 **mentions, not of required dependencies**: the groups above are conditional on the features your
 project actually has, and the list changes as the library grows. The orchestrator assumes the
 owning skill for a stage is present rather than checking for it — its inventory input says the
