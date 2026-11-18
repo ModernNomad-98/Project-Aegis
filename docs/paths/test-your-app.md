@@ -13,11 +13,12 @@ app**, it picks **one** QA play, names every skill it will use before starting,
 and leaves one plain-language report. A QA pass is not a fix pass — it finds
 and classifies defects; fixes are separate work.
 
-**Before you start — install the QA skills.** The
-[starter package](../consumer-starter-package.md) does **not** include
+**Source-only links.** Links to skills or pages outside the starter package are source-repository links; in a consumer copy they do not resolve — copy the skill first (starter sections 4.1–4.2).
+
+**Before you start — install the QA skills.** The starter package does **not** include
 `qa-orchestrator` and installs **no** manual-only skill. This is a two-stage
 copy using the selected-skills allow-list route in
-[Using the skills in your own project](../../README.md#using-the-skills-in-your-own-project):
+the source-only *Using the skills in your own project* section:
 1) copy `qa-orchestrator` itself; 2) invoke it, and it names the play order
 before starting, so you copy only the play skills that order reports. That
 route is also how you extend the starter package. Check `.claude/skills/<name>/`
@@ -34,8 +35,7 @@ sentence — **Help me test my app** — or name `qa-orchestrator`. For most QA
 steps the named skill selects itself. A **manual-only** step needs a valid
 recorded standing trigger-scoped override covering that exact step; without
 one, **you** name the exact skill and invoke it. The conductor never runs or
-chains a manual-only skill. (Auto-selection quality varies by tool — see the README's
-[tools section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
+chains a manual-only skill. (Auto-selection quality varies by tool — see the source-only Aegis README tools section.)
 
 ## The order
 

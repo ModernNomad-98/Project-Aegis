@@ -10,17 +10,16 @@ specialist checks before it starts.
 **How to run it:** open your project in your agent tool (Claude Code, OpenAI's Codex
 command-line interface (CLI), or any Agent Skills tool) and describe the situation. The
 page names the fixed order for each situation. Paste the order below into the chat so the
-agent has the sequence — describing the situation alone does not hand it over, and the
-starter package does not ship `docs/paths/`. The experts named are design and
+agent has the sequence — describing the situation alone does not hand it over, and the starter package ships these guides but not the specialists they name. The experts named are design and
 assessment skills — they produce the plan, map, analysis or evidence design and leave
 the decision with you and your auditors.
 
-**Before you start — what a starter install has.** The [starter
-package](../consumer-starter-package.md) installs none of these nine specialists (42
-files / 19 skills; manual-only skills are not installed). None of these nine is
+**Source-only links.** Links to skills or pages outside the starter package are source-repository links; in a consumer copy they do not resolve — copy the skill first (starter sections 4.1–4.2).
+
+**Before you start — what a starter install has.** The source-only starter-package page installs none of these nine specialists (manual-only skills are not installed). None of these nine is
 manual-only: all are model-invocable and design or assessment only. Copy each skill you
-need with the **selected-skills allow-list** route in [Using the skills in your own
-project](../../README.md#using-the-skills-in-your-own-project): copy the allow-listed
+need with the **selected-skills allow-list** route in the source-only *Using the skills in your own
+project* section: copy the allow-listed
 files for that skill (its `SKILL.md` and `references/`; do not copy `evals/`, which are
 evaluation answer keys), then check it is present at use time in the location your host
 discovers: `.claude/skills/<name>/` for Claude Code project skills, or

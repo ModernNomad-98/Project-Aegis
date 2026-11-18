@@ -2,6 +2,8 @@
 
 *This path names who acts and in what order — each skill owns its own how.*
 
+**Source-only links.** Links to skills or pages outside the starter package are source-repository links; in a consumer copy they do not resolve — copy the skill first (starter sections 4.1–4.2).
+
 **Who this is for:** you built something — maybe with artificial intelligence
 (AI) writing most of the code — and you
 want to know if it's safe before real users and real data depend on it. You don't need to
@@ -12,7 +14,7 @@ when it runs.
 command-line interface (CLI), or any Agent
 Skills tool) and take the steps top to bottom. For most steps, asking for what the step
 describes in plain words is enough — the named skill selects itself. (Auto-selection quality
-varies by tool — see the README's [tools section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
+varies by tool — see the source-only Aegis README's tools section.)
 Start with: **"In this product repository, use the full-codebase-auditor skill
 to inventory what was built and list evidence-backed risks before we invite
 users."** Any **manual-only** step requires you to name its skill explicitly.
