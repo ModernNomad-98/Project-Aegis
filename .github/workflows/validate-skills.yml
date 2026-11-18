@@ -98,12 +98,17 @@ jobs:
           # against display-quoting bypass; this is a boolean skip filter on an
           # advisory lane, and no tracked path in this repo contains a newline).
           git diff --no-renames --name-only "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/aegis-changed-paths"
-          if grep -Eq '^(tools/|docs/instrumentation/workflow-outcomes-v1\.schema\.json$)' "$RUNNER_TEMP/aegis-changed-paths"; then
+          # Dial phase 2 (owner-approved): the generated skills manifest is a derived
+          # artifact. A manifest-only change must not trigger the tools/ or offline
+          # lanes; every other tools/ change still does. docs_skills below keeps
+          # using the full changed-path list.
+          grep -Evx 'tools/skills-manifest\.json' "$RUNNER_TEMP/aegis-changed-paths" > "$RUNNER_TEMP/aegis-changed-paths-lanes" || true
+          if grep -Eq '^(tools/|docs/instrumentation/workflow-outcomes-v1\.schema\.json$)' "$RUNNER_TEMP/aegis-changed-paths-lanes"; then
             echo 'tools=true' >> "$GITHUB_OUTPUT"
           else
             echo 'tools=false' >> "$GITHUB_OUTPUT"
           fi
-          if grep -Eq '(^tools/|^requirements-ci\.(in|txt)$)' "$RUNNER_TEMP/aegis-changed-paths"; then
+          if grep -Eq '(^tools/|^requirements-ci\.(in|txt)$)' "$RUNNER_TEMP/aegis-changed-paths-lanes"; then
             echo 'offline=true' >> "$GITHUB_OUTPUT"
           else
             echo 'offline=false' >> "$GITHUB_OUTPUT"
