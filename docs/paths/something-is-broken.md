@@ -2,6 +2,8 @@
 
 *This path names who acts and in what order — each skill owns its own how.*
 
+**Source-only links.** Links to skills or pages outside the starter package are source-repository links; in a consumer copy they do not resolve — copy the skill first (starter sections 4.1–4.2).
+
 **Who this is for:** something in your app is wrong and you don't know why.
 
 **How to run it:** in your agent tool (Claude Code, Codex command-line
@@ -15,7 +17,7 @@ specialists can be selected automatically; specialists marked
 For an unknown cause, say: **"Use the systematic-debugger skill on this
 symptom; reproduce it before changing anything."**
 The table maps symptoms to owners. Auto-selection quality varies by tool; see
-the README's [tools section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).
+the source-only Aegis README's tools section.
 
 ## The symptom map
 

@@ -2,6 +2,8 @@
 
 *This path names who acts and in what order — each skill owns its own how.*
 
+**Source-only links.** Links to skills or pages outside the starter package are source-repository links; in a consumer copy they do not resolve — copy the skill first (starter sections 4.1–4.2).
+
 **Who this is for:** you want a screen, a flow or a whole interface designed and
 built — from a written idea, inside an app you already have, from a design file
 or screenshot someone handed you, or on top of a design system that already
@@ -15,8 +17,8 @@ asks you to add a new file to your project just to be eligible.
 command-line interface (CLI), or any Agent Skills tool) and start at the row
 below that matches where you actually are. For most steps, plain words are
 enough — the named skill selects itself. (Auto-selection quality varies by
-tool — see the README's [tools
-section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
+tool — see the source-only Aegis README's tools
+section.)
 Start with, for example: **"In this product repository, add a status filter to
 the existing task list, matching our design system. Classify the change first,
 reuse the components and tokens we already have, and tell me which Aegis skill

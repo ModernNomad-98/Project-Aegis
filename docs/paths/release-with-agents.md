@@ -2,12 +2,13 @@
 
 *This path coordinates existing Aegis skills and optional independent reviewers in your own product repository. Each linked skill owns its own method.*
 
+**Source-only links.** Links to skills or pages outside the starter package are source-repository links; in a consumer copy they do not resolve — copy the skill first (starter sections 4.1–4.2).
+
 **Who this is for:** your app is built and you want help checking, approving and
 verifying a release. Aegis gives the coding assistant a guided procedure; the
 assistant's host must support separate agents for genuinely independent reviews.
 A skill is an instruction for an assistant, while an agent is a separate worker
-with its own context. Aegis does not provide a live deployment service. Its
-[delivery control plane](../../tools/aegis_delivery_control/README.md) currently
+with its own context. Aegis does not provide a live deployment service. Its source-only delivery control plane currently
 operates on synthetic authorities and targets only.
 
 Open **your product repository** and say:
@@ -103,7 +104,7 @@ The reviewers above must inspect one frozen candidate, not a moving target.
    evidence holder under the evidence policy. Reviewers stay read-only, and no one
    edits the candidate while independent review is running. Reuse/evidence detail:
    [`screenshot-evidence-planner`](../../.claude/skills/screenshot-evidence-planner/SKILL.md)
-   and the source-repository [delivery workflow](../delivery-workflow.md).
+   and `docs/delivery-workflow.md` (source-only).
 4. **Freeze before independent final review.** Freeze and record the candidate's
    tree, artifact and evidence-set identity (expected members) before the final
    independent review; that review's verdict binds the frozen identity. The

@@ -2,6 +2,8 @@
 
 *This path names who acts and in what order — each skill owns its own how.*
 
+**Source-only links.** Links to skills or pages outside the starter package are source-repository links; in a consumer copy they do not resolve — copy the skill first (starter sections 4.1–4.2).
+
 **Who this is for:** you want to add an artificial intelligence (AI) feature — a chatbot, an assistant, an agent,
 anything that calls a model — without opening a security hole. The threats here are
 different from classic app security (a model can be talked into things a database cannot),
@@ -11,8 +13,8 @@ last.
 **How to run it:** open your project in your agent tool (Claude Code, Codex
 command-line interface (CLI), or any Agent
 Skills tool) and take the steps top to bottom. For most steps, plain words are enough — the
-named skill selects itself. (Auto-selection quality varies by tool — see the README's [tools
-section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).) Four steps are marked
+named skill selects itself. (Auto-selection quality varies by tool — see the source-only Aegis README's tools
+section.) Four steps are marked
 **manual-only — name it explicitly**: you start them by typing the skill's name.
 Start with: **"In this product repository, I want to add a chatbot that answers
 customer questions. Use the ai-threat-modeler skill to map its data, tools,
@@ -78,7 +80,7 @@ feature's shape.
 
 *If your feature is an agent, or an assistant that persists memory, connects to MCP servers, or runs a multi-step planner whose goal or plan could be redirected:* review it against the agentic risks.
 
-These rows are conditional — run only the rows that match the feature; none is required for every AI feature. If a copy of Aegis does not include a reviewer, copy it with the **selected-skills allow-list** route in [Using the skills in your own project](../../README.md#using-the-skills-in-your-own-project); the starter package installs none of these reviewers. For a starter consumer, record the extension as a DECISION in `docs/project-state.md` before first use (the starter §4.2 rule).
+These rows are conditional — run only the rows that match the feature; none is required for every AI feature. If a copy of Aegis does not include a reviewer, copy it with the **selected-skills allow-list** route in the source-only `README.md` section "Using the skills in your own project"; the starter package installs none of these reviewers. For a starter consumer, record the extension as a DECISION in `docs/project-state.md` before first use (the starter §4.2 rule).
 
 | Use when the feature… | Reviewer (linked to its SKILL.md) | What it yields (from its own description) | Its own stop conditions — stop and hand off when (quoted) |
 |---|---|---|---|
