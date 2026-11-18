@@ -87,6 +87,8 @@ a system that does not exist.
    from current to target, each with a verification step and a stop point.
    "Big-bang rewrite" is not a migration plan.
 
+*If the design contains a state-machine lifecycle — explicit states and the transition-triggering events or guards between them, not ordinary component events (this design treats async events as boundary contracts) — the state/event/guard table and transition matrix are `state-machine-modeler`'s artifact: hand off to it — optional; if your copy does not include it, record the missing state design as an open question instead of inventing states.*
+
 ## Output Format
 
 ```

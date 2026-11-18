@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "17a2f749a3d38a56d4b97c84655e10768628c592",
+  "source_revision": "f876e7cabfcb44b21af7d4ab2f7774e4c1dd7a02",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -186,7 +186,7 @@
     {
       "name": "architecture-designer",
       "path": ".claude/skills/architecture-designer/SKILL.md",
-      "sha256": "a6f56df1da1ed960d057290c905766fcd1a8266cd7cb13a0185d095ab342ec33"
+      "sha256": "7feb68defe563e82efd7dec8f29a41168cbbd3f0ff718e3d16ec6976454b2ebe"
     },
     {
       "name": "architecture-fitness-function-designer",
