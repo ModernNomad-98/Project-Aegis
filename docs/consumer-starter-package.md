@@ -314,7 +314,8 @@ Measured at the new pin for the 21 selected skills: skill-file links are intra-s
 The two startup files still carry their repo-root governance pointers — `AGENTS.md` points at `docs/delivery-workflow.md`, `CONTRIBUTING.md`, two `docs/roadmaps/*` pages and `docs/approvals/APPROVAL_REGISTER.md` — and those are **Role A governance pointers**: they govern work on this source library, no J1 step reads them, and they do not resolve in a consumer copy. The startup files stay byte-identical; no link rewriting is introduced.
 
 The nine added guide pages link to skills and to source pages. Links to installed skills resolve; links to skills that are not in the package follow the section 4.1 install-on-demand rule; links to source-only pages (for example `../../README.md` and `../consumer-starter-package.md`) do not resolve in a consumer copy. They are classified here rather than recursively installed, the guides stay byte-identical, and the install record discloses the non-resolving source-repo citations and the startup governance pointers.
-**Catalog source-only links (disclosed, never presented as working).** `docs/skills-catalog.md` is installed byte-identically and therefore keeps its source-repository links. At this pin it carries 89 links: 36 in-page anchors, 1 HTTP link, 1 link to an installed file (`AGENTS.md`), and 51 occurrences pointing at 28 distinct targets that this package does not install: `README.md`, `CHANGELOG.md`, `docs/README.md`, `docs/300-repeatable-software-saas-skills-roadmap.md`, `docs/acceptance/scenario-a-runbook.md`, `docs/approvals/APPROVAL_REGISTER.md`, `docs/consumer-contract-manual-only.md`, `docs/manual-only-policy.md`, `docs/offline-ci.md`, `docs/prompts/claude-skills-master-generation-prompts-v4.md`, `docs/reconciliation/step-0-reconciliation-v4.md`, `docs/research/aegis-workflow-extraction-report.md`, `docs/roadmaps/ai-sdlc-skill-batch-proposal.md`, `docs/roadmaps/behavioral-eval-runner-backlog.md`, `docs/skill-generation-standard.md`, `docs/skills/` (directory), `docs/skills/01-software-architecture-engineering.md` through `docs/skills/09-ai-software-engineering.md` (nine pages), `docs/skills/coverage-map.json`, `docs/skills/coverage-map.md`, and `.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md`. These are source-only: a consumer copy will show them as dead links, they are disclosed here rather than presented as working, and the catalog and its links stay byte-identical by the copy rule (section 3).
+
+**Catalog source-only links (disclosed, never presented as working).** `docs/skills-catalog.md` is installed byte-identically and therefore keeps its source-repository links. At this pin it carries 89 links: 36 in-page anchors, 1 HTTP link, 1 link to an installed file (`AGENTS.md`), and 51 occurrences pointing at 28 distinct targets that this package does not install: `README.md`, `CHANGELOG.md`, `docs/README.md`, `docs/300-repeatable-software-saas-skills-roadmap.md`, `docs/acceptance/scenario-a-runbook.md`, `docs/approvals/APPROVAL_REGISTER.md`, `docs/consumer-contract-manual-only.md`, `docs/manual-only-policy.md`, `docs/offline-ci.md`, `docs/prompts/claude-skills-master-generation-prompts-v4.md`, `docs/reconciliation/step-0-reconciliation-v4.md`, `docs/research/aegis-workflow-extraction-report.md`, `docs/roadmaps/ai-sdlc-skill-batch-proposal.md`, `docs/roadmaps/behavioral-eval-runner-backlog.md`, `docs/skill-generation-standard.md`, `docs/skills/` (directory), `docs/skills/01-software-architecture-engineering.md` through `docs/skills/09-ai-software-engineering.md` (nine pages), `docs/skills/coverage-map.json`, `docs/skills/coverage-map.md`, and `.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md`. These are source-only: a consumer copy will show them as dead links, they are disclosed here rather than presented as working, and the catalog and its links stay byte-identical by the copy rule (sections 2.1 and 7 P6).
 
 
 **Composition edges are not links.** The two passes above find file links and
@@ -891,7 +892,7 @@ before anything is written:
 ### P6 — Copy by allow-list only, then the startup files
 
 Copy the **60 listed paths in list order**: the installer loop copies every path
-in the sorted `$package` list (section 7.1, lines 1298–1309), creating parent
+in the sorted `$package` list (section 7.1), creating parent
 directories as needed and copying each file byte-identically. For a selected
 skill that means its `SKILL.md`, then every file under `assets/` and every file
 under `references/` that the package lists, preserving the relative path; nothing
@@ -2187,7 +2188,7 @@ No file from `docs/approvals/`, no `AEGIS-APR-*` text, no source-repository
 configuration, and no source-repository landmark or validator installation that
 would make your product repository look like the library — specifically, do not
 install the three landmarks P1 probes for, the source `scripts/` tree, or the
-source repository own configuration. The two startup files `AGENTS.md` and
+source repository's own configuration. The two startup files `AGENTS.md` and
 `CLAUDE.md` **are** installed deliberately (section 2.2); this rule does not
 exclude them. The package also installs `docs/skills-catalog.md` deliberately
 (sections 2.1 and 2.3); it is **not** a source-library landmark: a source
