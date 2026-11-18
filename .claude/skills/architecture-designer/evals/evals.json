@@ -68,6 +68,19 @@
           "Keeps its boundary: hands the ADR draft to adr-writer, leaves retry, scheduling, and idempotency semantics to background-job-orchestration-architect, and implements no code."
         ]
       }
+    },
+    {
+      "id": "route-state-machine-lifecycle-to-owner",
+      "type": "should_trigger",
+      "prompt": "Design the target structure for checkout: orders move through created, paid, fulfilled and cancelled, and each transition is triggered by a payment event or a guard such as stock reservation. We also have ordinary notification and retry events between components. How should the architecture handle the order lifecycle versus those other events?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Hands off the state/event/guard table and transition matrix to state-machine-modeler for the explicit order lifecycle.",
+          "Marks the state-machine handoff optional and, if the skill is absent, records the missing state design as an open question instead of inventing states.",
+          "Does not invent the state machine itself and does not treat ordinary component events as a state-machine lifecycle; async component events remain boundary contracts."
+        ]
+      }
     }
   ]
 }
