@@ -7431,7 +7431,7 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
 
     allowed_by_skill maps every skill directory in the pinned Git tree to the
     exact paths the package's allow-list rule copies for it: its SKILL.md plus
-    every non-evaluation file under references/. Evaluation answer content is
+    every non-evaluation file under references/ or assets/. Evaluation answer content is
     excluded from the required closure because the selector check forbids
     installing it. The closure is read from the committed object, never from
     the working tree, so a checkout that differs from the pin cannot change the
@@ -7492,7 +7492,7 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
             allowed.setdefault(parts[2], set()).add(path)
     if not allowed:
         return None, (
-            "PIN-MALFORMED: tree %s carries no SKILL.md or references/ file" % tree
+            "PIN-MALFORMED: tree %s carries no SKILL.md, references/ or assets/ file" % tree
         )
     return {skill: tuple(sorted(paths)) for skill, paths in allowed.items()}, None
 
@@ -9075,11 +9075,18 @@ def test_consumer_install_destination_links():
             proc = install(clean, second_record)
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             assert second_record.is_file()
-            package_rows = [row for row in first
-                            if row[1] != "FILE" or not row[0].startswith("docs/")]
-            resumed_rows = [row for row in _dest_snapshot(clean)
-                            if row[1] != "FILE" or not row[0].startswith("docs/")]
-            assert len([row for row in resumed_rows if row[1] == "FILE"]) == 50, resumed_rows
+            # Exclude only the second declared record path; every package file
+            # (including the ten under docs/) stays in the snapshot comparison, so
+            # the resume check does not lose coverage. The snapshot rows carry the
+            # sha256 digest, so this also compares the first record byte-for-byte.
+            def _without_second_record(row):
+                if row[1] != "FILE":
+                    return True
+                return not row[0].replace("\\", "/").endswith("docs/second-install-record.md")
+
+            package_rows = [row for row in first if _without_second_record(row)]
+            resumed_rows = [row for row in _dest_snapshot(clean) if _without_second_record(row)]
+            assert len([row for row in resumed_rows if row[1] == "FILE"]) == 61, resumed_rows
             assert package_rows == resumed_rows, (
                 "the resume changed an installed package file")
             assert (clean / "docs" / "consumer-install-record.md").is_file()
