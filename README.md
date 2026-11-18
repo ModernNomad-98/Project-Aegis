@@ -119,11 +119,13 @@ practical terms, Aegis can make your coding agent act as:
 | **an application security and row-level security (RLS) specialist** | Hardens the app and locks down exactly who can read which rows in the database. | `rls-policy-auditor`, `security-pr-reviewer` |
 | **a quality assurance (QA) automation and Playwright engineer** | Builds automated tests that click through your app like a real user and catch breakage before customers do. | `playwright-e2e-engineer`, `qa-automation-architect` |
 | **a cloud, DevOps (development and operations) and reliability architect** | Decides where and how it runs in production — and keeps it up. | `cloud-architecture-decider`, `slo-reliability-architect` |
+| **an after-launch operations engineer** | Keeps a live product healthy — learns from incidents, designs the routine checks and recovery tests that a person runs, watches for security and environment drift, and plans version or feature/customer retirement. | `incident-response-runbook`, `production-safe-smoke-tester`, `saas-offboarding-architect` |
 | **an AI security and agentic-red-team architect** | Red-teams your own AI features before an outsider does — prompt injection, data leaks, runaway agents — by designing the defenses; live adversarial probing runs only as an explicitly authorized scoped suite in the manual-only `ai-evaluation-harness`. | `ai-threat-modeler`, `prompt-injection-defender`, `ai-evaluation-harness` |
 | **an AI agent operating-environment architect** | Designs how your AI agent runs safely — what it's allowed to do, what it can see, and when it stops — so it can't overreach, leak data, or run away. | `agent-harness-architect`, `model-context-designer`, `agentic-loop-designer` |
 | **a security and AI-governance audit-readiness advisor** | Gets you audit-ready for what enterprise customers ask for: International Organization for Standardization (ISO) certification for security (27001) and AI governance (42001), and a System and Organization Controls 2 (SOC 2) attestation report. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
 | **a product discovery and specification facilitator** | Interviews you to turn a vague idea into clear written requirements and a spec. | `requirements-gathering-facilitator`, `product-spec-writer` |
 | **a product analytics and experimentation architect** | Decides what to measure and designs and analyzes experiments (honest A/B tests; execution is a separately authorized implementation/operations handoff), so decisions rest on evidence, not guesses. | `product-analytics-instrumenter`, `ab-test-designer` |
+| **a data engineer and data-platform architect** | Designs how data moves, lands and stays trustworthy — schemas and migrations that do not break the live app, warehouse/lake layout, event transport between services, and data-quality/PII controls. | `schema-evolution-planner`, `warehouse-lake-architect`, `data-quality-monitor-designer` |
 | **a UX/UI design conductor** | Turns "help me design my app's UI" into one guided design pass: picks one of four fixed plays, names every UX/UI skill in order before starting, hands the design path's context/classification, specification and design-authority steps to their owners, and hands implementation and manual-only execution back to you or your project route. It never writes code, drives a browser, captures screenshots or claims a design was built. | `design-orchestrator`, `ux-design-iteration`, `edge-state-ux-designer` |
 | **a technical writer and documentation engineer** | Writes the docs — READMEs, guides, application programming interface (API) references — and keeps them from drifting out of date. | `readme-craftsman`, `docs-as-code-architect` |
 | **a staff+ technical leadership advisor** | Brings the senior-engineer judgment call: what's worth building, how to scope it, when to say no. | `staff-scope-selector`, `tech-spec-writer` |
@@ -135,9 +137,10 @@ practical terms, Aegis can make your coding agent act as:
 ### Start here: pick your path
 
 You never have to pick from the list above yourself — describe your situation to your agent
-tool (Claude Code, OpenAI's Codex command-line interface (Codex CLI), or any Agent Skills tool) and Aegis selects and coordinates the
-right role for each step. Find the sentence that sounds like you: each door leads to a short
-guided path through the right skills, in the right order. (Auto-selection quality varies by
+tool (Claude Code, OpenAI's Codex command-line interface (Codex CLI), or any Agent Skills tool) and Aegis
+routes you to the right starting point; for anything not listed, ask for a shortlist of skills.
+Find the sentence that sounds like you: each door leads to a short guided path through the right
+skills, in the right order. (Auto-selection quality varies by
 tool — Claude Code reads the full skill descriptions; some tools' native selection reads only
 a short description prefix. Dated host caveats (checked 2026-09-26) are in [Using Aegis with
 Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
