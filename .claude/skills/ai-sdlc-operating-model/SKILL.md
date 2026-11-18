@@ -165,3 +165,6 @@ Review date:  <date>
 - `evals/trigger-evals.json` — discrimination against
   `agent-authorization-matrix`, `agent-governance-audit`,
   `agent-memory-governance`, and the Phase 1 stage skills.
+
+
+**Source-only links.** Links in this skill to source-repository documents outside the starter package are source-only references; in a consumer copy they do not resolve.
