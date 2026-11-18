@@ -249,3 +249,7 @@ The repository owner made this a permanent naming rule by direct instruction on 
 **Effective on merge.** This rule becomes effective when the change that adds it is merged to the default branch. Until that merge it is staged in the local isolated worktree and grants nothing.
 
 **Enforcement and limits.** The readable-name requirement is a documented rule: no machine check verifies that a report or item actually uses a readable name, and none is claimed. The independent plan, implementation and final reviewers check it as part of their existing duties. The rule's presence and the item list's presence are machine-checkable only as text; their semantic use remains procedural. A malformed or code-like report is corrected by its author, not by a machine gate.
+
+## Consumer copies: source-only links
+
+**Source-only links.** Links in this file to repository documents or paths outside the starter package are source-repository references; in a consumer copy they do not resolve. They document the source library and are never an installation claim.

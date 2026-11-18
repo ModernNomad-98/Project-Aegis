@@ -487,3 +487,6 @@ scope, users, success, open questions) refreshed at approved checkpoints.
   discipline: risk-tiered batching, authority kept separate from scope/spec/design, proposal-fingerprint idempotency, exactness; applied by the contract.
 - `evals/evals.json` — behavior cases for the cold-start interview, mid-flight state, stage routing and refusals; static spec only, evals do not run on PRs.
 - `evals/trigger-evals.json` — trigger discrimination against the requirements, AI-SDLC, spec and code-review owners.
+
+
+**Source-only links.** Links in this skill to source-repository documents outside the starter package are source-only references; in a consumer copy they do not resolve.
