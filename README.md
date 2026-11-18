@@ -15,8 +15,7 @@ The library does not itself build, deploy or operate an application.
    checkout and begin with the [documentation index](docs/README.md).
 2. **Get the skills.** Install Git. There are three installation routes, and
    they prove different things: the [starter package](docs/consumer-starter-package.md)
-   — a fixed, dependency-checked set of 41 skill-directory files for 20 skills plus 2
-   startup files for a first product slice; the documented allow-list copy of the skills you choose;
+   — a fixed, dependency-checked set of 53 files (41 skill-directory files for 20 skills, 2 startup files, 9 guides and the manifest) for a first product slice; the documented allow-list copy of the skills you choose;
    and the full source checkout, which is for maintaining the library and for
    reading the skills before choosing. [Getting started](#getting-started) walks
    through each one.
@@ -336,7 +335,7 @@ below starts from. Later, run `git pull` from the same folder to update to the l
 
 **Choose your installation route before you start a project.**
 
-- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 53-file set (41 skill-directory files for 20 skills, 2 startup files, the nine path guides and the manifest), its dependency ledger, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, the explicit `human-only`/`agent-commit` install mode, and the commit identity the startup gate checks and requires. The install writes only the 19 skill directories, the two startup files, and the optional install record at the `-RecordPath` you pass; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
+- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 53-file set (41 skill-directory files for 20 skills, 2 startup files, the nine path guides and the manifest), its dependency ledger, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, the explicit `human-only`/`agent-commit` install mode, and the commit identity the startup gate checks and requires. The install writes the full 53-file set (20 skill directories / 41 skill-directory files, the two startup files, the nine path guides and the manifest) plus the optional install record at the `-RecordPath` you pass; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
 - **Selected skills (any product slice).** Copy only the skills a slice needs with the allow-list block in [Using the skills in your own project](#using-the-skills-in-your-own-project); this is also how you extend the starter package.
 - **Full source checkout (library maintenance).** Keep this clone and work in it; only this route runs the repository's own validator and CI-equivalent checks.
 

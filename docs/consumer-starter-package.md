@@ -162,7 +162,7 @@ is told to read and cite, (iii) the owning skill of a J1 step, (iv) a skill whos
 output J1's recording schema composes by name, or (v) an enforcer the stage map
 names for a J1 stage, even when no skill links to it. Everything
 conditional-by-evidence, everything MANUAL-ONLY, and every owner of a stage
-outside J1 is excluded (section 4). This revision additionally carries the owner-approved consumer door dependency `skill-selection-advisor` with the manifest it reads (the source catalog is no longer installed; the advisor has a catalog-missing fallback) closure - as measured consumer additions rather than J1 steps.
+outside J1 is excluded (section 4). This revision additionally carries the owner-approved consumer door dependency `skill-selection-advisor` with the manifest it reads (the source catalog is no longer installed; the advisor has a catalog-missing fallback), as measured consumer additions rather than J1 steps.
 
 ### 2.2 The skills and why each one is a direct dependency
 
@@ -303,11 +303,10 @@ Measured at the new pin for the 20 selected skills: skill-file links are intra-s
 
 The two startup files still carry their repo-root governance pointers — `AGENTS.md` points at `docs/delivery-workflow.md`, `CONTRIBUTING.md`, two `docs/roadmaps/*` pages and `docs/approvals/APPROVAL_REGISTER.md` — and those are **Role A governance pointers**: they govern work on this source library, no J1 step reads them, and they do not resolve in a consumer copy. The startup files are copied byte-identically from the pin; this revision adds the source-only link notice to `AGENTS.md` (owner-approved PR-A2) and introduces no link rewriting.
 
-The nine added guide pages link to skills and to source pages. Links to installed skills resolve; links to skills that are not in the package follow the section 4.1 install-on-demand rule; links to source-only pages (for example `../../README.md` and `../consumer-starter-package.md`) do not resolve in a consumer copy. They are classified here rather than recursively installed, the guides stay byte-identical, and the install record discloses the non-resolving source-repo citations and the startup governance pointers.
+The nine added guide pages link to skills and to source pages. Links to installed skills resolve; links to skills that are not in the package follow the section 4.1 install-on-demand rule; links to source-only pages do not resolve in a consumer copy; at this pin the guides' remaining source-only references are disclosed by the guides' own source-only notice rather than presented as working. They are classified here rather than recursively installed, the guides stay byte-identical, and the install record discloses the non-resolving source-repo citations and the startup governance pointers.
 
 **Advisor disclosure after catalog removal (declared, not hidden).** `skill-selection-advisor` stays installed with `tools/skills-manifest.json`, but `docs/skills-catalog.md` is not installed. In a starter consumer the advisor therefore reports the source catalog as missing and must not give a definitive shortlist for the wider library; it is included for the installed skills it can rank and as the pointer to the source catalog (source-only). Its catalog links are disclosed as source-only above; the hash-gated catalog-missing fallback in its SKILL.md is the consumer path.
 
-**Catalog source-only links (disclosed, never presented as working).** `docs/skills-catalog.md` is not installed by this package; the guides and advisor name it as a source-only document. At the source pin it carries 89 links: 36 in-page anchors, 1 HTTP link, 1 link to an installed file (`AGENTS.md`), and 51 occurrences pointing at 28 distinct targets that this package does not install: `README.md`, `CHANGELOG.md`, `docs/README.md`, `docs/300-repeatable-software-saas-skills-roadmap.md`, `docs/acceptance/scenario-a-runbook.md`, `docs/approvals/APPROVAL_REGISTER.md`, `docs/consumer-contract-manual-only.md`, `docs/manual-only-policy.md`, `docs/offline-ci.md`, `docs/prompts/claude-skills-master-generation-prompts-v4.md`, `docs/reconciliation/step-0-reconciliation-v4.md`, `docs/research/aegis-workflow-extraction-report.md`, `docs/roadmaps/ai-sdlc-skill-batch-proposal.md`, `docs/roadmaps/behavioral-eval-runner-backlog.md`, `docs/skill-generation-standard.md`, `docs/skills/` (directory), `docs/skills/01-software-architecture-engineering.md` through `docs/skills/09-ai-software-engineering.md` (nine pages), `docs/skills/coverage-map.json`, `docs/skills/coverage-map.md`, and `.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md`. These are source-only: the catalog is not installed, a consumer copy will not carry them, they are disclosed here rather than presented as working, and the catalog itself stays source-only (sections 2.1 and 7 P6).
 
 
 **Composition edges are not links.** The two passes above find file links and
@@ -476,7 +475,7 @@ Run the install in this order. It is the order of the normative procedure in sec
 | P3 | Clone the source at a pinned commit, and prove the checkout | Clone at the pin, check out the pinned commit, verify HEAD/tree/clean status (section 7 P3) | **S3**; **CP3** |
 | P4 | Name the package | Confirm the 53-path copy list that the harness carries as `$package`; no writes and no separate checkpoint (section 7 P4) | install preparation for **S5**; no separate CP |
 | P5 | Destination pre-checks (before any write) | Destination containment, resume-or-refuse and record-path pre-checks, before any write (section 7 P5) | **S5**; **CP5** after the install completes |
-| P6 | Copy by allow-list only, then the startup files | Copy only the declared package files: **41 skill-directory files + the 2 startup files + the 9 guides + the catalog + the manifest = the 53 listed paths**; existing identical files are skipped (section 7 P6) | **S5**; **CP5** |
+| P6 | Copy by allow-list only, then the startup files | Copy only the declared package files: **41 skill-directory files + the 2 startup files + the 9 guides + the manifest = the 53 listed paths**; existing identical files are skipped (section 7 P6) | **S5**; **CP5** |
 | P7 | Refuse eval material, scoped to the installed skills | Refuse eval material inside the installed skill directories (section 7 P7) | **S5**; **CP5** |
 | P8 | Verify the closure and the pins, against independent values | Run the closure/pin checks and print the five `P8:` lines (section 7 P8) | **S5**; **CP5** |
 | P9 | Write the consumer install record | Write the create-new atomic install record with the 53 rows and aggregate (section 7 P9) | **S5/S6**; **CP5/CP6** |
@@ -492,8 +491,8 @@ The table below groups actions by `S` label; **it is not the execution order**. 
 | S2 Prerequisites and owner record | PowerShell 7 | Section 6 prerequisites; P0 host record; set `git config --local aegis.ownerName` / `aegis.ownerEmail` (your own values, never committed). This writes only those two keys into your product's `.git/config` | Version lines and `ok` from the shell probe; the two local keys set (values not printed); no package file written | CP2 |
 | S3 Clone the pinned source | PowerShell 7 | P3: clone and check out the pinned commit as documented there, then verify HEAD, tree and clean status | HEAD = `3c6f4e7d1c0556d1b52c8195941674f2319c0348`; tree = `ac16c0c2683058ce43a5289709530004f14e6ce2`; empty status | CP3 |
 | S4 Install-mode gate | PowerShell 7 | P2: save the published P2 block as `install-mode.ps1` in your helper folder outside the product repository; it validates your explicit `-Mode` and `-OwnerAuthorization` and the identity records | Exit 0 with the gate's acceptance line; nothing copied into the product (the helper `.ps1` is outside it) | CP4 |
-| S5 Install and verify | PowerShell 7 | P5–P9 / section 7.1: save the published harness as `install-starter.ps1` and run the documented invocation | Five `P8:` lines (`count_check=PASS installed=53 extra=0`, `manifest_pins=PASS 21/21`, `source_pins=PASS 39/39`, `siblings=PASS absent=0`, `forbidden=PASS none`), then the `P9: rows=60 serialized_bytes=6713 aggregate=86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28 (matches the published value)` line, exit 0, and the install record written | CP5 |
-| S6 Identify success (installation) | PowerShell 7 | Read the exit code, the five P8 lines, the P9 line and the record path; compare the aggregate with the published value; note the pinned clone and helper folder paths | Record at `docs/consumer-install-record.md` with `rows=60`, `serialized_bytes=6713`, aggregate `86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28`; no unexpected files; the clone and helper scripts remain outside the product repository | CP6 |
+| S5 Install and verify | PowerShell 7 | P5–P9 / section 7.1: save the published harness as `install-starter.ps1` and run the documented invocation | Five `P8:` lines (`count_check=PASS installed=53 extra=0`, `manifest_pins=PASS 20/20`, `source_pins=PASS 33/33`, `siblings=PASS absent=0`, `forbidden=PASS none`), then the `P9: rows=53 serialized_bytes=6713 aggregate=86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28 (matches the published value)` line, exit 0, and the install record written | CP5 |
+| S6 Identify success (installation) | PowerShell 7 | Read the exit code, the five P8 lines, the P9 line and the record path; compare the aggregate with the published value; note the pinned clone and helper folder paths | Record at `docs/consumer-install-record.md` with `rows=53`, `serialized_bytes=6713`, aggregate `86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28`; no unexpected files; the clone and helper scripts remain outside the product repository | CP6 |
 | S7 First useful task (CX-FT1) | A new DeepSeek Harness session opened on your product folder | Stage 1 requirements brief only, on a disposable repository or a dedicated branch (see the safety preconditions below) | `docs/requirements.md` and `docs/project-state.md` with the required sections; no code, commit or push | CP7 |
 | S8 Fresh-chat resumption | A new DeepSeek Harness chat on the same product folder | Start a fresh chat and ask a **read-only** status question: "Where am I? Read `docs/project-state.md` and tell me the latest STATE SNAPSHOT and the next action; do not continue work yet." | The agent reports the latest STATE SNAPSHOT and next action without restarting; it makes no file changes during this check | CP8 |
 | S9 Refusal and recovery (failure-only) | PowerShell 7 and/or the product session | **Only when a step stops:** map the exact refusal to section 7.2; use its permitted next action; record what happened; resume at the failed step | A recorded refusal with its exact code and message plus the next action | CP9 (failure-only) |
@@ -892,7 +891,7 @@ skill that means its `SKILL.md` and every file under `references/` that the
 package lists, preserving the relative path; nothing else is copied from the
 skill directory. Then copy the two startup files to the
 target root — `AGENTS.md` -> `<target>/AGENTS.md` and `CLAUDE.md` ->
-`<target>/CLAUDE.md` — byte-identically. Composition: 20 `SKILL.md` + 24
+`<target>/CLAUDE.md` — byte-identically. Composition: 20 `SKILL.md` + 21
 `references/*` = 41 skill-directory files (15 skills x2,
 `agent-startup-context-gate`, `project-orchestrator` and `test-plan-designer` x3,
 `model-routing-policy` and `skill-selection-advisor` x1 each), plus the 2 startup
@@ -917,7 +916,7 @@ before retrying.
 The published harness in section 7.1 implements every check and exits nonzero on
 the first failure:
 
-1. **Count and scope:** exactly 53 packaged files present, and under the 20 installed skill directories no file outside the list (**exit 30**); 41 skill-directory files plus the 2 startup files, the 9 guides, the catalog and the manifest.
+1. **Count and scope:** exactly 53 packaged files present, and under the 20 installed skill directories no file outside the list (**exit 30**); 41 skill-directory files plus the 2 startup files, the 9 guides and the manifest.
 2. **Skill pins:** each of the 20 `SKILL.md` files, with CRLF->LF normalization, equals its `tools/skills-manifest.json` entry (**exit 31**).
 3. **Reference and startup pins:** each of the 21 reference files, the 9 guides and the manifest, plus the 2 startup files (33 source pins) matches the pinned source, after P3 has proven the source is the pinned commit and tree and is clean (**exit 31**).
 4. **Siblings:** every sibling `SKILL.md` linked by an installed skill exists in
@@ -1520,7 +1519,7 @@ if ($RecordPath) {
 Write-Output 'OK: 53 installed files; closure, pins, siblings, eval and aggregate checks passed'
 exit 0
 ```
-Role B planning: the consumer repository uses the same plan-of-record-author and plan-audit-reviewer contracts; the Option A re-pin installs those contracts at the new pin 20b0efde, while an install from the retired published pin 2fef11dd still carries the previous contracts.
+Role B planning: the consumer repository uses the same plan-of-record-author and plan-audit-reviewer contracts; this design-round re-pin installs those contracts at the new pin 3c6f4e7d, while an install from the retired published pin 2fef11dd still carries the previous contracts.
 J1 step 5 (an independently audited plan) is unchanged and remains the consumer planning route.
 
 If `-RecordPath` already exists, the block stops with **exit 24** before it writes
@@ -1655,12 +1654,12 @@ Each code stops; none warns and continues.
 | Code | Meaning | What you see |
 | --- | --- | --- |
 | 1 | Prerequisite failure | `STOP: no Git sh.exe found`, a missing source/target clone, or a `sh` that did not answer. The source/target checks run before any write. The published harness probes `sh` at the end of P8, so that path stops **after** the 53 files are written - the install is resumable from there and no record is written |
-| 20 | Foreign material in a destination skill directory | The exact file that is outside the package; nothing overwritten |
+| 20 | Destination collision (skill file, guide or manifest) | The exact destination that is outside the package, differs from the pinned source, or is a non-file at a guide/manifest path; refused before any write and nothing overwritten |
 | 21 | Unsafe or missing source path | The `..`/reparse-point segment or the missing file; nothing written |
 | 22 | Startup-file conflict | The differing file; existing bytes unchanged |
 | 23 | Unsafe destination path (junction, symbolic link or other reparse point) | The exact path and the link type/target; refused before any package or record write, including a reparse point at `-RecordPath`, which is a **23** and never a 24. P9 re-reads the record leaf's attributes after the preflight (attributes only, never followed), so a link swapped in after the walk is refused at **23** too; by then the package copy is complete and no record is written |
-| 24 | Install record path cannot be used | The exact path. An existing path at `-RecordPath`, an existing directory or other non-file under `-AllowExistingRecord`, and a path that equals, contains **or is nested under** one of the 60 package outputs are all refused before any package or record write. `-AllowExistingRecord` keeps a record only when the path was an existing regular file at the preflight, leaves it unchanged, and does not read or verify its contents (the identical-install claim is operator-attested). A record **file** that first appears after the preflight is refused at 24 with or without the switch and no new record is written, though the package copy has already completed. A reparse point at the record path is refused by the containment walk at **23**, not here, and P9 re-checks the leaf for one that appeared after that walk |
-| 25 | The install record could not be written atomically | The record path and the underlying error; the unique same-directory temp file is removed (best effort) and no new record is left at `-RecordPath`, so a partial receipt cannot be read as one. The message states that the **60 package files are already written** at this point ("the package copy is complete but no record was written"); a P9 containment failure on the record temp reports the same scope. Directory creation for the record is part of this same contract, so a directory-creation failure is 25, not 1 |
+| 24 | Install record path cannot be used | The exact path. An existing path at `-RecordPath`, an existing directory or other non-file under `-AllowExistingRecord`, and a path that equals, contains **or is nested under** one of the 53 package outputs are all refused before any package or record write. `-AllowExistingRecord` keeps a record only when the path was an existing regular file at the preflight, leaves it unchanged, and does not read or verify its contents (the identical-install claim is operator-attested). A record **file** that first appears after the preflight is refused at 24 with or without the switch and no new record is written, though the package copy has already completed. A reparse point at the record path is refused by the containment walk at **23**, not here, and P9 re-checks the leaf for one that appeared after that walk |
+| 25 | The install record could not be written atomically | The record path and the underlying error; the unique same-directory temp file is removed (best effort) and no new record is left at `-RecordPath`, so a partial receipt cannot be read as one. The message states that the **53 package files are already written** at this point ("the package copy is complete but no record was written"); a P9 containment failure on the record temp reports the same scope. Directory creation for the record is part of this same contract, so a directory-creation failure is 25, not 1 |
 | 30 | Closure, count or eval-material failure | The offending path or the count found |
 | 31 | Pin or byte mismatch (including a CRLF checkout or an aggregate mismatch) | The exact file, or the aggregate comparison that failed |
 | 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
@@ -1891,7 +1890,7 @@ aggregate algorithm of sections 9.1 and 9.2 equals
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over 5,420
 serialized bytes (the 7,025 B record file is the observed fixture size, not a
 universal constant);
-4. all 53 selected paths are present and byte-identical to the pin;
+4. all 41 selected paths are present and byte-identical to the pin;
 5. unrelated product files, the local Git configuration and the commit are
 unchanged, and the v1 record is **at the v1 path inside the target repository**,
 with its file bytes unchanged from the value captured before the run
@@ -2094,7 +2093,7 @@ is produced by the same run that passed the checks; it is not retyped by hand.
 The aggregate is a SHA-256 over a byte-exact serialization, so two operators can
 reproduce it:
 
-1. **Row set.** One row per installed file: all 60 package paths, consumer
+1. **Row set.** One row per installed file: all 53 package paths, consumer
    relative, using `/` separators (no leading `./`).
 2. **Row fields, in this order:** `path`, `bytes` (decimal, no padding), `lf`
    (decimal count of `0x0A` bytes), `sha256` (lowercase hex, 64 chars).
@@ -2109,11 +2108,11 @@ reproduce it:
    stable.
 6. **Aggregate:** SHA-256 of the concatenated serialization, lowercase hex,
    published with the row count and the serialization byte length
-   (`rows=60`, `serialized_bytes=6713` at the pin) so a mismatch is diagnosable by
+   (`rows=53`, `serialized_bytes=6713` at the pin) so a mismatch is diagnosable by
    inspection.
 7. **Base value (commit `3c6f4e7d1c0556d1b52c8195941674f2319c0348`):**
    `86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28` over
-   **6,713** serialized bytes for **60** rows.
+   **6,713** serialized bytes for **53** rows.
 
 The section 7.1 harness computes this exact serialization and **compares it
 fail-closed** with the base value above; it exits 31 on a row-count,
@@ -2121,11 +2120,10 @@ serialized-length or hash difference, and the check reports the row count,
 serialized length and aggregate hash; it does not name an individual row.
 A mismatch is a finding, not a rounding.
 
-The arithmetic makes the length checkable: the 60 consumer-relative paths total
-3,177 bytes and the 60 full 64-character digests total 3,840 bytes, so 7,017 bytes
-is the minimum before separators; adding three TABs per row (180), one LF per row
-(60) and the decimal fields (428 characters across the `bytes` and `lf` columns)
-gives exactly 6,713.
+The arithmetic makes the length checkable: the 53 consumer-relative paths total
+2,734 bytes and the 53 full 64-character digests total 3,392 bytes; adding the
+three TAB separators per row (159), one LF per row (53) and the decimal fields
+(375 characters across the `bytes` and `lf` columns) gives exactly 6,713.
 
 ## 10. Recording authority on the consumer route
 
@@ -2195,21 +2193,15 @@ install the four landmarks P1 probes for, the source `scripts/` tree, or the
 source repository's own configuration. The two startup files `AGENTS.md` and
 `CLAUDE.md` **are** installed deliberately (section 2.2); this rule does not
 exclude them. `docs/skills-catalog.md` is **not** installed by this package (the
-advisor's catalog-missing fallback covers its absence), and it is not a
-source-library landmark even in a source checkout that carries it. The package
+advisor's catalog-missing fallback covers its absence); it remains one of the four
+source-library landmarks P1 probes, and that is precisely why it is not installed. The package
 contains no approval record of any kind; the copy never reads the register, and a
 source-repository grant is never authority in your repository.
 
-**Residual installed-text note (declared, not hidden).** The installed startup
-files at the pin still enumerate four corroborating files for source-library role
-detection: `AGENTS.md` line 7 and its incomplete-landmarks question rule at line
-10, `CLAUDE.md` line 5, `agent-startup-context-gate/SKILL.md` lines 49-53 and its
-`references/context-source-checklist.md` line 26, and
-`project-orchestrator/SKILL.md` lines 66-68. In a consumer copy the catalog is
-**not installed**, so it cannot be counted as a landmark; the P1 probe above and
-this section are authoritative for install-time role classification. The P1 probe
-is the four-marker version (consumer 0/4, source 4/4); the startup texts remain
-source-library-aligned and the page states that divergence rather than hiding it.
+**Role-probe note.** The P1 probe is the four-marker version (consumer 0/4, source
+4/4); the installed startup files refer to the same four landmarks and are copied
+byte-identically from the pin. The package contains no approval record of any
+kind.
 ## 11. Screenshot evidence: policy versus capture
 
 Policy is a design act; capture is an action that creates new data about a real
@@ -2253,7 +2245,7 @@ a pass.
   array select the same rows, that each selected skill's allow-list closure
   (`SKILL.md` plus every `references/` file) is carried, and that removing either
   `scoped-approval-register` row from either selector fails deliberately. Nothing
-  checks that the 21-skill list is still the right *minimum*; the derivation rule,
+  checks that the 20-skill list is still the right *minimum*; the derivation rule,
   the install checks and this disclosure are the mitigation. A future change to the
   package needs a new measurement, not a memory.
 - **Some source-repo links do not resolve in your copy** (section 3), by design: rewriting them

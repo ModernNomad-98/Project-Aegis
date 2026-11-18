@@ -7324,7 +7324,7 @@ STARTER_REQUIRED_PATHS = (
     ".claude/skills/scoped-approval-register/references/register-format.md",
 )
 # The non-skill rows the selectors may carry: the two root startup files plus the
-# nine Option A guides, the catalog and the manifest.
+# nine Option A guides and the manifest.
 # Every other row must be a file under .claude/skills/, so an extra non-skill
 # row cannot ride along in the selector (I4 advisory F1).
 STARTER_STARTUP_PATHS = ("AGENTS.md", "CLAUDE.md")
@@ -8987,7 +8987,7 @@ def test_consumer_install_destination_links():
             ok("S4-1: an ordinary clean target still installs 53 files plus the "
                "declared record with the containment preflight in place")
 
-            # S4-23 (P5 extension): a populated target with a differing guide is
+            # S4-26 (P5 extension): a populated target with a differing guide is
             # refused at 20 before any write, and the target is unchanged.
             differing = _install_mode_repo(tmp / "d-guide-differ", env)
             guide_rel = Path("docs") / "paths" / "add-ai-safely.md"
@@ -8998,12 +8998,29 @@ def test_consumer_install_destination_links():
             proc = install(differing)
             assert proc.returncode == 20, (proc.returncode, proc.stdout, proc.stderr)
             assert "non-skill destination differs" in proc.stderr, proc.stderr
+            assert guide_rel.as_posix() in proc.stderr, proc.stderr
             assert _dest_snapshot(differing) == differing_before, (
                 "a package file was written before the differing-guide refusal")
-            ok("S4-23: a differing guide destination exits 20 before any write; "
+            ok("S4-26: a differing guide destination exits 20 before any write; "
                "the target inventory is unchanged")
 
-            # S4-24 (P5 extension): an identical guide is a valid resume and the
+            # S4-28 (P5 extension): a non-file (directory) sitting at a guide
+            # destination is refused at 20 before any write, and is left intact.
+            nonfile = _install_mode_repo(tmp / "d-guide-nonfile", env)
+            guide_dir = nonfile / guide_rel
+            guide_dir.mkdir(parents=True)
+            (guide_dir / "marker.txt").write_text("not a package file\n", encoding="utf-8")
+            nonfile_before = _dest_snapshot(nonfile)
+            proc = install(nonfile)
+            assert proc.returncode == 20, (proc.returncode, proc.stdout, proc.stderr)
+            assert "not a regular file" in proc.stderr, proc.stderr
+            assert guide_rel.as_posix() in proc.stderr, proc.stderr
+            assert _dest_snapshot(nonfile) == nonfile_before, (
+                "the non-file guide destination was modified before refusal")
+            ok("S4-28: a non-file guide destination exits 20 before any write "
+               "and is left intact")
+
+            # S4-27 (P5 extension): an identical guide is a valid resume and the
             # install completes successfully.
             identical = _install_mode_repo(tmp / "d-guide-identical", env)
             guide_dst = identical / guide_rel
@@ -9013,7 +9030,7 @@ def test_consumer_install_destination_links():
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             assert guide_dst.read_bytes() == (source / guide_rel).read_bytes(), (
                 "the identical guide was modified")
-            ok("S4-24: an identical guide destination resumes successfully")
+            ok("S4-27: an identical guide destination resumes successfully")
 
             # S4-2: a linked target root is refused, and the external tree is
             # byte-for-byte unchanged - nothing is written through the junction.
@@ -9043,7 +9060,7 @@ def test_consumer_install_destination_links():
             assert _dest_snapshot(ext) == [], "a skill file was written through the reference junction"
             assert _dest_snapshot(late) == late_before, "a package file was written before the refusal"
             assert not (late / ".claude" / "skills" / "agent-startup-context-gate" / "SKILL.md").exists()
-            ok("S4-3: an intermediate junction at the 38th package row exits 23 before "
+            ok("S4-3: an intermediate junction at the 40th package row exits 23 before "
                "the first package file is written; target and external trees unchanged")
 
             # S4-4: a broken junction is refused, not treated as a missing path.
