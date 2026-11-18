@@ -15,7 +15,7 @@ The library does not itself build, deploy or operate an application.
    checkout and begin with the [documentation index](docs/README.md).
 2. **Get the skills.** Install Git. There are three installation routes, and
    they prove different things: the [starter package](docs/consumer-starter-package.md)
-   — a fixed, dependency-checked set of 40 skill files for 19 skills plus 2
+   — a fixed, dependency-checked set of 41 skill-directory files for 20 skills plus 2
    startup files for a first product slice; the documented allow-list copy of the skills you choose;
    and the full source checkout, which is for maintaining the library and for
    reading the skills before choosing. [Getting started](#getting-started) walks
@@ -336,7 +336,7 @@ below starts from. Later, run `git pull` from the same folder to update to the l
 
 **Choose your installation route before you start a project.**
 
-- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 42-file set (40 skill files for 19 skills plus 2 startup files), its dependency ledger, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, the explicit `human-only`/`agent-commit` install mode, and the commit identity the startup gate checks and requires. The install writes only the 19 skill directories, the two startup files, and the optional install record at the `-RecordPath` you pass; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
+- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 53-file set (41 skill-directory files for 20 skills, 2 startup files, the nine path guides and the manifest), its dependency ledger, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, the explicit `human-only`/`agent-commit` install mode, and the commit identity the startup gate checks and requires. The install writes only the 19 skill directories, the two startup files, and the optional install record at the `-RecordPath` you pass; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
 - **Selected skills (any product slice).** Copy only the skills a slice needs with the allow-list block in [Using the skills in your own project](#using-the-skills-in-your-own-project); this is also how you extend the starter package.
 - **Full source checkout (library maintenance).** Keep this clone and work in it; only this route runs the repository's own validator and CI-equivalent checks.
 
@@ -472,7 +472,7 @@ way. If your repo has no `.claude/skills/` folder yet, create it first (it's jus
 
 **Solo-owner commit identity — decided (2026-10-28):** a solo owner may commit under their own identity; only agent-authored commits must use the documented repository-local agent identity. The install mode makes that route explicit: `human-only` installs without an agent commit or any Git identity change, while `agent-commit` keeps the startup gate's fail-closed check for agent commits. The check is unchanged, and the package still makes no consumer-readiness claim (package sections P2 and 8.3; owner decision via [OWNER BRIEF] #910 comment 6463527894).
 
-The package's definition, its 42-file selection and the one install procedure are in [docs/consumer-starter-package.md](docs/consumer-starter-package.md). The [v2 evidence record](docs/evidence/consumer-readiness/local-starter-v2.md) names the host, the installed-file hashes, each check's result and every UNRUN; the [v1 record](docs/evidence/consumer-readiness/local-starter-v1.md) remains the historical 39-file record. The explicit install-mode branch and its native before/after evidence are in [human-commit-install-v1](docs/evidence/consumer-readiness/human-commit-install-v1.md).
+The package's definition, its 53-file selection and the one install procedure are in [docs/consumer-starter-package.md](docs/consumer-starter-package.md). The [v2 evidence record](docs/evidence/consumer-readiness/local-starter-v2.md) names the host, the installed-file hashes, each check's result and every UNRUN; the [v1 record](docs/evidence/consumer-readiness/local-starter-v1.md) remains the historical 39-file record. The explicit install-mode branch and its native before/after evidence are in [human-commit-install-v1](docs/evidence/consumer-readiness/human-commit-install-v1.md).
 
 Not claimed here: consumer readiness, production readiness, multi-tenant or SaaS readiness, a second host, a hosted deployment, live-model evaluation, or CI-green equality. macOS/Linux remain not validated (see the copy section). The setup/control-plane warnings elsewhere on this page still apply.
 

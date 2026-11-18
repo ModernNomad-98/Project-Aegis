@@ -152,7 +152,7 @@ actual permitted next action are defined, docs-only, in
 T6, mounted coverage (T5) is UNKNOWN, and no enforcement claim is made. Where the authoritative record
 is unavailable, the only truthful display is UNKNOWN or STALE with its resolver - never a pass.
 
-## 2. The 53 files: 20 skills, 2 startup files, 9 path guides, the catalog and the manifest
+## 2. The 53 files: 20 skills, 2 startup files, 9 path guides and the manifest
 
 ### 2.1 Selection rule
 
@@ -187,79 +187,77 @@ outside J1 is excluded (section 4). This revision additionally carries the owner
 | `test-plan-designer` | Stage 7 owner (`SKILL.md:260-261`); J1 step 8's positive/negative cases. |
 | `release-readiness-reviewer` | Stage 9 gate (`SKILL.md:278`) and the evidence table J1 step 9 needs for a local delivery; its own contract requires an artifact per blocking dimension or a MISSING entry (`SKILL.md:12-21, 105-110`). |
 | `screenshot-evidence-planner` | J1 step 11, **policy half only**. J1 has no UI slice, so step 11 invokes the planner to produce the policy handoff (checkpoints, deterministic naming, pre-storage masking, retention) and nothing is captured; the handoff is recorded as AC-30's policy answer in the evidence record. It captures nothing by contract (`SKILL.md:16`; its Use-When 27-28 hands capture to a manual-only owner). |
-| `skill-selection-advisor` | The advisor behind the README door 'I know what I want to do - I just don't know which skill': it maps a plain-language situation to the owning skill and reads the installed catalog and manifest; the package carries it with those two data files so the door works from a fresh install. |
-| (removed) | `complete-project-checkpoint` is no longer installed by the starter package (owner-approved design round; manual-only save-and-resume stays install-on-demand). | (removed) `references/` + `assets/`); no eval material is included. |
+| `skill-selection-advisor` | The advisor behind the README door 'I know what I want to do - I just don't know which skill': it maps a plain-language situation to the owning skill and reads `tools/skills-manifest.json`; the source catalog is not installed, and the advisor's catalog-missing fallback (hash-gated local frontmatter; may be incomplete) covers that gap. |
 
-The two startup files are `AGENTS.md` (the role-detection and operating contract,
-29,137 B) and `CLAUDE.md` (`@AGENTS.md` import plus startup routing, 3,681 B).
+The two startup files are `AGENTS.md` (the role-detection and operating contract, 29,424 B) and `CLAUDE.md` (`@AGENTS.md` import plus startup routing, 3,681 B).
 Both are required because the role recognition J1 step 2 tests lives in them.
 
 ### 2.3 The file list (53 paths, bytes and LF at the pin `3c6f4e7d1c0556d1b52c8195941674f2319c0348`)
 
-Every file is copied byte-identically by the package rule: `SKILL.md`, everything under `references/`, everything under `assets/`, the two startup files, the nine `docs/paths/` guides, `docs/skills-catalog.md` and `tools/skills-manifest.json`. This is the exact closure measured at `3c6f4e7d1c0556d1b52c8195941674f2319c0348` (tree `ac16c0c2683058ce43a5289709530004f14e6ce2`), sorted by path in ordinal order (the same order the install-record aggregate uses). Every row below was recomputed at this pin.
+Every file is copied byte-identically by the package rule: `SKILL.md`, everything under `references/`, the two startup files, the nine `docs/paths/` guides and `tools/skills-manifest.json`. This is the exact closure measured at `3c6f4e7d1c0556d1b52c8195941674f2319c0348` (tree `ac16c0c2683058ce43a5289709530004f14e6ce2`), sorted by path in ordinal order (the same order the install-record aggregate uses). Every row below was recomputed at this pin.
 
-**Pin delta from published base `2fef11dd`.** This revision refreshes nine base rows - `.claude/skills/agent-startup-context-gate/SKILL.md`, `architecture-designer/SKILL.md`, `model-routing-policy/SKILL.md`, `plan-audit-reviewer/SKILL.md` and its `references/plan-audit-checklist.md`, `plan-of-record-author/SKILL.md` and its `references/plan-of-record-package.md`, `project-orchestrator/SKILL.md`, and `CLAUDE.md` - and adds 18 measured consumer files: the nine guides, `skill-selection-advisor/SKILL.md` with `docs/skills-catalog.md` and `tools/skills-manifest.json`, and the complete `complete-project-checkpoint` closure (SKILL + three references + two assets). The other 33 base rows are byte-identical. Evals are excluded.
+**Pin delta from published base `2fef11dd`.** This design-round re-pin moves the starter to the merge commit of the content fixes, refreshes the startup files (source-only notices; `AGENTS.md` changed), the three edited skills, the nine consumer-safe path guides and the manifest, and drops `complete-project-checkpoint` (6 files) and `docs/skills-catalog.md` (1 file) from the package: 53 files, 20 skills, 41 skill-directory files. The byte/LF rows in section 2.3 are measured at the new pin.
 
 **Pin delta from base `7e79ce0e`.** `2fef11dd` differs from that earlier base only by the Layer 2 package registration: the new `.claude/skills/model-routing-policy/SKILL.md`, the orchestrator `SKILL.md` pointer change, the `recording-and-authority.md` section-5 move and the `tools/skills-manifest.json` refresh. That historical delta is retained here; it is not the current pin.
 
 | Path (consumer-relative) | Bytes | LF |
 | --- | --- | --- |
-| `.claude/skills/agent-startup-context-gate/SKILL.md` | 24,010 | 364 |
-| `.claude/skills/agent-startup-context-gate/references/context-source-checklist.md` | 3,325 | 59 |
-| `.claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md` | 19,372 | 338 |
-| `.claude/skills/ai-sdlc-operating-model/SKILL.md` | 9,822 | 170 |
-| `.claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md` | 5,596 | 65 |
-| `.claude/skills/architecture-designer/SKILL.md` | 8,948 | 160 |
-| `.claude/skills/architecture-designer/references/architecture-artifacts.md` | 3,110 | 66 |
-| `.claude/skills/change-classification-gate/SKILL.md` | 7,185 | 141 |
-| `.claude/skills/change-classification-gate/references/classification-matrix.md` | 3,781 | 49 |
-| `.claude/skills/code-reviewer/SKILL.md` | 9,404 | 165 |
-| `.claude/skills/code-reviewer/references/severity-rubric.md` | 5,151 | 86 |
-| `.claude/skills/domain-modeler/SKILL.md` | 7,031 | 129 |
-| `.claude/skills/domain-modeler/references/domain-artifacts.md` | 3,737 | 77 |
-| `.claude/skills/human-approval-boundary/SKILL.md` | 8,301 | 146 |
-| `.claude/skills/human-approval-boundary/references/consumer-manual-only-policy.md` | 3,764 | 35 |
-| `.claude/skills/model-routing-policy/SKILL.md` | 6,692 | 78 |
-| `.claude/skills/phased-work-handoff-designer/SKILL.md` | 10,070 | 175 |
-| `.claude/skills/phased-work-handoff-designer/references/handoff-sheet.md` | 2,433 | 80 |
-| `.claude/skills/plan-audit-reviewer/SKILL.md` | 10,426 | 77 |
-| `.claude/skills/plan-audit-reviewer/references/plan-audit-checklist.md` | 3,197 | 28 |
-| `.claude/skills/plan-of-record-author/SKILL.md` | 12,638 | 88 |
-| `.claude/skills/plan-of-record-author/references/plan-of-record-package.md` | 2,938 | 28 |
-| `.claude/skills/product-spec-writer/SKILL.md` | 13,519 | 234 |
-| `.claude/skills/product-spec-writer/references/product-spec-sheet.md` | 3,940 | 111 |
-| `.claude/skills/project-orchestrator/SKILL.md` | 45,794 | 492 |
-| `.claude/skills/project-orchestrator/references/project-state-template.md` | 22,454 | 357 |
-| `.claude/skills/project-orchestrator/references/recording-and-authority.md` | 10,024 | 180 |
-| `.claude/skills/release-readiness-reviewer/SKILL.md` | 10,663 | 192 |
-| `.claude/skills/release-readiness-reviewer/references/readiness-evidence.md` | 3,645 | 48 |
-| `.claude/skills/requirements-gathering-facilitator/SKILL.md` | 16,061 | 271 |
-| `.claude/skills/requirements-gathering-facilitator/references/elicitation-sheet.md` | 6,524 | 174 |
-| `.claude/skills/scoped-approval-register/SKILL.md` | 11,822 | 193 |
-| `.claude/skills/scoped-approval-register/references/register-format.md` | 7,518 | 136 |
-| `.claude/skills/screenshot-evidence-planner/SKILL.md` | 15,823 | 254 |
-| `.claude/skills/screenshot-evidence-planner/references/evidence-rules.md` | 9,645 | 166 |
-| `.claude/skills/skill-selection-advisor/SKILL.md` | 31,202 | 460 |
-| `.claude/skills/tech-spec-writer/SKILL.md` | 10,865 | 191 |
-| `.claude/skills/tech-spec-writer/references/tech-spec-sheet.md` | 2,935 | 72 |
-| `.claude/skills/test-plan-designer/SKILL.md` | 9,662 | 158 |
-| `.claude/skills/test-plan-designer/references/qa-scenario-extensions.md` | 2,450 | 32 |
-| `.claude/skills/test-plan-designer/references/test-plan-template.md` | 5,256 | 77 |
-| `AGENTS.md` | 29,424 | 255 |
-| `CLAUDE.md` | 3,681 | 17 |
-| `docs/paths/add-ai-safely.md` | 13,475 | 125 |
-| `docs/paths/after-launch.md` | 12,975 | 66 |
-| `docs/paths/check-your-app.md` | 6,560 | 112 |
-| `docs/paths/design-and-build-ui.md` | 21,869 | 321 |
-| `docs/paths/find-a-specialist.md` | 48,335 | 185 |
-| `docs/paths/get-audit-ready.md` | 10,130 | 111 |
-| `docs/paths/release-with-agents.md` | 12,980 | 167 |
-| `docs/paths/something-is-broken.md` | 4,214 | 47 |
-| `docs/paths/test-your-app.md` | 8,328 | 133 |
-| `tools/skills-manifest.json` | 53,282 | 1,297 |
+| `.claude/skills/agent-startup-context-gate/SKILL.md` | 24010 | 364 |
+| `.claude/skills/agent-startup-context-gate/references/context-source-checklist.md` | 3325 | 59 |
+| `.claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md` | 19372 | 338 |
+| `.claude/skills/ai-sdlc-operating-model/SKILL.md` | 9822 | 170 |
+| `.claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md` | 5596 | 65 |
+| `.claude/skills/architecture-designer/SKILL.md` | 8948 | 160 |
+| `.claude/skills/architecture-designer/references/architecture-artifacts.md` | 3110 | 66 |
+| `.claude/skills/change-classification-gate/SKILL.md` | 7185 | 141 |
+| `.claude/skills/change-classification-gate/references/classification-matrix.md` | 3781 | 49 |
+| `.claude/skills/code-reviewer/SKILL.md` | 9404 | 165 |
+| `.claude/skills/code-reviewer/references/severity-rubric.md` | 5151 | 86 |
+| `.claude/skills/domain-modeler/SKILL.md` | 7031 | 129 |
+| `.claude/skills/domain-modeler/references/domain-artifacts.md` | 3737 | 77 |
+| `.claude/skills/human-approval-boundary/SKILL.md` | 8301 | 146 |
+| `.claude/skills/human-approval-boundary/references/consumer-manual-only-policy.md` | 3764 | 35 |
+| `.claude/skills/model-routing-policy/SKILL.md` | 6692 | 78 |
+| `.claude/skills/phased-work-handoff-designer/SKILL.md` | 10070 | 175 |
+| `.claude/skills/phased-work-handoff-designer/references/handoff-sheet.md` | 2433 | 80 |
+| `.claude/skills/plan-audit-reviewer/SKILL.md` | 10426 | 77 |
+| `.claude/skills/plan-audit-reviewer/references/plan-audit-checklist.md` | 3197 | 28 |
+| `.claude/skills/plan-of-record-author/SKILL.md` | 12638 | 88 |
+| `.claude/skills/plan-of-record-author/references/plan-of-record-package.md` | 2938 | 28 |
+| `.claude/skills/product-spec-writer/SKILL.md` | 13519 | 234 |
+| `.claude/skills/product-spec-writer/references/product-spec-sheet.md` | 3940 | 111 |
+| `.claude/skills/project-orchestrator/SKILL.md` | 45794 | 492 |
+| `.claude/skills/project-orchestrator/references/project-state-template.md` | 22454 | 357 |
+| `.claude/skills/project-orchestrator/references/recording-and-authority.md` | 10024 | 180 |
+| `.claude/skills/release-readiness-reviewer/SKILL.md` | 10663 | 192 |
+| `.claude/skills/release-readiness-reviewer/references/readiness-evidence.md` | 3645 | 48 |
+| `.claude/skills/requirements-gathering-facilitator/SKILL.md` | 16061 | 271 |
+| `.claude/skills/requirements-gathering-facilitator/references/elicitation-sheet.md` | 6524 | 174 |
+| `.claude/skills/scoped-approval-register/SKILL.md` | 11822 | 193 |
+| `.claude/skills/scoped-approval-register/references/register-format.md` | 7518 | 136 |
+| `.claude/skills/screenshot-evidence-planner/SKILL.md` | 15823 | 254 |
+| `.claude/skills/screenshot-evidence-planner/references/evidence-rules.md` | 9645 | 166 |
+| `.claude/skills/skill-selection-advisor/SKILL.md` | 31202 | 460 |
+| `.claude/skills/tech-spec-writer/SKILL.md` | 10865 | 191 |
+| `.claude/skills/tech-spec-writer/references/tech-spec-sheet.md` | 2935 | 72 |
+| `.claude/skills/test-plan-designer/SKILL.md` | 9662 | 158 |
+| `.claude/skills/test-plan-designer/references/qa-scenario-extensions.md` | 2450 | 32 |
+| `.claude/skills/test-plan-designer/references/test-plan-template.md` | 5256 | 77 |
+| `AGENTS.md` | 29424 | 255 |
+| `CLAUDE.md` | 3681 | 17 |
+| `docs/paths/add-ai-safely.md` | 13475 | 125 |
+| `docs/paths/after-launch.md` | 12975 | 66 |
+| `docs/paths/check-your-app.md` | 6560 | 112 |
+| `docs/paths/design-and-build-ui.md` | 21869 | 321 |
+| `docs/paths/find-a-specialist.md` | 48335 | 185 |
+| `docs/paths/get-audit-ready.md` | 10130 | 111 |
+| `docs/paths/release-with-agents.md` | 12980 | 167 |
+| `docs/paths/something-is-broken.md` | 4214 | 47 |
+| `docs/paths/test-your-app.md` | 8328 | 133 |
+| `tools/skills-manifest.json` | 53282 | 1297 |
 | **Total: 53 files** | **635986** | **9238** |
 
-Composition: 20 `SKILL.md` + 21 `references/*` files + 0 `assets/*` files = 41 skill-directory files, plus the 2 startup files, the 9 guides, `docs/skills-catalog.md` and `tools/skills-manifest.json`. Fifteen skills carry 2 files each; `agent-startup-context-gate`, `project-orchestrator` and `test-plan-designer` carry 3 each; `complete-project-checkpoint` carries its SKILL, three references and two assets (6 files); `model-routing-policy` and `skill-selection-advisor` carry 1 each.
+Composition: 20 `SKILL.md` + 21 `references/*` files = 41 skill-directory files, plus the 2 startup files, the 9 guides and `tools/skills-manifest.json`. Fifteen skills carry 2 files each; `agent-startup-context-gate`, `project-orchestrator` and `test-plan-designer` carry 3 each; `model-routing-policy` and `skill-selection-advisor` carry 1 each.
 
 Aggregate over these 53 rows, using the algorithm in section 9.2:
 `86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28` over **6,713 serialized bytes** for **53 rows**. That is the measurement at the new pin; your install record records the same three numbers.
@@ -301,13 +299,15 @@ MANUAL-ONLY and is not classified on this page at all. A consumer who continues
 past J1 must classify one of those owners before use instead of assuming this page
 already did.
 
-Measured at the new pin for the 20 selected skills: skill-file links are intra-skill or sibling-`SKILL.md` delegation, except the deliberate eval references inside `complete-project-checkpoint/SKILL.md` (evals are excluded from installation) and two `docs/skills/coverage-map.json` links inside `skill-selection-advisor/SKILL.md` that do not resolve in a consumer copy. The four repo-root citations that the previous revision classified as install-on-demand — `docs/skills-catalog.md`, `docs/paths/design-and-build-ui.md`, `docs/paths/add-ai-safely.md` and `docs/paths/release-with-agents.md` — now resolve because Option A installs those files. The non-resolving source-repo citations from the skill files are `docs/acceptance/scenario-a-runbook.md` and `docs/skills/coverage-map.json` (two links).
+Measured at the new pin for the 20 selected skills: skill-file links are intra-skill or sibling-`SKILL.md` delegation, except the deliberate eval references in installed skill text (evals are excluded from installation) and two `docs/skills/coverage-map.json` links inside `skill-selection-advisor/SKILL.md` that do not resolve in a consumer copy. The three repo-root guide citations that the previous revision classified as install-on-demand - `docs/paths/design-and-build-ui.md`, `docs/paths/add-ai-safely.md` and `docs/paths/release-with-agents.md` - now resolve because this package installs the nine consumer-safe guides. `docs/skills-catalog.md` is **not** installed: it stays a source-only citation, the advisor's catalog-missing fallback covers its absence, and the guides carry the source-only link notice. The other non-resolving source-repo citations from the skill files are `docs/acceptance/scenario-a-runbook.md` and `docs/skills/coverage-map.json` (two links).
 
-The two startup files still carry their repo-root governance pointers — `AGENTS.md` points at `docs/delivery-workflow.md`, `CONTRIBUTING.md`, two `docs/roadmaps/*` pages and `docs/approvals/APPROVAL_REGISTER.md` — and those are **Role A governance pointers**: they govern work on this source library, no J1 step reads them, and they do not resolve in a consumer copy. The startup files stay byte-identical; no link rewriting is introduced.
+The two startup files still carry their repo-root governance pointers — `AGENTS.md` points at `docs/delivery-workflow.md`, `CONTRIBUTING.md`, two `docs/roadmaps/*` pages and `docs/approvals/APPROVAL_REGISTER.md` — and those are **Role A governance pointers**: they govern work on this source library, no J1 step reads them, and they do not resolve in a consumer copy. The startup files are copied byte-identically from the pin; this revision adds the source-only link notice to `AGENTS.md` (owner-approved PR-A2) and introduces no link rewriting.
 
 The nine added guide pages link to skills and to source pages. Links to installed skills resolve; links to skills that are not in the package follow the section 4.1 install-on-demand rule; links to source-only pages (for example `../../README.md` and `../consumer-starter-package.md`) do not resolve in a consumer copy. They are classified here rather than recursively installed, the guides stay byte-identical, and the install record discloses the non-resolving source-repo citations and the startup governance pointers.
 
-**Catalog source-only links (disclosed, never presented as working).** `docs/skills-catalog.md` is installed byte-identically and therefore keeps its source-repository links. At this pin it carries 89 links: 36 in-page anchors, 1 HTTP link, 1 link to an installed file (`AGENTS.md`), and 51 occurrences pointing at 28 distinct targets that this package does not install: `README.md`, `CHANGELOG.md`, `docs/README.md`, `docs/300-repeatable-software-saas-skills-roadmap.md`, `docs/acceptance/scenario-a-runbook.md`, `docs/approvals/APPROVAL_REGISTER.md`, `docs/consumer-contract-manual-only.md`, `docs/manual-only-policy.md`, `docs/offline-ci.md`, `docs/prompts/claude-skills-master-generation-prompts-v4.md`, `docs/reconciliation/step-0-reconciliation-v4.md`, `docs/research/aegis-workflow-extraction-report.md`, `docs/roadmaps/ai-sdlc-skill-batch-proposal.md`, `docs/roadmaps/behavioral-eval-runner-backlog.md`, `docs/skill-generation-standard.md`, `docs/skills/` (directory), `docs/skills/01-software-architecture-engineering.md` through `docs/skills/09-ai-software-engineering.md` (nine pages), `docs/skills/coverage-map.json`, `docs/skills/coverage-map.md`, and `.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md`. These are source-only: a consumer copy will show them as dead links, they are disclosed here rather than presented as working, and the catalog and its links stay byte-identical by the copy rule (sections 2.1 and 7 P6).
+**Advisor disclosure after catalog removal (declared, not hidden).** `skill-selection-advisor` stays installed with `tools/skills-manifest.json`, but `docs/skills-catalog.md` is not installed. In a starter consumer the advisor therefore reports the source catalog as missing and must not give a definitive shortlist for the wider library; it is included for the installed skills it can rank and as the pointer to the source catalog (source-only). Its catalog links are disclosed as source-only above; the hash-gated catalog-missing fallback in its SKILL.md is the consumer path.
+
+**Catalog source-only links (disclosed, never presented as working).** `docs/skills-catalog.md` is not installed by this package; the guides and advisor name it as a source-only document. At the source pin it carries 89 links: 36 in-page anchors, 1 HTTP link, 1 link to an installed file (`AGENTS.md`), and 51 occurrences pointing at 28 distinct targets that this package does not install: `README.md`, `CHANGELOG.md`, `docs/README.md`, `docs/300-repeatable-software-saas-skills-roadmap.md`, `docs/acceptance/scenario-a-runbook.md`, `docs/approvals/APPROVAL_REGISTER.md`, `docs/consumer-contract-manual-only.md`, `docs/manual-only-policy.md`, `docs/offline-ci.md`, `docs/prompts/claude-skills-master-generation-prompts-v4.md`, `docs/reconciliation/step-0-reconciliation-v4.md`, `docs/research/aegis-workflow-extraction-report.md`, `docs/roadmaps/ai-sdlc-skill-batch-proposal.md`, `docs/roadmaps/behavioral-eval-runner-backlog.md`, `docs/skill-generation-standard.md`, `docs/skills/` (directory), `docs/skills/01-software-architecture-engineering.md` through `docs/skills/09-ai-software-engineering.md` (nine pages), `docs/skills/coverage-map.json`, `docs/skills/coverage-map.md`, and `.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md`. These are source-only: the catalog is not installed, a consumer copy will not carry them, they are disclosed here rather than presented as working, and the catalog itself stays source-only (sections 2.1 and 7 P6).
 
 
 **Composition edges are not links.** The two passes above find file links and
@@ -401,7 +401,7 @@ This rule text in `CLAUDE.md` item 6 and the orchestrator is installed by this O
 <product repository>/
   AGENTS.md                                  copied, byte-identical, never overwritten
   CLAUDE.md                                  copied, byte-identical, never overwritten
-  .claude/skills/<20 skill directories>/      SKILL.md + references/*.md (+ assets/* for complete-project-checkpoint)
+  .claude/skills/<20 skill directories>/      SKILL.md + references/*.md
   docs/paths/<9 guides>.md                   copied, byte-identical consumer guides
     tools/skills-manifest.json                 copied; the manifest skill-selection-advisor reads
   docs/project-state.md                      created by project-orchestrator at Stage 0 (not copied)
@@ -471,7 +471,7 @@ Run the install in this order. It is the order of the normative procedure in sec
 | # | Step | What you do (one line) | Walkthrough label / checkpoint |
 | --- | --- | --- | --- |
 | P0 | Record the host | Capture the PowerShell 7, Git, resolved `sh` path and host-agent versions (section 7 P0) | supports **S2**; checkpoint **CP2** after S2 completes |
-| P1 | Prove the target is a consumer repository, not the library | Run the role probe: 0 of 3 Aegis source landmarks in your product repository (section 7 P1) | **S1**; **CP1** |
+| P1 | Prove the target is a consumer repository, not the library | Run the role probe: 0 of 4 Aegis source landmarks in your product repository (section 7 P1) | **S1**; **CP1** |
 | P2 | State the install mode, then verify the two identity records | State explicit `-Mode` and `-OwnerAuthorization`; the gate validates the owner/commit identity records (section 7 P2) | **S4**; **CP4** |
 | P3 | Clone the source at a pinned commit, and prove the checkout | Clone at the pin, check out the pinned commit, verify HEAD/tree/clean status (section 7 P3) | **S3**; **CP3** |
 | P4 | Name the package | Confirm the 53-path copy list that the harness carries as `$package`; no writes and no separate checkpoint (section 7 P4) | install preparation for **S5**; no separate CP |
@@ -488,7 +488,7 @@ The table below groups actions by `S` label; **it is not the execution order**. 
 | Shared step | Where it runs | Documented action (reference; no new command) | Expected observable output | Safe stop |
 | --- | --- | --- | --- | --- |
 | S0 Canonical start | Your app or browser | Read the [README Start here](../README.md#start-here) and choose Route A or Route B; both doors run the same steps below | You can say which route you are taking and distinguish source from product | none |
-| S1 Workspace and role | PowerShell 7, in your existing product repository folder | The P1 role probe: confirm the folder is your product repository (0 of 3 Aegis source landmarks) | Role B classification with count 0; no package file written | CP1 |
+| S1 Workspace and role | PowerShell 7, in your existing product repository folder | The P1 role probe: confirm the folder is your product repository (0 of 4 Aegis source landmarks) | Role B classification with count 0; no package file written | CP1 |
 | S2 Prerequisites and owner record | PowerShell 7 | Section 6 prerequisites; P0 host record; set `git config --local aegis.ownerName` / `aegis.ownerEmail` (your own values, never committed). This writes only those two keys into your product's `.git/config` | Version lines and `ok` from the shell probe; the two local keys set (values not printed); no package file written | CP2 |
 | S3 Clone the pinned source | PowerShell 7 | P3: clone and check out the pinned commit as documented there, then verify HEAD, tree and clean status | HEAD = `3c6f4e7d1c0556d1b52c8195941674f2319c0348`; tree = `ac16c0c2683058ce43a5289709530004f14e6ce2`; empty status | CP3 |
 | S4 Install-mode gate | PowerShell 7 | P2: save the published P2 block as `install-mode.ps1` in your helper folder outside the product repository; it validates your explicit `-Mode` and `-OwnerAuthorization` and the identity records | Exit 0 with the gate's acceptance line; nothing copied into the product (the helper `.ps1` is outside it) | CP4 |
@@ -514,7 +514,7 @@ The table below groups actions by `S` label; **it is not the execution order**. 
 
 ### Installation, optional `aegis-setup`, and starting product work are three different things
 
-1. **Installation** is this page's P0–P9 procedure. It writes the 60 package files plus the install record, and its success is the observable output at CP5/CP6; the walkthrough then continues to the first task.
+1. **Installation** is this page's P0–P9 procedure. It writes the 53 package files plus the install record, and its success is the observable output at CP5/CP6; the walkthrough then continues to the first task.
 2. **Optional `aegis-setup` preference selection** is different. `aegis-setup` is a **MANUAL-ONLY** skill: this starter package does **not** install it (section 4.1), and a human must name it explicitly to use it. It exists to discuss Aegis setup preferences (the options the README describes under "Help me set up Aegis"); it is not an installer, it does not verify or repair an install, and J1 does not require it. A run that does not use it is complete.
 3. **Starting product work** means opening a new DeepSeek Harness session on your product repository folder and running the first useful task below. It is not a fourth installation step.
 
@@ -557,7 +557,7 @@ do not start Stage 2.
 `$TGT` below is your product repository and `$SRC` is the pinned clone from P3. The preceding guided walkthrough is optional explanation; this section is the normative procedure, in P0–P9 order.
 
 **Target scope.** The procedure writes exactly 53 files: the 20 skill
-directories (41 files including references and assets), `AGENTS.md` and `CLAUDE.md`, the nine `docs/paths/` guides, `docs/skills-catalog.md` and `tools/skills-manifest.json` — plus
+directories (41 files including references), `AGENTS.md` and `CLAUDE.md`, the nine `docs/paths/` guides and `tools/skills-manifest.json` — plus
 `docs/consumer-install-record.md` when P9 runs. Everything else in `$TGT` — your
 `README.md`, source tree, `.gitignore`, your own `.claude/skills/*`, your own
 `.claude/settings.json` — is outside the package. It is never read, overwritten
@@ -603,30 +603,26 @@ if (-not $sh) { [Console]::Error.WriteLine('STOP: no Git sh.exe found'); exit 1 
 Run this step **from `$TGT`** (or prefix every probe with
 `-LiteralPath (Join-Path $TGT '...')`), so each relative path names a file in the
 target and not in whatever directory you happen to be in. The target may be empty
-apart from `.git`, or a populated product repository; P1 reads only the three
+apart from `.git`, or a populated product repository; P1 reads only the four
 landmarks and writes nothing.
 
 ```powershell
 $landmarks = @(
   [bool]((Test-Path -LiteralPath 'README.md') -and
          (Select-String -LiteralPath 'README.md' -Pattern '^# Project Aegis' -Quiet -ErrorAction SilentlyContinue)),
+  (Test-Path -LiteralPath 'docs/skills-catalog.md'),
   (Test-Path -LiteralPath 'scripts/validate-skills.py'),
   (Test-Path -LiteralPath 'artifacts/audits/skill-contract-audit-baseline.json'))
 $count = @($landmarks | Where-Object { $_ }).Count
 ```
-
-`docs/skills-catalog.md` is installed deliberately by this package (sections 2.1
-and 2.3) and is therefore **not** a landmark: a source checkout and a consumer
-copy under this package both carry it, so it does not separate them. P1 does not
-probe it.
 
 The guard is part of the contract: a missing `README.md` is a **false** landmark,
 not an exception. The decision is exhaustive:
 
 | `$count` | Classification | Exact action | Exact message |
 | --- | --- | --- | --- |
-| **3** | The source library or a fork of it | **STOP, exit 40**; write nothing | "STOP: this workspace carries all three Project Aegis source-package landmarks, so it is the Project Aegis source library or a fork of it, not an installation target. Install into your own product repository instead. Nothing was changed by this attempt." |
-| **1-2** | Genuinely ambiguous | **Ask exactly one role/location question and write nothing**; then act on the answer: "library/fork" -> exit 40; "my product repository" -> continue to P2; no clear answer -> stop | "This workspace has <N> of the three Project Aegis source-package landmarks (<the ones present>). Is it (a) a copy of the Project Aegis source library or a fork of it, or (b) your own product repository? Nothing has been written." |
+| **4** | The source library or a fork of it | **STOP, exit 40**; write nothing | "STOP: this workspace carries all four Project Aegis source-package landmarks, so it is the Project Aegis source library or a fork of it, not an installation target. Install into your own product repository instead. Nothing was changed by this attempt." |
+| **1-3** | Genuinely ambiguous | **Ask exactly one role/location question and write nothing**; then act on the answer: "library/fork" -> exit 40; "my product repository" -> continue to P2; no clear answer -> stop | "This workspace has <N> of the four Project Aegis source-package landmarks (<the ones present>). Is it (a) a copy of the Project Aegis source library or a fork of it, or (b) your own product repository? Nothing has been written." |
 | **0** | Role B — the consumer/product repository | Continue to P2 | none |
 
 ### P2 — State the install mode, then verify the two identity records
@@ -844,9 +840,10 @@ The runnable implementation of P5-P9 is the harness in section 7.1; the bullets
 below state what each step requires and why. The pre-checks run in this order and
 before anything is written:
 
-- **Scope.** The 21 destination skill directories (`.claude/skills/<name>`), the two
-  startup files and the declared `-RecordPath` output are examined, together with
-  the existing components of the target path itself. A file elsewhere in your
+- **Scope.** Every one of the 53 destination paths (the 20 destination skill
+  directories, the two startup files, the nine `docs/paths/` guides and
+  `tools/skills-manifest.json`) and the declared `-RecordPath` output are examined,
+  together with the existing components of the target path itself. A file elsewhere in your
   repository is never considered, so a populated product repository is a supported
   target.
 - **Existing skill directories are resume-or-refuse.** A directory that already
@@ -862,7 +859,7 @@ before anything is written:
   segment** (the check walks `.claude`, `.claude/skills`, the skill directory and
   `references/`); and must resolve inside the clone (**exit 21**).
 - **Destination links fail closed.** The target root, every existing ancestor of
-  the target, every existing intermediate directory and leaf on the 60 intended
+  the target, every existing intermediate directory and leaf on the 53 intended
   destination paths, and the existing components of `-RecordPath` are inspected
   with `[IO.File]::GetAttributes`; a junction, symbolic link or other reparse
   point stops the run (**exit 23**) with the exact path and link type before any
@@ -870,6 +867,12 @@ before anything is written:
   nothing below it can exist. The check does not follow, repair or delete the
   link, and it does not claim to survive concurrent replacement of a checked
   directory.
+- **Every non-skill destination is preflighted before any write.** An existing guide
+  or manifest leaf must be byte-identical to the pinned source; a differing file or
+  a non-file at a guide/manifest destination stops the run (**exit 20**) with the
+  path and **zero package files written**, exactly as a copy-step collision would.
+  An identical guide is accepted and resumes the install. (The startup files have
+  their own exit-22 rule below.)
 - **Startup files never overwrite.** An existing `AGENTS.md`/`CLAUDE.md` that
   differs byte-wise from the source is refused (**exit 22**); an identical one is
   accepted and counted, and is re-checked at copy time rather than trusted from
@@ -885,16 +888,15 @@ before anything is written:
 Copy the **53 listed paths in list order**: the installer loop copies every path
 in the sorted `$package` list (section 7.1), creating parent
 directories as needed and copying each file byte-identically. For a selected
-skill that means its `SKILL.md`, then every file under `assets/` and every file
-under `references/` that the package lists, preserving the relative path; nothing
-else is copied from the skill directory. Then copy the two startup files to the
+skill that means its `SKILL.md` and every file under `references/` that the
+package lists, preserving the relative path; nothing else is copied from the
+skill directory. Then copy the two startup files to the
 target root — `AGENTS.md` -> `<target>/AGENTS.md` and `CLAUDE.md` ->
 `<target>/CLAUDE.md` — byte-identically. Composition: 20 `SKILL.md` + 24
-`references/*` + 0 `assets/*` = 41 skill-directory files (15 skills ×2,
-`agent-startup-context-gate`, `project-orchestrator` and `test-plan-designer` ×3,
-`complete-project-checkpoint` ×6, `model-routing-policy` and
-`skill-selection-advisor` ×1 each), plus the 2 startup files, the 9 guides, the
-catalog and the manifest = 60. Nothing is ever deleted, so the procedure cannot
+`references/*` = 41 skill-directory files (15 skills x2,
+`agent-startup-context-gate`, `project-orchestrator` and `test-plan-designer` x3,
+`model-routing-policy` and `skill-selection-advisor` x1 each), plus the 2 startup
+files, the 9 guides, the manifest = 53. Nothing is ever deleted, so the procedure cannot
 damage an existing tree, and an existing file is **never overwritten**: it is
 skipped only after its hash matches the pinned source, so an interrupted run
 resumes where it stopped.
@@ -917,7 +919,7 @@ the first failure:
 
 1. **Count and scope:** exactly 53 packaged files present, and under the 20 installed skill directories no file outside the list (**exit 30**); 41 skill-directory files plus the 2 startup files, the 9 guides, the catalog and the manifest.
 2. **Skill pins:** each of the 20 `SKILL.md` files, with CRLF->LF normalization, equals its `tools/skills-manifest.json` entry (**exit 31**).
-3. **Reference and startup pins:** each of the 21 reference files, the 2 assets, the 9 guides, the catalog and the manifest, plus the 2 startup files (33 source pins) matches the pinned source, after P3 has proven the source is the pinned commit and tree and is clean (**exit 31**).
+3. **Reference and startup pins:** each of the 21 reference files, the 9 guides and the manifest, plus the 2 startup files (33 source pins) matches the pinned source, after P3 has proven the source is the pinned commit and tree and is clean (**exit 31**).
 4. **Siblings:** every sibling `SKILL.md` linked by an installed skill exists in
    the destination (**exit 32**).
 5. **No forbidden material:** no eval material, `scripts/`, executable or other
@@ -941,7 +943,7 @@ The harness writes `docs/consumer-install-record.md` when given `-RecordPath`. I
 refuses an existing record there with **exit 24** before it writes anything, unless
 `-AllowExistingRecord` keeps a record that was already an existing regular file at
 the preflight. A record path that is an existing directory or another non-file, or
-that **equals, contains or is nested under** one of the installer's own 60 outputs,
+that **equals, contains or is nested under** one of the installer's own 53 outputs,
 is refused at **exit 24** too, including when the switch is passed, because P9 can
 only keep a receipt that already exists as a file and a path under a package file
 can never be written. A reparse point at `-RecordPath` is refused earlier and at
@@ -1013,7 +1015,7 @@ intermediate destination directory, existing destination leaf or install-record
 path that is a junction, symbolic link or other reparse point (**exit 23**,
 naming the exact path and link type); the refusal happens before any package or
 record write. On a quiescent target tree with no such reparse point on a
-destination path, it writes nothing outside the 60 package paths and the install
+destination path, it writes nothing outside the 53 package paths and the install
 record. The preflight is not a boundary against concurrent replacement of a
 directory between the check and the write (section 1.3).
 
@@ -1041,7 +1043,7 @@ $PSNativeCommandArgumentPassing = 'Standard'
 $PinCommit = '3c6f4e7d1c0556d1b52c8195941674f2319c0348'
 $PinTree   = 'ac16c0c2683058ce43a5289709530004f14e6ce2'
 $AggSha    = '86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28'
-$AggRows   = 60
+$AggRows   = 53
 $AggBytes  = 6713
 
 function Stop-Step([int]$Code, [string]$Message) {
@@ -1085,12 +1087,6 @@ $package = @(
   '.claude/skills/change-classification-gate/references/classification-matrix.md'
   '.claude/skills/code-reviewer/SKILL.md'
   '.claude/skills/code-reviewer/references/severity-rubric.md'
-  '.claude/skills/complete-project-checkpoint/SKILL.md'
-  '.claude/skills/complete-project-checkpoint/assets/checkpoint-template.md'
-  '.claude/skills/complete-project-checkpoint/assets/resume-card-template.md'
-  '.claude/skills/complete-project-checkpoint/references/checkpoint-contract.md'
-  '.claude/skills/complete-project-checkpoint/references/evidence-basis.md'
-  '.claude/skills/complete-project-checkpoint/references/owner-prompt-original.md'
   '.claude/skills/domain-modeler/SKILL.md'
   '.claude/skills/domain-modeler/references/domain-artifacts.md'
   '.claude/skills/human-approval-boundary/SKILL.md'
@@ -1132,12 +1128,12 @@ $package = @(
   'docs/paths/release-with-agents.md'
   'docs/paths/something-is-broken.md'
   'docs/paths/test-your-app.md'
-    'tools/skills-manifest.json'
+  'tools/skills-manifest.json'
 )
-if ($package.Count -ne 60) { Stop-Step 31 "package list has $($package.Count) rows, expected 60" }
+if ($package.Count -ne 53) { Stop-Step 31 "package list has $($package.Count) rows, expected 53" }
 $skillDirs = @($package | Where-Object { $_ -like '.claude/skills/*' } |
   ForEach-Object { ($_ -split '/')[0..2] -join '/' } | Sort-Object -Unique)
-if ($skillDirs.Count -ne 21) { Stop-Step 31 "package list yields $($skillDirs.Count) skill directories, expected 21" }
+if ($skillDirs.Count -ne 20) { Stop-Step 31 "package list yields $($skillDirs.Count) skill directories, expected 20" }
 
 # P3 identity - the clone must be the pinned commit/tree and clean.
 $head = (& git -C $Src rev-parse HEAD 2>$null | Out-String).Trim()
@@ -1163,7 +1159,7 @@ function Get-CrCount([byte[]]$Bytes) { return @($Bytes | Where-Object { $_ -eq 1
 # attributes only: it never follows, repairs or deletes the link.
 $destChecked = @{}
 # The refusal text depends on the phase: P5 runs before any write, while P9's
-# record-temp re-walk runs after the 60 package files are written.
+# record-temp re-walk runs after the 53 package files are written.
 $nothingWritten = 'nothing was written'
 $refusingBeforeWrite = 'refusing before any write'
 function Get-DestinationAttributes([string]$Path, [int]$Code = 23) {
@@ -1271,6 +1267,24 @@ if ($RecordPath) {
     }
   }
 }
+# P5d - non-skill destinations are preflighted before any write. An existing guide
+# or manifest leaf must be byte-identical to the pinned source; a differing file or
+# a non-file at that path stops at 20 with zero package files written. The startup
+# files keep their own exit-22 rule just below.
+foreach ($rel in $package) {
+  if ($rel -clike '.claude/skills/*') { continue }
+  if ($rel -in 'AGENTS.md','CLAUDE.md') { continue }
+  $dst = Join-Path $Tgt ($rel -replace '/', [IO.Path]::DirectorySeparatorChar)
+  if (Test-Path -LiteralPath $dst) {
+    if (-not (Test-Path -LiteralPath $dst -PathType Leaf)) {
+      Stop-Step 20 ("non-skill destination exists and is not a regular file: {0}; nothing was written" -f $rel)
+    }
+    $srcHash = Get-FileSha256 (Join-Path $Src ($rel -replace '/', [IO.Path]::DirectorySeparatorChar))
+    if ((Get-FileSha256 $dst) -ne $srcHash) {
+      Stop-Step 20 ("non-skill destination differs from the pinned source: {0}; nothing was written" -f $rel)
+    }
+  }
+}
 # P5c - the install record is the receipt for THIS run. An existing path at
 # -RecordPath would let P9 skip the receipt silently (the C7 footgun: exit 0 with
 # package files installed and no fresh record), so the run stops here, before the
@@ -1331,7 +1345,7 @@ $rows = New-Object System.Collections.Generic.List[object]
 $missing = @($package | Where-Object {
   -not (Test-Path -LiteralPath (Join-Path $Tgt ($_ -replace '/', [IO.Path]::DirectorySeparatorChar)) -PathType Leaf)
 })
-if ($missing.Count) { Stop-Step 30 "missing $($missing.Count) of 60: $($missing[0])" }
+if ($missing.Count) { Stop-Step 30 "missing $($missing.Count) of 53: $($missing[0])" }
 
 $extra = @()
 foreach ($dir in $skillDirs) {
@@ -1348,7 +1362,7 @@ foreach ($dir in $skillDirs) {
   $full = Join-Path $Tgt ($dir -replace '/', [IO.Path]::DirectorySeparatorChar)
   $installedSkillFiles += @(Get-ChildItem -LiteralPath $full -Recurse -Force -File -ErrorAction Stop).Count
 }
-if ($installedSkillFiles -ne 47) { Stop-Step 30 "installed skill files: $installedSkillFiles, expected 47 (53 paths minus the 2 startup files, minus 9 guides, catalog and manifest)" }
+if ($installedSkillFiles -ne 41) { Stop-Step 30 "installed skill files: $installedSkillFiles, expected 41 (53 paths minus the 2 startup files, minus 9 guides, minus the manifest)" }
 
 foreach ($rel in $package) {
   $dst = Join-Path $Tgt ($rel -replace '/', [IO.Path]::DirectorySeparatorChar)
@@ -1400,7 +1414,7 @@ foreach ($rel in ($package | Where-Object { $_ -notlike '.claude/skills/*/SKILL.
   if ((Get-FileSha256 $dst) -ne (Get-FileSha256 $srcFile)) { Stop-Step 31 "source pin mismatch: $rel" }
   $sourcePins++
 }
-if ($manifestPins -ne 21 -or $sourcePins -ne 39) { Stop-Step 31 "pin counts $manifestPins/$sourcePins, expected 21/39" }
+if ($manifestPins -ne 20 -or $sourcePins -ne 33) { Stop-Step 31 "pin counts $manifestPins/$sourcePins, expected 20/33" }
 
 $siblingMissing = @()
 foreach ($rel in ($package | Where-Object { $_ -like '.claude/skills/*' })) {
@@ -1459,7 +1473,7 @@ if ($RecordPath) {
     } else {
       [void]$record.AppendLine('- Agent commit: only under the accepted non-owner identity, with current authority and a DCO Signed-off-by trailer on every commit.')
     }
-    [void]$record.AppendLine('- Rows: 60; serialized bytes: ' + $serialized.Length + '; aggregate: ' + $aggregate)
+    [void]$record.AppendLine('- Rows: 53; serialized bytes: ' + $serialized.Length + '; aggregate: ' + $aggregate)
     [void]$record.AppendLine('- Result: P5-P8 exit 0. A later mismatch in any row is a stop, not a warning.')
     [void]$record.AppendLine('- Section 3 discloses the non-resolving source-repo citations (docs/acceptance/scenario-a-runbook.md, the two docs/skills/coverage-map.json links, and the catalog''s source-only link targets) and the startup files'' Role A governance pointers; links from the nine copied guides to skills outside the package follow section 4.1 install-on-demand')
     [void]$record.AppendLine('')
@@ -1503,7 +1517,7 @@ if ($RecordPath) {
     Write-Output "P9: install record written: $RecordPath"
   }
 }
-Write-Output 'OK: 60 installed files; closure, pins, siblings, eval and aggregate checks passed'
+Write-Output 'OK: 53 installed files; closure, pins, siblings, eval and aggregate checks passed'
 exit 0
 ```
 Role B planning: the consumer repository uses the same plan-of-record-author and plan-audit-reviewer contracts; the Option A re-pin installs those contracts at the new pin 20b0efde, while an install from the retired published pin 2fef11dd still carries the previous contracts.
@@ -1650,7 +1664,7 @@ Each code stops; none warns and continues.
 | 30 | Closure, count or eval-material failure | The offending path or the count found |
 | 31 | Pin or byte mismatch (including a CRLF checkout or an aggregate mismatch) | The exact file, or the aggregate comparison that failed |
 | 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
-| 40 | Wrong repository role | The three-landmark stop message (P1) |
+| 40 | Wrong repository role | The four-landmark stop message (P1) |
 | 41 | Owner record missing | The exact `aegis.*` remediation text (section 8.2) |
 | 42 | Commit identity missing or owner-matching on the `agent-commit` route | On **stderr**: the parse failure, or the matched field and value plus the resolved author/committer and one question (section 8.3). A `human-only` install does not exit 42 on an owner match, because it makes no commit; it is not a relaxed agent check. Both modes still need a parsable identity, because P2 reports `owner_match=` in its acceptance line. This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
 | 43 | Install mode or owner authorization not stated, empty or unrecognised | The exact question and the two valid `-Mode` tokens (P2). Nothing written; no package file copied |
@@ -1877,7 +1891,7 @@ aggregate algorithm of sections 9.1 and 9.2 equals
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over 5,420
 serialized bytes (the 7,025 B record file is the observed fixture size, not a
 universal constant);
-4. all 41 selected paths are present and byte-identical to the pin;
+4. all 53 selected paths are present and byte-identical to the pin;
 5. unrelated product files, the local Git configuration and the commit are
 unchanged, and the v1 record is **at the v1 path inside the target repository**,
 with its file bytes unchanged from the value captured before the run
@@ -2065,7 +2079,7 @@ repository's evidence and does not replace the separate acceptance record.
 - The tool versions from P0 and the resolved `sh` path.
 - One row per installed file: consumer-relative path, bytes, LF count, SHA-256.
 - The aggregate and its three published numbers (rows, serialized bytes, SHA-256).
-- The disclosed non-resolving source-repo citations (the scenario-a runbook, the two coverage-map links, and the catalog's source-only link targets) and the startup governance pointers disclosed in section 3; links from the nine guides follow section 4.1.
+- The disclosed non-resolving source-repo citations (the scenario-a runbook, the two coverage-map links, and the source-only catalog link targets) and the startup governance pointers disclosed in section 3; links from the nine guides follow section 4.1.
 - The owner record's presence (not its value).
 - The install mode P2 accepted and what it did or did not authorize (no agent
   commit and no identity change for `human-only`; the non-owner identity and
@@ -2176,29 +2190,26 @@ case is genuinely unclear, stop and ask rather than picking one.
 
 No file from `docs/approvals/`, no `AEGIS-APR-*` text, no source-repository
 configuration, and no source-repository landmark or validator installation that
-would make your product repository look like the library — specifically, do not
-install the three landmarks P1 probes for, the source `scripts/` tree, or the
+would make your product repository look like the library - specifically, do not
+install the four landmarks P1 probes for, the source `scripts/` tree, or the
 source repository's own configuration. The two startup files `AGENTS.md` and
 `CLAUDE.md` **are** installed deliberately (section 2.2); this rule does not
-exclude them. The package also installs `docs/skills-catalog.md` deliberately
-(sections 2.1 and 2.3); it is **not** a source-library landmark: a source
-checkout and a consumer copy under this package both carry it, so it separates
-nothing, and P1 does not probe it (section 7 P1). The package contains no
-approval record of any kind; the copy never reads the register, and a
+exclude them. `docs/skills-catalog.md` is **not** installed by this package (the
+advisor's catalog-missing fallback covers its absence), and it is not a
+source-library landmark even in a source checkout that carries it. The package
+contains no approval record of any kind; the copy never reads the register, and a
 source-repository grant is never authority in your repository.
 
 **Residual installed-text note (declared, not hidden).** The installed startup
 files at the pin still enumerate four corroborating files for source-library role
 detection: `AGENTS.md` line 7 and its incomplete-landmarks question rule at line
-10, `CLAUDE.md` line 5, `agent-startup-context-gate/SKILL.md` lines 49–53 and its
+10, `CLAUDE.md` line 5, `agent-startup-context-gate/SKILL.md` lines 49-53 and its
 `references/context-source-checklist.md` line 26, and
-`project-orchestrator/SKILL.md` lines 66–68. In a consumer copy the catalog is
-installed by this package and MUST NOT be counted as a landmark; the P1 probe
-above and this section are authoritative for install-time role classification.
-The startup texts are aligned only by a future starter re-pin (recorded as a
-follow-up in the T-15 closeout); this page states the divergence rather than
-hiding it.
-
+`project-orchestrator/SKILL.md` lines 66-68. In a consumer copy the catalog is
+**not installed**, so it cannot be counted as a landmark; the P1 probe above and
+this section are authoritative for install-time role classification. The P1 probe
+is the four-marker version (consumer 0/4, source 4/4); the startup texts remain
+source-library-aligned and the page states that divergence rather than hiding it.
 ## 11. Screenshot evidence: policy versus capture
 
 Policy is a design act; capture is an action that creates new data about a real
