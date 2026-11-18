@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "5ced23777d5ba769ad126df0a07d2d65709f3945",
+  "source_revision": "c4dbaffca880ad58a0528559f1482373d2660f69",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -1091,7 +1091,7 @@
     {
       "name": "skill-selection-advisor",
       "path": ".claude/skills/skill-selection-advisor/SKILL.md",
-      "sha256": "fc45dff9b70ab43d635c43fe2408370b0ae65cc60621e61faeaf8391a2baea95"
+      "sha256": "2b3f6919b0d4712475a97d1fc568118160cf20825b382db0445dd9cf30c44fda"
     },
     {
       "name": "skill-usage-instrumenter",
