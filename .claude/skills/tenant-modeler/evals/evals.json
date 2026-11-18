@@ -66,6 +66,78 @@
           "Presents explicit options with consequences and stops for a human decision rather than picking merge semantics silently."
         ]
       }
+    },
+    {
+      "id": "handoff-invitation-lifecycle",
+      "type": "should_trigger",
+      "prompt": "We're modeling the tenant and account structure for a B2B SaaS: the tenant is the customer company, users work inside it through memberships, and owners can invite teammates by email. Design the tenant/membership model — including what invitation states exist — so it stays coherent as roles and seats grow.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the tenant/membership model as its own task, then hands the invitation flow itself (token/link acceptance, expiry/revocation races, identity binding) to membership-invitation-designer, marked optional.",
+          "If the copy does not include membership-invitation-designer, keeps the invitation lifecycle in this model instead of inventing a separate invitation design.",
+          "Does not design token acceptance or expiry/revocation races itself when handing off; stops at the tenant-model boundary."
+        ]
+      }
+    },
+    {
+      "id": "handoff-subscription-state-machine",
+      "type": "should_trigger",
+      "prompt": "We're designing the tenant model for a B2B SaaS that sells monthly plans: each tenant has a subscription with billing states and dunning/grace timing alongside its tenant lifecycle. Model the tenant and membership semantics, and keep the subscription's billing-state design coherent with that model.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the tenant/membership model as its own task, then hands the subscription state machine itself (states, transitions, dunning/grace timing) to subscription-lifecycle-designer, marked optional.",
+          "If the copy does not include subscription-lifecycle-designer, records the subscription state machine as an open question instead of inventing it.",
+          "Does not design the subscription transitions or dunning timing itself when handing off; keeps the tenant model boundary."
+        ]
+      }
+    },
+    {
+      "id": "handoff-tenant-provisioning",
+      "type": "should_trigger",
+      "prompt": "We're modeling tenant structure for a B2B SaaS that signs up self-serve customers, adds sales-led enterprise accounts, and imports existing customers; first owners must be assigned for each new tenant. Design the tenant/membership model and cover how tenant creation fits it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the tenant/membership model as its own task, then hands the tenant-creation path (signup, sales-led creation, import, first-owner assignment) to tenant-provisioning-designer, marked optional.",
+          "If the copy does not include tenant-provisioning-designer, records the creation path as an open question instead of inventing it.",
+          "Does not design the provisioning workflow itself when handing off; stops at the tenant-model boundary."
+        ]
+      }
+    },
+    {
+      "id": "negative-direct-invitation-design",
+      "type": "should_not_trigger",
+      "prompt": "Design our invite-by-email flow: token/link acceptance, expiry and revocation races, and identity binding. This is the invitation flow itself, not the tenant model.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "The direct invitation-flow design is membership-invitation-designer's artifact; tenant-modeler owns tenant semantics and only hands off when tenant modeling is the task."
+        ]
+      }
+    },
+    {
+      "id": "negative-direct-subscription-design",
+      "type": "should_not_trigger",
+      "prompt": "Design the subscription state machine itself: states, transitions, dunning and grace timing. The tenant model is already settled.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "The direct subscription state-machine design is subscription-lifecycle-designer's artifact; tenant-modeler owns tenant semantics and only hands off when tenant modeling is the task."
+        ]
+      }
+    },
+    {
+      "id": "negative-direct-provisioning-design",
+      "type": "should_not_trigger",
+      "prompt": "Design our tenant-creation path: signup, sales-led creation, import and first-owner assignment. Do not redo the tenant model; that is settled.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "The direct tenant-creation path is tenant-provisioning-designer's artifact; tenant-modeler owns tenant semantics and only hands off when tenant modeling is the task."
+        ]
+      }
     }
   ]
 }
