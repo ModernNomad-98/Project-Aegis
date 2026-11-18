@@ -1,0 +1,62 @@
+{
+  "schema": "aegis.skill-reachability-allow-list/1",
+  "description": "Name-only-by-design skills that T-08 recorded as intentionally unrouted; T-09 deliberately wrote no page rows for them. This is a policy record, not evidence of use and not a routing waiver.",
+  "triage_source": "GAP-18-TRIAGE-f-operating-governance.md (T-08 batch f), rows 3, 9, 10, 11, 12, 13, 17, 18 and 19; T-08 summary records nine name-only-by-design rows (seven tier none, two handoff).",
+  "expected_count": 9,
+  "skills": [
+    {
+      "name": "eval-runner-designer",
+      "tier_at_triage": "none",
+      "triage_row": 9,
+      "reason": "library-internal: how skill-library eval cases would execute and be judged"
+    },
+    {
+      "name": "framework-edition-tracker",
+      "tier_at_triage": "none",
+      "triage_row": 17,
+      "reason": "library-internal: track editions of external standards the library cites"
+    },
+    {
+      "name": "framework-mapping-refresher",
+      "tier_at_triage": "none",
+      "triage_row": 18,
+      "reason": "library-internal: propose skill/reference updates from a verified edition delta"
+    },
+    {
+      "name": "library-diff-reviewer",
+      "tier_at_triage": "none",
+      "triage_row": 10,
+      "reason": "library-internal: end-to-end review of a skill-library PR"
+    },
+    {
+      "name": "skill-deprecation-planner",
+      "tier_at_triage": "handoff",
+      "triage_row": 11,
+      "reason": "library-internal: plan the safe retirement of a library skill"
+    },
+    {
+      "name": "skill-quality-reviewer",
+      "tier_at_triage": "none",
+      "triage_row": 12,
+      "reason": "library-internal: quality review of one library skill above the validator"
+    },
+    {
+      "name": "skill-usage-instrumenter",
+      "tier_at_triage": "handoff",
+      "triage_row": 13,
+      "reason": "library-internal: design usage instrumentation for a skill library"
+    },
+    {
+      "name": "skill-usage-ledger",
+      "tier_at_triage": "none",
+      "triage_row": 3,
+      "reason": "library-internal: six-field record of which Aegis skills a task used, bound to the skills-manifest SHA-256"
+    },
+    {
+      "name": "source-currency-auditor",
+      "tier_at_triage": "none",
+      "triage_row": 19,
+      "reason": "library-internal: audit the library's external-source citations for staleness"
+    }
+  ]
+}
