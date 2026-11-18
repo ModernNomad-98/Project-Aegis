@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "fcdfaf6bbba4f13e329e47f5f1854b18ce9be721",
+  "source_revision": "5ced23777d5ba769ad126df0a07d2d65709f3945",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -141,7 +141,7 @@
     {
       "name": "ai-sdlc-operating-model",
       "path": ".claude/skills/ai-sdlc-operating-model/SKILL.md",
-      "sha256": "604e4d5aee14a88ec124a369fd4f7600d049e42bfef49f780cf858086426682e"
+      "sha256": "18a8cc521085a37f5448462b54d3c0bbab95d6c833fff71b0afc5a5228111dae"
     },
     {
       "name": "ai-task-decomposer",
@@ -846,7 +846,7 @@
     {
       "name": "project-orchestrator",
       "path": ".claude/skills/project-orchestrator/SKILL.md",
-      "sha256": "3138ae26b404929dc0bbba568c15c262f90108f0442fbf3f72fbafa759bd30eb"
+      "sha256": "fa48ec9a5cfc29f2a1a5e5da2695564a8c791c4c5ae138509c1ec99935df18ae"
     },
     {
       "name": "promotion-packet-writer",
@@ -1091,7 +1091,7 @@
     {
       "name": "skill-selection-advisor",
       "path": ".claude/skills/skill-selection-advisor/SKILL.md",
-      "sha256": "9046bf0d0995188f58eba50d73e27c01f47dae42d69ea2b8fe38345ab87aac21"
+      "sha256": "fc45dff9b70ab43d635c43fe2408370b0ae65cc60621e61faeaf8391a2baea95"
     },
     {
       "name": "skill-usage-instrumenter",
