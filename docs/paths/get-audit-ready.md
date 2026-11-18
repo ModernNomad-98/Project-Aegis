@@ -18,8 +18,7 @@ the decision with you and your auditors.
 
 **Before you start — what a starter install has.** The starter package installs none of these nine specialists (see the source-only starter-package page; manual-only skills are not installed). None of these nine is
 manual-only: all are model-invocable and design or assessment only. Copy each skill you
-need with the **selected-skills allow-list** route in the source-only *Using the skills in your own
-project* section: copy the allow-listed
+need with the **selected-skills allow-list** route in the source-only `README.md` section "Using the skills in your own project": copy the allow-listed
 files for that skill (its `SKILL.md` and `references/`; do not copy `evals/`, which are
 evaluation answer keys), then check it is present at use time in the location your host
 discovers: `.claude/skills/<name>/` for Claude Code project skills, or

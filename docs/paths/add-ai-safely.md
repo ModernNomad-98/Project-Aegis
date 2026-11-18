@@ -80,7 +80,7 @@ feature's shape.
 
 *If your feature is an agent, or an assistant that persists memory, connects to MCP servers, or runs a multi-step planner whose goal or plan could be redirected:* review it against the agentic risks.
 
-These rows are conditional — run only the rows that match the feature; none is required for every AI feature. If a copy of Aegis does not include a reviewer, copy it with the **selected-skills allow-list** route in the source-only *Using the skills in your own project* section; the starter package installs none of these reviewers. For a starter consumer, record the extension as a DECISION in `docs/project-state.md` before first use (the starter §4.2 rule).
+These rows are conditional — run only the rows that match the feature; none is required for every AI feature. If a copy of Aegis does not include a reviewer, copy it with the **selected-skills allow-list** route in the source-only `README.md` section "Using the skills in your own project"; the starter package installs none of these reviewers. For a starter consumer, record the extension as a DECISION in `docs/project-state.md` before first use (the starter §4.2 rule).
 
 | Use when the feature… | Reviewer (linked to its SKILL.md) | What it yields (from its own description) | Its own stop conditions — stop and hand off when (quoted) |
 |---|---|---|---|

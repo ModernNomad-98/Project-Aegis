@@ -104,7 +104,7 @@ The reviewers above must inspect one frozen candidate, not a moving target.
    evidence holder under the evidence policy. Reviewers stay read-only, and no one
    edits the candidate while independent review is running. Reuse/evidence detail:
    [`screenshot-evidence-planner`](../../.claude/skills/screenshot-evidence-planner/SKILL.md)
-   and the source-only delivery workflow.
+   and `docs/delivery-workflow.md` (source-only).
 4. **Freeze before independent final review.** Freeze and record the candidate's
    tree, artifact and evidence-set identity (expected members) before the final
    independent review; that review's verdict binds the frozen identity. The
