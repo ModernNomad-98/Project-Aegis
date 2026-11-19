@@ -44,8 +44,8 @@ Owner instruction, 2026-11-19 (received in the active Aegis session; quote verba
 9. **Evidence (T14-D8).** Local evidence and RUN-LOG, plus PR receipts and disposition comments on GitHub.
 10. **Start and scope (T14-D9/D10).** The start is recorded as 2026-11-18, the date of the operating-mode direction. Scope is Project Aegis (Role A) only; consumer repositories do not inherit this policy.
 11. **Blocked work (T14-D11).** Park the item and continue independent work.
-12. **Owner-reserved items, each with its source.** (a) Required checks, workflows, gate-guard, branch protection and the approval mechanism: AEGIS-APR-175 'Scope FORBIDDEN' on `main`. (b) Deploy, release and arming auto-merge: T14-D2 verbatim above. (c) This adoption PR and its merge: the owner's explicit instruction above. (d) Deletions, secrets, tags, releases and schedules: the owner's 2026-11-18 operating-mode direction recorded in the session decision log (D-62/D-64 family); that direction is **not yet on `main`**, so this file records it as a session-recorded owner direction with that adoption gap disclosed, not as an invented restriction.
-13. **Non-alteration (F11/A1).** This policy narrows, amends and replaces no register entry — including SDP-2 (AEGIS-APR-162) and AEGIS-APR-175. A merger relying on D-52 cites AEGIS-APR-162 or the owner's verbatim text above, because this file is not a register entry.
+12. **Owner-reserved items, each with its source.** (a) Required checks, workflows, gate-guard, branch protection and the approval mechanism: AEGIS-APR-175 'Scope FORBIDDEN' on `main`. (b) Deploy, release and arming auto-merge: T14-D2 verbatim above. (c) This adoption PR and its merge: the owner's explicit instruction above. (d) **Deletions, secrets, tags, releases and schedules are not asserted as new restrictions by this file.** The session operating-mode direction that mentioned them is not on `main`, and no verbatim owner text for that list was captured; this file therefore leaves them where the existing authority already puts them and asserts nothing new. A fresh agent must not read this item as a new reservation.
+13. **Non-alteration (F11/A1) and the authority test.** This policy narrows, amends and replaces no register entry — including SDP-2 (AEGIS-APR-162) and AEGIS-APR-175. A merger relying on D-52 **must satisfy AEGIS-APR-162's conditions and cite AEGIS-APR-162**; the owner's verbatim text above is additional context, not an alternative route, and this file is not a register entry. MG1–MG5 do not replace APR-162's conditions.
 14. **Adoption-merge rule (F9/R2-3).** No agent merges this adoption PR under any standing authority. It merges only on the owner's explicit instruction; the owner gave it in the 2026-11-19 message quoted above. After a fresh head-bound review and green required checks, the merge uses admin bypass only for the approving-review count under AEGIS-APR-175; the PR body quotes the instruction with this source.
 15. **Limitations recorded honestly.** (a) The decision-log text of D-52 is not on the default branch; the only `D52` there is an unrelated reconciliation note. D-52 is cited as the owner's phrase in the verbatim reply, and a merger must cite AEGIS-APR-162 or the owner's text (item 13). (b) T14-D7 is not entered in the owner approval register; whether to record it there is the owner's decision and is left as a PR follow-up, not settled here. (c) The 2026-11-18 reply's exact time was not captured; the text is verbatim and its file hash is above.
 
@@ -64,10 +64,10 @@ Owner instruction, 2026-11-19 (received in the active Aegis session; quote verba
 | 9 evidence | T14-D8 |
 | 10 start and scope | T14-D9, T14-D10 |
 | 11 blocked work | T14-D11 |
-| 12 owner-reserved items | AEGIS-APR-175; T14-D2; owner instruction 2026-11-19; session direction D-62/D-64 (not on main, gap disclosed) |
+| 12 owner-reserved items | AEGIS-APR-175; T14-D2; owner instruction 2026-11-19; (d) explicitly non-operative here (no durable owner text) |
 | 13 non-alteration | owner answers; AEGIS-APR-162/175 |
 | 14 adoption-merge rule | owner instruction 2026-11-19 (verbatim above) |
-| 15 limitations | capture record above; APR-173/decision-log adoption gap |
+| 15 limitations | capture record above; decision-log adoption gap (D-52 text not on main) |
 
 ## Relationship to existing authority
 
