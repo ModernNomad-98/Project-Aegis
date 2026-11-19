@@ -52,6 +52,7 @@ status; the dated proposals and evidence pages further down are history.
   Project Aegis grants, limits and lifecycle events; read the complete register
   before acting.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
+- [Owner operating-mode policy (2026-11-18)](approvals/OPERATING-MODE-2026-11-18.md): the owner's verbatim T-14 answers and 2026-11-19 adoption instruction; a record, not a register entry and not a grant.
 - [Audit evidence registers](audits/README.md): dated row-level audit and coverage
   registers (read-only reference, not build authorization).
 - [Delivery workflow](delivery-workflow.md): the seven-stage delivery rule, each
