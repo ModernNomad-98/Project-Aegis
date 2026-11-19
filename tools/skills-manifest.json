@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "12333a532ba383bc5249c2efac26ec785d5e9c21",
+  "source_revision": "0626ea07a1ec275a1962d98d06f46abc1eec0060",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -411,7 +411,7 @@
     {
       "name": "design-orchestrator",
       "path": ".claude/skills/design-orchestrator/SKILL.md",
-      "sha256": "1dccbd6574d80be2b0e37b653c390d7e01be463261011e554d44f0da66a4a6bd"
+      "sha256": "92d9bb1a54fdc15f8be99578b0e742ec5600703a89dcb7c50b4b25cf05735c43"
     },
     {
       "name": "design-review-facilitator",
@@ -1007,6 +1007,11 @@
       "name": "scoped-approval-register",
       "path": ".claude/skills/scoped-approval-register/SKILL.md",
       "sha256": "a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076"
+    },
+    {
+      "name": "screen-composition-designer",
+      "path": ".claude/skills/screen-composition-designer/SKILL.md",
+      "sha256": "341c1e1c9716027da80e80a94350907e70b0b9996c77f71d18483c5432496afe"
     },
     {
       "name": "screenshot-evidence-planner",
