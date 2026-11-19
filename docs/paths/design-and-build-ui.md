@@ -261,9 +261,11 @@ and design-system-change plays keep their existing scope.
      Yields the mobile journey coverage design for the changed interaction:
      select → inspect detail → return with the visible selected row, the
      accessible selection semantics where the widget exposes them, and the
-     detail identity required to agree; filtering; no results and recovery;
-     adjacent-ID selection by touch and keyboard; and restored position/focus
-     on return, with focus and selection distinguished and a correct control
+     detail identity required to agree; filtering and no results and recovery
+     where the journey has a filter or search (a journey without them records
+     the check as not applicable); adjacent-ID selection by touch and keyboard;
+     and restored position/focus on return, with focus and selection
+     distinguished and a correct control
      included so a reviewer cannot pass by flagging every focused row. The
      skill designs coverage only: layout correctness stays with
      [`mobile-viewport-craft`](../../.claude/skills/mobile-viewport-craft/SKILL.md),

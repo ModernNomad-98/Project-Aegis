@@ -81,7 +81,13 @@ network performance on mobile are `frontend-perf-engineer`'s.
 1. **Set the target context and go mobile-first.** State the minimum
    supported width, the device/input classes that matter, and design up
    from the smallest — progressive enhancement, not desktop shrunk down.
-2. **Compose the first viewport against the primary task.** Name the primary
+2. **Compose the first viewport against the primary task.** Apply this step
+   when the request composes or changes what the first phone viewport shows —
+   a new or redesigned entry screen, or a change that adds or removes entry
+   content or prominence. For a narrow correctness repair that does not change
+   what the first viewport shows (a `100vh` clipping fix, a hover-only
+   affordance, a wide-table reflow), keep the existing flow and do not invent
+   content volumes or a second arrangement. Name the primary
    task this screen must support at the supported phone size (for example
    finding one entry in a 73-entry list, or seeing several monitoring signals)
    and say what is visible and actionable in the first viewport — the initial
@@ -100,7 +106,12 @@ network performance on mobile are `frontend-perf-engineer`'s.
    universal above-the-fold primary button: a button is one way to make the
    primary task actionable, not a rule; a dashboard may lead with signals and a
    reading surface with content. Never claim a rendered or browser check from
-   this step; rendered verification stays with its owners.
+   this step; rendered verification stays with its owners. Entry arrangement —
+   what leads and what is deferred — stays with `screen-composition-designer`:
+   where the arrangement is unsettled, or this comparison would change it
+   beyond fitting an approved arrangement, hand that decision to its owner;
+   this step fits the first viewport inside an already approved arrangement and
+   fixes a narrow layout defect.
 3. **Choose breakpoints by content, not devices.** Add a breakpoint where
    THIS layout starts to break (line length too long, columns too
    cramped), not at a list of named phone widths that dates instantly.

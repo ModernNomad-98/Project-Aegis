@@ -72,7 +72,7 @@
         "triggers": true,
         "assertions": [
           "Specifies select -> inspect detail -> return for the journey, recording the visible selected row identity, the detail identity and the returned list position and focus at each step.",
-          "Requires the visible selected row, the accessible selection semantics where the widget exposes them, and the detail identity to agree on the same entry ID; where the widget exposes none, records that as a gap, not a pass.",
+          "Requires the visible selected row, the accessible selection semantics where the widget exposes them, and the detail identity to agree on the same entry ID; for plain link navigation, compares the activated link identity with the detail identity instead of demanding selection state, and only a widget that models selection and exposes no selection state records that as a gap, not a pass.",
           "Checks filtering and the return after a filter: the result-set identity, the retained filter/query, and the restored list position and focus.",
           "Selects adjacent IDs (n and n+1, near-duplicate titles) by touch and by keyboard, and requires the detail identity to match on each selection, while distinguishing focus from selection.",
           "Hands execution to clickthrough-test-engineer or playwright-e2e-engineer (manual-only) rather than running it, and keeps layout with mobile-viewport-craft."

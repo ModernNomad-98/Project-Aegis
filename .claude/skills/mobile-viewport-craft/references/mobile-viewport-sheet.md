@@ -43,15 +43,15 @@ and two-line rows about 64–72 px, a search field 44–48 px, a filter-chip row
 | Above-the-fold element | Candidate A — welcome hero first | Candidate B — task first |
 | --- | --- | --- |
 | App bar | 56 | 56 |
-| Title / intro | hero headline + subhead ≈ 108 | compact title ≈ 32 |
-| Hero media | ≈ 160 | — |
+| Title / intro | hero headline + subhead ≈ 128 | compact title ≈ 32 |
+| Hero media | ≈ 288 | — |
 | Search + filters | below the first viewport | search ≈ 48 + chips ≈ 40 |
-| Primary app button | ≈ 48 | search is the primary action |
-| Secondary card (newsletter / sign-up) | ≈ 120 | below the list or deferred |
+| Primary app button | ≈ 56 | search is the primary action |
+| Secondary card (newsletter / sign-up) | ≈ 144 | below the list or deferred |
 | List section header | — | ≈ 32 |
-| Approximate used height | ≈ 552 incl. gaps | ≈ 232 incl. gaps |
-| Remaining before first scroll | ≈ 150–170 | ≈ 470–490 |
-| Rows fully visible | 0 (search partly cut) | 6–8 at 56–72 px |
+| Approximate used height | ≈ 700–712 incl. gaps (consumes the viewport) | ≈ 232 incl. gaps |
+| Remaining before first scroll | ≈ 0–12 | ≈ 470–490 |
+| Rows fully visible | 0 (no result row visible) | 4–6 at 56–72 px |
 | Primary task on entry | not visible or actionable | find/select an entry is visible and actionable |
 
 **The secondary-feature displacement test.** List every element whose top edge is

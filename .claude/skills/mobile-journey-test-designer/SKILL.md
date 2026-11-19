@@ -54,20 +54,26 @@ selection state and the detail identity in agreement.
    recording the visible selected row's identity, the detail's identity and the
    restored list position and focus at each step; filtering (the result-set
    identity, the retained filter/query, and the restored position and focus
-   after return); no results and recovery (the honest zero-match state
-   distinguished from loading and from an error, and clearing or correcting the
-   query restoring the previous result set and context); adjacent IDs selected
+   after return); where the list has search or filtering, no results and
+   recovery (the honest zero-match state distinguished from loading and from an
+   error, and clearing or correcting the query restoring the previous result
+   set and context) — a journey with no filtering feature records filtering and
+   the zero-match check as not applicable instead of inventing them; adjacent
+   IDs selected
    by touch and keyboard (tap row n and row n+1, and use the keyboard arrows and
    Enter where the widget exposes them, checking the detail identity each
    time); and the agreement of the visible selected row, the accessible
    selection semantics where the widget exposes them, and the detail identity —
-   where the widget exposes no selection semantics, record that as a gap, not a
-   pass. Distinguish focus from selection: a row with the keyboard focus ring is
-   not necessarily the selected row, so include a correct control example
-   (focus on one row while the selected row and the detail show the same
-   identity) that a reviewer must accept, beside the seeded mismatch (the
-   selected row's identity differs from the detail's) that must be flagged with
-   visible evidence. State positioning and focus restoration explicitly,
+   for a list that is plain link navigation (activating a row navigates to a
+   detail page rather than selecting in a composite widget), compare the
+   activated link's identity and the return context instead of demanding
+   persistent selection state; only a widget that models selection and exposes
+   no selection state records that as a gap, not a pass. Distinguish focus from
+   selection: a row with the keyboard focus ring is not necessarily the
+   selected row, so include a correct control example (focus on one row while
+   the selected row and the detail show the same identity) that a reviewer must
+   accept, beside the seeded mismatch (the selected row's identity differs from
+   the detail's) that must be flagged with visible evidence. State positioning and focus restoration explicitly,
    including what is not restored. Layout correctness stays with
    mobile-viewport-craft; the zero-match state design stays with
    edge-state-ux-designer; execution stays with the manual-only owners named in
