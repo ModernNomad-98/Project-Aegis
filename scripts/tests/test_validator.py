@@ -8215,8 +8215,8 @@ def test_consumer_starter_git_failure_classes():
 
 STARTER_MODE_HEADING = "### P2 "
 STARTER_HARNESS_HEADING = "### 7.1 "
-STARTER_PIN_COMMIT = "3c6f4e7d1c0556d1b52c8195941674f2319c0348"
-STARTER_PIN_TREE = "ac16c0c2683058ce43a5289709530004f14e6ce2"
+STARTER_PIN_COMMIT = "191dbcd5a6f84ab531df1063093830261f936f09"
+STARTER_PIN_TREE = "675dd8c622fa6370e01a0a764becbb9b3e012a7d"
 STARTER_SOLO = ("Peter Nguyen", "263130032+ModernNomad-98@users.noreply.github.com")
 STARTER_AGENT = ("Aegis Agent (DeepSeek V4 Flash)", "agent@example.invalid")
 STARTER_OWNER = ("Owner Person", "owner@example.invalid")

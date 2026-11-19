@@ -3,8 +3,8 @@
 Status: **normative definition of the v2 consumer starter package.** This page
 defines one fixed, dependency-checked installation for a beginner's first product
 slice. It is measured against the Project Aegis source tree at commit
-`3c6f4e7d1c0556d1b52c8195941674f2319c0348` (tree
-`ac16c0c2683058ce43a5289709530004f14e6ce2`). It is not an installation log
+`191dbcd5a6f84ab531df1063093830261f936f09` (tree
+`675dd8c622fa6370e01a0a764becbb9b3e012a7d`). It is not an installation log
 and not an acceptance record: the first native-host acceptance record is produced
 separately, after the run it describes, and nothing here is evidence that the
 procedure has already been executed on your machine. Section 7.1 does report a
@@ -39,7 +39,7 @@ pins and its aggregate are unchanged. Native before/after evidence is in
 [human-commit-install-v1](evidence/consumer-readiness/human-commit-install-v1.md).
 
 **Revision (2026-11-13, Layer 2).** The Layer 2 revision adds `.claude/skills/model-routing-policy/SKILL.md` - the capability-based, model-agnostic routing policy moved out of the orchestrator reference - so the set is now **42 files / 19 skills** (40 skill files plus the 2 startup files). The orchestrator `SKILL.md` points to the new skill and the reference file no longer carries a duplicate section. This is the content half: the page's contract and the test fixtures are updated in the same pull request at pin `2fef11dd43fe6e943e99c7948ebeaca95d138072`; page re-acceptance (Phase B) follows separately. This revision makes no readiness, publication, human-usability or acceptance claim; the measured 42-file P8/P9 run is a local verification of the published block, not consumer readiness.
-**Revision (2026-11-18, T-15 design round / Option A).** This revision re-pins the starter definition to commit `3c6f4e7d1c0556d1b52c8195941674f2319c0348` (tree `ac16c0c2683058ce43a5289709530004f14e6ce2`) with a **53-file package**: 20 skills (41 skill-directory files), the two startup files, the nine consumer-safe path guides and `tools/skills-manifest.json`. `complete-project-checkpoint` (manual-only) and `docs/skills-catalog.md` are no longer installed; the advisor gets a catalog-missing fallback; the four-marker P1 probe is restored (consumer 0/4, source 4/4); and the guides now carry the source-only link notice made in the preceding content PR. The byte/LF/SHA rows below are measured at this pin.
+**Revision (2026-11-18, T-15 design round / Option A).** This revision re-pins the starter definition to commit `191dbcd5a6f84ab531df1063093830261f936f09` (tree `675dd8c622fa6370e01a0a764becbb9b3e012a7d`) with a **53-file package**: 20 skills (41 skill-directory files), the two startup files, the nine consumer-safe path guides and `tools/skills-manifest.json`. `complete-project-checkpoint` (manual-only) and `docs/skills-catalog.md` are no longer installed; the advisor gets a catalog-missing fallback; the four-marker P1 probe is restored (consumer 0/4, source 4/4); and the guides now carry the source-only link notice made in the preceding content PR. The byte/LF/SHA rows below are measured at this pin.
 
 **Reading key.** **Role A** is the Project Aegis source repository; **Role B** is
 your own consumer/product repository, which copies Aegis files into its workspace.
@@ -192,9 +192,9 @@ outside J1 is excluded (section 4). This revision additionally carries the owner
 The two startup files are `AGENTS.md` (the role-detection and operating contract, 29,424 B) and `CLAUDE.md` (`@AGENTS.md` import plus startup routing, 3,681 B).
 Both are required because the role recognition J1 step 2 tests lives in them.
 
-### 2.3 The file list (53 paths, bytes and LF at the pin `3c6f4e7d1c0556d1b52c8195941674f2319c0348`)
+### 2.3 The file list (53 paths, bytes and LF at the pin `191dbcd5a6f84ab531df1063093830261f936f09`)
 
-Every file is copied byte-identically by the package rule: `SKILL.md`, everything under `references/`, the two startup files, the nine `docs/paths/` guides and `tools/skills-manifest.json`. This is the exact closure measured at `3c6f4e7d1c0556d1b52c8195941674f2319c0348` (tree `ac16c0c2683058ce43a5289709530004f14e6ce2`), sorted by path in ordinal order (the same order the install-record aggregate uses). Every row below was recomputed at this pin.
+Every file is copied byte-identically by the package rule: `SKILL.md`, everything under `references/`, the two startup files, the nine `docs/paths/` guides and `tools/skills-manifest.json`. This is the exact closure measured at `191dbcd5a6f84ab531df1063093830261f936f09` (tree `675dd8c622fa6370e01a0a764becbb9b3e012a7d`), sorted by path in ordinal order (the same order the install-record aggregate uses). Every row below was recomputed at this pin.
 
 **Pin delta from published base `2fef11dd`.** This design-round re-pin moves the starter to the merge commit of the content fixes, refreshes the startup files (source-only notices; `AGENTS.md` changed), the three edited skills, the nine consumer-safe path guides and the manifest, and drops `complete-project-checkpoint` (6 files) and `docs/skills-catalog.md` (1 file) from the package: 53 files, 20 skills, 41 skill-directory files. The byte/LF rows in section 2.3 are measured at the new pin.
 
@@ -249,18 +249,18 @@ Every file is copied byte-identically by the package rule: `SKILL.md`, everythin
 | `docs/paths/after-launch.md` | 12975 | 66 |
 | `docs/paths/check-your-app.md` | 6560 | 112 |
 | `docs/paths/design-and-build-ui.md` | 21869 | 321 |
-| `docs/paths/find-a-specialist.md` | 48335 | 185 |
+| `docs/paths/find-a-specialist.md` | 48811 | 185 |
 | `docs/paths/get-audit-ready.md` | 10130 | 111 |
 | `docs/paths/release-with-agents.md` | 12980 | 167 |
 | `docs/paths/something-is-broken.md` | 4214 | 47 |
 | `docs/paths/test-your-app.md` | 8328 | 133 |
 | `tools/skills-manifest.json` | 53282 | 1297 |
-| **Total: 53 files** | **635986** | **9238** |
+| **Total: 53 files** | **636462** | **9238** |
 
 Composition: 20 `SKILL.md` + 21 `references/*` files = 41 skill-directory files, plus the 2 startup files, the 9 guides and `tools/skills-manifest.json`. Fifteen skills carry 2 files each; `agent-startup-context-gate`, `project-orchestrator` and `test-plan-designer` carry 3 each; `model-routing-policy` and `skill-selection-advisor` carry 1 each.
 
 Aggregate over these 53 rows, using the algorithm in section 9.2:
-`86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28` over **6,713 serialized bytes** for **53 rows**. That is the measurement at the new pin; your install record records the same three numbers.
+`889d032df9956736b79b0fb52ef245361c31de1eb3d61d5ed14b2e3681b3d0a2` over **6,713 serialized bytes** for **53 rows**. That is the measurement at the new pin; your install record records the same three numbers.
 
 ## 3. How the closure was derived
 
@@ -489,10 +489,10 @@ The table below groups actions by `S` label; **it is not the execution order**. 
 | S0 Canonical start | Your app or browser | Read the [README Start here](../README.md#start-here) and choose Route A or Route B; both doors run the same steps below | You can say which route you are taking and distinguish source from product | none |
 | S1 Workspace and role | PowerShell 7, in your existing product repository folder | The P1 role probe: confirm the folder is your product repository (0 of 4 Aegis source landmarks) | Role B classification with count 0; no package file written | CP1 |
 | S2 Prerequisites and owner record | PowerShell 7 | Section 6 prerequisites; P0 host record; set `git config --local aegis.ownerName` / `aegis.ownerEmail` (your own values, never committed). This writes only those two keys into your product's `.git/config` | Version lines and `ok` from the shell probe; the two local keys set (values not printed); no package file written | CP2 |
-| S3 Clone the pinned source | PowerShell 7 | P3: clone and check out the pinned commit as documented there, then verify HEAD, tree and clean status | HEAD = `3c6f4e7d1c0556d1b52c8195941674f2319c0348`; tree = `ac16c0c2683058ce43a5289709530004f14e6ce2`; empty status | CP3 |
+| S3 Clone the pinned source | PowerShell 7 | P3: clone and check out the pinned commit as documented there, then verify HEAD, tree and clean status | HEAD = `191dbcd5a6f84ab531df1063093830261f936f09`; tree = `675dd8c622fa6370e01a0a764becbb9b3e012a7d`; empty status | CP3 |
 | S4 Install-mode gate | PowerShell 7 | P2: save the published P2 block as `install-mode.ps1` in your helper folder outside the product repository; it validates your explicit `-Mode` and `-OwnerAuthorization` and the identity records | Exit 0 with the gate's acceptance line; nothing copied into the product (the helper `.ps1` is outside it) | CP4 |
-| S5 Install and verify | PowerShell 7 | P5–P9 / section 7.1: save the published harness as `install-starter.ps1` and run the documented invocation | Five `P8:` lines (`count_check=PASS installed=53 extra=0`, `manifest_pins=PASS 20/20`, `source_pins=PASS 33/33`, `siblings=PASS absent=0`, `forbidden=PASS none`), then the `P9: rows=53 serialized_bytes=6713 aggregate=86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28 (matches the published value)` line, exit 0, and the install record written | CP5 |
-| S6 Identify success (installation) | PowerShell 7 | Read the exit code, the five P8 lines, the P9 line and the record path; compare the aggregate with the published value; note the pinned clone and helper folder paths | Record at `docs/consumer-install-record.md` with `rows=53`, `serialized_bytes=6713`, aggregate `86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28`; no unexpected files; the clone and helper scripts remain outside the product repository | CP6 |
+| S5 Install and verify | PowerShell 7 | P5–P9 / section 7.1: save the published harness as `install-starter.ps1` and run the documented invocation | Five `P8:` lines (`count_check=PASS installed=53 extra=0`, `manifest_pins=PASS 20/20`, `source_pins=PASS 33/33`, `siblings=PASS absent=0`, `forbidden=PASS none`), then the `P9: rows=53 serialized_bytes=6713 aggregate=889d032df9956736b79b0fb52ef245361c31de1eb3d61d5ed14b2e3681b3d0a2 (matches the published value)` line, exit 0, and the install record written | CP5 |
+| S6 Identify success (installation) | PowerShell 7 | Read the exit code, the five P8 lines, the P9 line and the record path; compare the aggregate with the published value; note the pinned clone and helper folder paths | Record at `docs/consumer-install-record.md` with `rows=53`, `serialized_bytes=6713`, aggregate `889d032df9956736b79b0fb52ef245361c31de1eb3d61d5ed14b2e3681b3d0a2`; no unexpected files; the clone and helper scripts remain outside the product repository | CP6 |
 | S7 First useful task (CX-FT1) | A new DeepSeek Harness session opened on your product folder | Stage 1 requirements brief only, on a disposable repository or a dedicated branch (see the safety preconditions below) | `docs/requirements.md` and `docs/project-state.md` with the required sections; no code, commit or push | CP7 |
 | S8 Fresh-chat resumption | A new DeepSeek Harness chat on the same product folder | Start a fresh chat and ask a **read-only** status question: "Where am I? Read `docs/project-state.md` and tell me the latest STATE SNAPSHOT and the next action; do not continue work yet." | The agent reports the latest STATE SNAPSHOT and next action without restarting; it makes no file changes during this check | CP8 |
 | S9 Refusal and recovery (failure-only) | PowerShell 7 and/or the product session | **Only when a step stops:** map the exact refusal to section 7.2; use its permitted next action; record what happened; resume at the failed step | A recorded refusal with its exact code and message plus the next action | CP9 (failure-only) |
@@ -800,11 +800,11 @@ runs neither an agent commit nor the gate's own check.
 ```powershell
 $SRC = Join-Path ([IO.Path]::GetTempPath()) ('aegis-src-' + [guid]::NewGuid().ToString('N'))
 git clone --no-checkout -c core.autocrlf=false -c core.eol=lf https://github.com/ModernNomad-98/Project-Aegis.git $SRC
-git -C $SRC checkout --detach 3c6f4e7d1c0556d1b52c8195941674f2319c0348
+git -C $SRC checkout --detach 191dbcd5a6f84ab531df1063093830261f936f09
 $head = ((& git -C $SRC rev-parse HEAD) -join '').Trim()
 $tree = ((& git -C $SRC rev-parse 'HEAD^{tree}') -join '').Trim()
-if ($head -ne '3c6f4e7d1c0556d1b52c8195941674f2319c0348') { [Console]::Error.WriteLine("exit 31: HEAD $head is not the pinned commit"); exit 31 }
-if ($tree -ne 'ac16c0c2683058ce43a5289709530004f14e6ce2') { [Console]::Error.WriteLine("exit 31: tree $tree is not the pinned tree"); exit 31 }
+if ($head -ne '191dbcd5a6f84ab531df1063093830261f936f09') { [Console]::Error.WriteLine("exit 31: HEAD $head is not the pinned commit"); exit 31 }
+if ($tree -ne '675dd8c622fa6370e01a0a764becbb9b3e012a7d') { [Console]::Error.WriteLine("exit 31: tree $tree is not the pinned tree"); exit 31 }
 if (@(git -C $SRC status --porcelain).Count) { [Console]::Error.WriteLine('exit 31: the source clone is not clean'); exit 31 }
 $badEol = @(git -C $SRC ls-files --eol -- AGENTS.md CLAUDE.md .claude/skills | Where-Object { $_ -match 'w/crlf' })
 if ($badEol.Count) { [Console]::Error.WriteLine('exit 31: CRLF checkout: ' + $badEol[0]); exit 31 }
@@ -930,7 +930,7 @@ the first failure:
 compare the destination with the same clone used for copying, so on their own they
 prove only internal consistency. P8 therefore recomputes the aggregate over the
 installed 53 rows and **fails closed unless it equals the published
-`86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28` over 6,713
+`889d032df9956736b79b0fb52ef245361c31de1eb3d61d5ed14b2e3681b3d0a2` over 6,713
 serialized bytes and 53 rows**, and P3/P8 verify `git rev-parse HEAD` and
 `HEAD^{tree}` against the pinned commit and tree before trusting any source-side
 pin. A contaminated clone that does not reproduce the published aggregate does not
@@ -1039,9 +1039,9 @@ $ErrorActionPreference = 'Stop'
 # or owner text, and Standard is the quote-safe mode; the invocation guard stays
 # the only control at or below 7.2.
 $PSNativeCommandArgumentPassing = 'Standard'
-$PinCommit = '3c6f4e7d1c0556d1b52c8195941674f2319c0348'
-$PinTree   = 'ac16c0c2683058ce43a5289709530004f14e6ce2'
-$AggSha    = '86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28'
+$PinCommit = '191dbcd5a6f84ab531df1063093830261f936f09'
+$PinTree   = '675dd8c622fa6370e01a0a764becbb9b3e012a7d'
+$AggSha    = '889d032df9956736b79b0fb52ef245361c31de1eb3d61d5ed14b2e3681b3d0a2'
 $AggRows   = 53
 $AggBytes  = 6713
 
@@ -2110,8 +2110,8 @@ reproduce it:
    published with the row count and the serialization byte length
    (`rows=53`, `serialized_bytes=6713` at the pin) so a mismatch is diagnosable by
    inspection.
-7. **Base value (commit `3c6f4e7d1c0556d1b52c8195941674f2319c0348`):**
-   `86647c99ed3e926d3c60d96278887162bb78011eefb997d006e626866e093e28` over
+7. **Base value (commit `191dbcd5a6f84ab531df1063093830261f936f09`):**
+   `889d032df9956736b79b0fb52ef245361c31de1eb3d61d5ed14b2e3681b3d0a2` over
    **6,713** serialized bytes for **53** rows.
 
 The section 7.1 harness computes this exact serialization and **compares it
@@ -2120,9 +2120,7 @@ serialized-length or hash difference, and the check reports the row count,
 serialized length and aggregate hash; it does not name an individual row.
 A mismatch is a finding, not a rounding.
 
-The arithmetic makes the length checkable: the 53 consumer-relative paths total
-2,734 bytes and the 53 full 64-character digests total 3,392 bytes; adding the
-three TAB separators per row (159), one LF per row (53) and the decimal fields
+The arithmetic makes the length checkable: the 53 consumer-relative paths total 2,734 bytes and the 53 full 64-character digests total 3,392 bytes; adding the three TAB separators per row (159), one LF per row (53) and the decimal fields (375 characters across the bytes and lf columns) gives exactly 6,713.
 (375 characters across the `bytes` and `lf` columns) gives exactly 6,713.
 
 ## 10. Recording authority on the consumer route
