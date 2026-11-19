@@ -9020,6 +9020,19 @@ def test_consumer_install_destination_links():
             ok("S4-28: a non-file guide destination exits 20 before any write "
                "and is left intact")
 
+            # S4-29 (P5 extension, Codex P2): a regular file at a destination
+            # parent path is refused at 20 before any write.
+            parentfile = _install_mode_repo(tmp / "d-parent-file", env)
+            (parentfile / "tools").write_text("not a directory\n", encoding="utf-8", newline="\n")
+            parentfile_before = _dest_snapshot(parentfile)
+            proc = install(parentfile)
+            assert proc.returncode == 20, (proc.returncode, proc.stdout, proc.stderr)
+            assert "destination parent path exists and is not a directory" in proc.stderr, proc.stderr
+            assert "tools/skills-manifest.json" in proc.stderr, proc.stderr
+            assert _dest_snapshot(parentfile) == parentfile_before, (
+                "the parent-file collision modified the target before refusal")
+            ok("S4-29: a regular file at a destination parent path exits 20 before any write")
+
             # S4-27 (P5 extension): an identical guide is a valid resume and the
             # install completes successfully.
             identical = _install_mode_repo(tmp / "d-guide-identical", env)

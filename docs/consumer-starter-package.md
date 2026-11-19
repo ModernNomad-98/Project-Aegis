@@ -870,8 +870,9 @@ before anything is written:
   or manifest leaf must be byte-identical to the pinned source; a differing file or
   a non-file at a guide/manifest destination stops the run (**exit 20**) with the
   path and **zero package files written**, exactly as a copy-step collision would.
-  An identical guide is accepted and resumes the install. (The startup files have
-  their own exit-22 rule below.)
+  An identical guide is accepted and resumes the install. A regular file at any
+  destination parent path is also refused (**exit 20**) before any write. (The
+  startup files have their own exit-22 rule below.)
 - **Startup files never overwrite.** An existing `AGENTS.md`/`CLAUDE.md` that
   differs byte-wise from the source is refused (**exit 22**); an identical one is
   accepted and counted, and is re-checked at copy time rather than trusted from
@@ -1207,6 +1208,21 @@ function Assert-DestinationPath([string]$Path, [string]$Root, [int]$Code = 23) {
   }
 }
 
+# P5b2 - a regular file at any destination parent path would stop P6 from
+# creating that directory; refuse it at 20 before any write (Codex P2 on the
+# final head: a file named tools before tools/skills-manifest.json, for example).
+foreach ($rel in $package) {
+  $parts = $rel -split '/'
+  $walk = $Tgt
+  for ($i = 0; $i -lt $parts.Count - 1; $i++) {
+    $walk = Join-Path $walk $parts[$i]
+    if (Test-Path -LiteralPath $walk) {
+      if (-not (Test-Path -LiteralPath $walk -PathType Container)) {
+        Stop-Step 20 ("destination parent path exists and is not a directory: {0} (for {1}); nothing was written" -f $walk, $rel)
+      }
+    } else { break }
+  }
+}
 # P5 - destination pre-checks. An existing skill directory is accepted only as a
 # resume of a prior partial install: every file already there must be one of that
 # skill's packaged files and byte-identical to the pinned source.
