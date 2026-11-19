@@ -196,7 +196,7 @@ Both are required because the role recognition J1 step 2 tests lives in them.
 
 Every file is copied byte-identically by the package rule: `SKILL.md`, everything under `references/`, the two startup files, the nine `docs/paths/` guides and `tools/skills-manifest.json`. This is the exact closure measured at `191dbcd5a6f84ab531df1063093830261f936f09` (tree `675dd8c622fa6370e01a0a764becbb9b3e012a7d`), sorted by path in ordinal order (the same order the install-record aggregate uses). Every row below was recomputed at this pin.
 
-**Pin delta from published base `2fef11dd`.** This design-round re-pin moves the starter to the merge commit of the content fixes, refreshes the startup files (source-only notices; `AGENTS.md` changed), the three edited skills, the nine consumer-safe path guides and the manifest, and drops `complete-project-checkpoint` (6 files) and `docs/skills-catalog.md` (1 file) from the package: 53 files, 20 skills, 41 skill-directory files. The byte/LF rows in section 2.3 are measured at the new pin.
+**Pin delta from published base `2fef11dd`.** This design-round re-pin moves the starter to the merge commit of the content fixes, refreshes the startup files (source-only notices; `AGENTS.md` changed), the eight edited skills (10 files), the nine consumer-safe path guides and the manifest, and drops `complete-project-checkpoint` (6 files) and `docs/skills-catalog.md` (1 file) from the package: 53 files, 20 skills, 41 skill-directory files. The byte/LF rows in section 2.3 are measured at the new pin.
 
 **Pin delta from base `7e79ce0e`.** `2fef11dd` differs from that earlier base only by the Layer 2 package registration: the new `.claude/skills/model-routing-policy/SKILL.md`, the orchestrator `SKILL.md` pointer change, the `recording-and-authority.md` section-5 move and the `tools/skills-manifest.json` refresh. That historical delta is retained here; it is not the current pin.
 
@@ -305,7 +305,7 @@ The two startup files still carry their repo-root governance pointers — `AGENT
 
 The nine added guide pages link to skills and to source pages. Links to installed skills resolve; links to skills that are not in the package follow the section 4.1 install-on-demand rule; links to source-only pages do not resolve in a consumer copy; at this pin the guides' remaining source-only references are disclosed by the guides' own source-only notice rather than presented as working. They are classified here rather than recursively installed, the guides stay byte-identical, and the install record discloses the non-resolving source-repo citations and the startup governance pointers.
 
-**Advisor disclosure after catalog removal (declared, not hidden).** `skill-selection-advisor` stays installed with `tools/skills-manifest.json`, but `docs/skills-catalog.md` is not installed. In a starter consumer the advisor therefore reports the source catalog as missing and must not give a definitive shortlist for the wider library; it is included for the installed skills it can rank and as the pointer to the source catalog (source-only). Its catalog links are disclosed as source-only above; the hash-gated catalog-missing fallback in its SKILL.md is the consumer path.
+**Advisor disclosure after catalog removal (declared, not hidden).** `skill-selection-advisor` stays installed with `tools/skills-manifest.json`, but `docs/skills-catalog.md` is not installed. In a starter consumer the advisor therefore reports the source catalog as missing and does not give a definitive shortlist for the wider library; it is included for the installed skills it can rank and as the pointer to the source catalog (source-only). Its catalog links are disclosed as source-only above; the hash-gated catalog-missing fallback in its SKILL.md is the consumer path.
 
 
 
@@ -348,7 +348,7 @@ pinned clone — never a recursive tree copy, which would carry `evals/`.
 
 | Journey step outside J1 | Owning skill(s) not installed | Install-on-demand trigger |
 | --- | --- | --- |
-| A skills-used record for a consumer PR or ledger | `skill-usage-ledger` | **Deliberately excluded.** Its workflow resolves each name against `tools/skills-manifest.json` and stops on a name that is not there (`SKILL.md:36-51`); the manifest and catalog are now installed as direct dependencies of `skill-selection-advisor`, but `scripts/validate-skills.py` is not and a consumer install runs no Python. Use your host agent's own report; a consumer that also copies the validator tooling may install the skill with the allow-list copy. Never present it as a J1 dependency. |
+| A skills-used record for a consumer PR or ledger | `skill-usage-ledger` | **Deliberately excluded.** Its workflow resolves each name against `tools/skills-manifest.json` and stops on a name that is not there (`SKILL.md:36-51`); only the manifest is installed as a direct dependency of `skill-selection-advisor` (the source catalog is **not** installed; the advisor uses its catalog-missing fallback); `scripts/validate-skills.py` is not and a consumer install runs no Python. Use your host agent's own report; a consumer that also copies the validator tooling may install the skill with the allow-list copy. Never present it as a J1 dependency. |
 | Any stage routed to **Reconcile** (the stage map's Reconcile row: "sources conflict (any stage may route here)", `stage-gate-map.md:17`) | `source-of-truth-reconciler` | **A conditional route, not a J1 step.** J1 does not start from conflicting sources, so the row is never entered on the supported path. Trigger: an actual conflict is found — two records that cannot both be true (a state snapshot contradicting the repository, a requirements answer contradicting the accepted spec) -> allow-list copy of `.claude/skills/source-of-truth-reconciler/`, recorded as a DECISION before the step runs. Never present it as a J1 dependency. |
 | Stage 2 conditional owners | `prioritization-frame-picker`, `roadmap-under-uncertainty-planner`, `roadmap-to-commitments-translator` | The orchestrator classifies one applicable (competing initiatives, sequencing uncertainty, or a requested date/commitment). A bounded MVP with none of those signals is `n/a` with a reason and does not invoke them (`project-orchestrator/SKILL.md:186-209`). |
 | Stage 3 design — the two owners the orchestrator names but J1 does not require | `architecture-advisor`, `adr-writer` | **A routing mention, not a read dependency.** `project-orchestrator/SKILL.md:239-240` routes Stage 3 `domain-modeler` -> `architecture-advisor` -> `architecture-designer` -> `adr-writer`; this package installs the first and the third. Neither excluded skill is a gate, a stop or MANUAL-ONLY, and no packaged skill reads either one's files: `architecture-designer` writes its own ADR **draft** and hands the text over (`architecture-designer/SKILL.md:31, 83, 104, 158`). Trigger: the slice makes a significant architecture decision whose style or paradigm is genuinely open, or a decision must be recorded durably as an ADR -> allow-list copy of `.claude/skills/architecture-advisor/` or `.claude/skills/adr-writer/`, recorded as a DECISION in `docs/project-state.md` before the step runs. Never present either as a J1 dependency. |
@@ -392,7 +392,7 @@ names one of the excluded skills: the ledger in section 4.1 and this rule are th
 instruction to follow, and the copied `SKILL.md` stays byte-identical (section 3)
 so it cannot carry a local "not installed" note.
 
-This rule text in `CLAUDE.md` item 6 and the orchestrator is installed by this Option A re-pin; the T-11a source change itself did not re-pin the package, but this page now installs the post-T-11a item 6 and routing text at the new pin (`20b0efde`).
+This rule text in `CLAUDE.md` item 6 and the orchestrator is installed by this Option A re-pin; the T-11a source change itself did not re-pin the package, but this page now installs the post-T-11a item 6 and routing text at the new pin (`191dbcd5a6f84ab531df1063093830261f936f09`).
 
 ## 5. Package layout in your repository
 
@@ -1474,7 +1474,7 @@ if ($RecordPath) {
     }
     [void]$record.AppendLine('- Rows: 53; serialized bytes: ' + $serialized.Length + '; aggregate: ' + $aggregate)
     [void]$record.AppendLine('- Result: P5-P8 exit 0. A later mismatch in any row is a stop, not a warning.')
-    [void]$record.AppendLine('- Section 3 discloses the non-resolving source-repo citations (docs/acceptance/scenario-a-runbook.md, the two docs/skills/coverage-map.json links, and the catalog''s source-only link targets) and the startup files'' Role A governance pointers; links from the nine copied guides to skills outside the package follow section 4.1 install-on-demand')
+    [void]$record.AppendLine('- Section 3 discloses the non-resolving source-repo citations (docs/acceptance/scenario-a-runbook.md, the two docs/skills/coverage-map.json links, and the catalog''s source-only link targets) and the startup files'' Role A governance pointers; the advisor disclosure: the source catalog is not installed, so the advisor reports it as missing and does not give a definitive shortlist for the wider library - it is included for the installed skills it can rank and as the source-only pointer; links from the nine copied guides to skills outside the package follow section 4.1 install-on-demand')
     [void]$record.AppendLine('')
     [void]$record.AppendLine('| Path (consumer-relative) | Bytes | LF | SHA-256 |')
     [void]$record.AppendLine('| --- | --- | --- | --- |')
@@ -1519,7 +1519,7 @@ if ($RecordPath) {
 Write-Output 'OK: 53 installed files; closure, pins, siblings, eval and aggregate checks passed'
 exit 0
 ```
-Role B planning: the consumer repository uses the same plan-of-record-author and plan-audit-reviewer contracts; this design-round re-pin installs those contracts at the new pin 3c6f4e7d, while an install from the retired published pin 2fef11dd still carries the previous contracts.
+Role B planning: the consumer repository uses the same plan-of-record-author and plan-audit-reviewer contracts; this design-round re-pin installs those contracts at the new pin 191dbcd5a6f84ab531df1063093830261f936f09, while an install from the retired published pin 2fef11dd still carries the previous contracts.
 J1 step 5 (an independently audited plan) is unchanged and remains the consumer planning route.
 
 If `-RecordPath` already exists, the block stops with **exit 24** before it writes
@@ -2121,7 +2121,6 @@ serialized length and aggregate hash; it does not name an individual row.
 A mismatch is a finding, not a rounding.
 
 The arithmetic makes the length checkable: the 53 consumer-relative paths total 2,734 bytes and the 53 full 64-character digests total 3,392 bytes; adding the three TAB separators per row (159), one LF per row (53) and the decimal fields (375 characters across the bytes and lf columns) gives exactly 6,713.
-(375 characters across the `bytes` and `lf` columns) gives exactly 6,713.
 
 ## 10. Recording authority on the consumer route
 
