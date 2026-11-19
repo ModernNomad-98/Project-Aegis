@@ -165,8 +165,9 @@ Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-ag
   authority, and hand off between agents without re-explaining. The guide's steps 1-3 come
   first; after them, `design-orchestrator` is the optional invocable door for a whole design pass.
   **Changing chat mid-design?** The same guide's step 7 carries one copyable handoff
-  record — the task, design sources with the revision actually read, approved
-  decisions, open composition decisions, target device and one observable success
+  record — the task, design sources with the revision or snapshot actually read,
+  approved decisions with the source that authorizes each, open composition decisions,
+  every in-scope target device and input method, and one observable success
   condition — so a fresh session continues the next scoped task without another round
   of routine questions; the [UI guide](docs/paths/design-and-build-ui.md) holds the
   canonical instructions.

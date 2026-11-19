@@ -320,10 +320,10 @@ and design-system-change plays keep their existing scope.
    HANDOFF — <task>
 
    Task: <the next scoped task, in one sentence>
-   Design sources: <each design source and the revision actually read; say which one you could open>
-   Approved decisions: <decision ID → what it settles>
+   Design sources: <each design source and the revision or snapshot actually read; say which one you could open>
+   Approved decisions: <decision ID → what it settles, and which source authorizes it>
    Open composition decisions: <what is not settled, and who owns it>
-   Target device: <viewport and input method>
+   Target device: <every in-scope viewport and input method>
    One observable success condition: <what the receiver can show as done>
 
    Receiver: before starting, state which source you could actually read and what
@@ -338,6 +338,10 @@ and design-system-change plays keep their existing scope.
    round of routine questions. The record projects the step-7 protocol above; the
    canonical instructions for that protocol remain
    [`phased-work-handoff-designer`](../../.claude/skills/phased-work-handoff-designer/SKILL.md).
+   When implementation or verification has already begun, this founder-facing
+   projection supplements — it never replaces — the full carry-forward record
+   above, whose decision IDs, changed and deliberately untouched files,
+   proven-invocation evidence and open items still carry.
 
 ## If you bring in an external repository
 
