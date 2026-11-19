@@ -305,7 +305,7 @@ The two startup files still carry their repo-root governance pointers — `AGENT
 
 The nine added guide pages link to skills and to source pages. Links to installed skills resolve; links to skills that are not in the package follow the section 4.1 install-on-demand rule; links to source-only pages do not resolve in a consumer copy; at this pin the guides' remaining source-only references are disclosed by the guides' own source-only notice rather than presented as working. They are classified here rather than recursively installed, the guides stay byte-identical, and the install record discloses the non-resolving source-repo citations and the startup governance pointers.
 
-**Advisor disclosure after catalog removal (declared, not hidden).** `skill-selection-advisor` stays installed with `tools/skills-manifest.json`, but `docs/skills-catalog.md` is not installed. In a starter consumer the advisor therefore reports the source catalog as missing and does not give a definitive shortlist for the wider library; it is included for the installed skills it can rank and as the pointer to the source catalog (source-only). Its catalog links are disclosed as source-only above; the hash-gated catalog-missing fallback in its SKILL.md is the consumer path.
+**Advisor disclosure after catalog removal (declared, not hidden).** `skill-selection-advisor` stays installed with `tools/skills-manifest.json`, but `docs/skills-catalog.md` is not installed. In a starter consumer the advisor therefore reports the source catalog as missing and gives only a provisional (non-definitive) shortlist. It is included as the README's shortlist door and as the pointer to the source-only catalog. Its catalog links are disclosed as source-only above; the hash-gated catalog-missing fallback in its SKILL.md is the consumer path.
 
 
 
@@ -1474,7 +1474,7 @@ if ($RecordPath) {
     }
     [void]$record.AppendLine('- Rows: 53; serialized bytes: ' + $serialized.Length + '; aggregate: ' + $aggregate)
     [void]$record.AppendLine('- Result: P5-P8 exit 0. A later mismatch in any row is a stop, not a warning.')
-    [void]$record.AppendLine('- Section 3 discloses the non-resolving source-repo citations (docs/acceptance/scenario-a-runbook.md, the two docs/skills/coverage-map.json links, and the catalog''s source-only link targets) and the startup files'' Role A governance pointers; the advisor disclosure: the source catalog is not installed, so the advisor reports it as missing and does not give a definitive shortlist for the wider library - it is included for the installed skills it can rank and as the source-only pointer; links from the nine copied guides to skills outside the package follow section 4.1 install-on-demand')
+    [void]$record.AppendLine('- Section 3 discloses the non-resolving source-repo citations (docs/acceptance/scenario-a-runbook.md, the two docs/skills/coverage-map.json links, and the catalog''s source-only link targets) and the startup files'' Role A governance pointers; the advisor disclosure: the source catalog is not installed, so the advisor reports it as missing and gives only a provisional (non-definitive) shortlist; it is included as the README''s shortlist door and as the pointer to the source-only catalog; links from the nine copied guides to skills outside the package follow section 4.1 install-on-demand')
     [void]$record.AppendLine('')
     [void]$record.AppendLine('| Path (consumer-relative) | Bytes | LF | SHA-256 |')
     [void]$record.AppendLine('| --- | --- | --- | --- |')
