@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Verifies the captured revision hash and the clean base before auditing.",
-          "Re-runs the verified read-only closures on the base and confirms they fail (unsafe/networked/privileged/state-changing closures are recorded as UNRUN, not executed); checks the after-state expectations.",
+          "Re-runs the verified read-only closures on the base and confirms they fail (unsafe/networked/privileged/state-changing/secret-accessing closures are recorded as UNRUN, not executed); checks the after-state expectations.",
           "Independently re-measures counts/gate values and checks the protected-path/authority statements.",
           "Returns ACCEPT (the Stage-B exit-gate vocabulary) or REVISE/REJECT with a minimal fix list bound to the captured hash and routes findings as backlog input only."
         ]
@@ -83,7 +83,7 @@
         "triggers": true,
         "assertions": [
           "Names Role B from the repository evidence and audits the captured revision against the consumer repository at the claimed head/tree and the consumer's own recorded authority, not against the source library's registries or approval register.",
-          "Classifies the plan's closures; with no source declared allowlist it treats the consumer's documented commands as candidates, default-denies unverifiable provenance and records unsafe/networked/privileged/state-changing/unverifiable closures as UNRUN with the human-approval-boundary requirement.",
+          "Classifies the plan's closures; with no source declared allowlist it treats the consumer's documented commands as candidates, default-denies unverifiable provenance and records unsafe/networked/privileged/state-changing/secret-accessing/unverifiable closures as UNRUN with the human-approval-boundary requirement.",
           "Re-measures the consumer repository's own counts/checks the plan claims and checks the plan recorded its classification.",
           "Returns ACCEPT or REVISE/REJECT bound to the captured revision hash and never authors, fixes, implements or merges."
         ]
