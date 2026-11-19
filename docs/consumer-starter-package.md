@@ -1670,7 +1670,7 @@ Each code stops; none warns and continues.
 | Code | Meaning | What you see |
 | --- | --- | --- |
 | 1 | Prerequisite failure | `STOP: no Git sh.exe found`, a missing source/target clone, or a `sh` that did not answer. The source/target checks run before any write. The published harness probes `sh` at the end of P8, so that path stops **after** the 53 files are written - the install is resumable from there and no record is written |
-| 20 | Destination collision (skill file, guide or manifest) | The exact destination that is outside the package, differs from the pinned source, or is a non-file at a guide/manifest path; refused before any write and nothing overwritten |
+| 20 | Destination collision (skill file, guide or manifest) | The exact destination that is outside the package, differs from the pinned source, is a non-file at a guide/manifest path, or is a regular file at a destination parent path; refused before any write and nothing overwritten |
 | 21 | Unsafe or missing source path | The `..`/reparse-point segment or the missing file; nothing written |
 | 22 | Startup-file conflict | The differing file; existing bytes unchanged |
 | 23 | Unsafe destination path (junction, symbolic link or other reparse point) | The exact path and the link type/target; refused before any package or record write, including a reparse point at `-RecordPath`, which is a **23** and never a 24. P9 re-reads the record leaf's attributes after the preflight (attributes only, never followed), so a link swapped in after the walk is refused at **23** too; by then the package copy is complete and no record is written |
