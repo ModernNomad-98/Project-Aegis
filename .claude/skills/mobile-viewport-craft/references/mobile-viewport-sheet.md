@@ -74,18 +74,18 @@ arrangement, so record the trade-off and hand that decision to
 remaining trade-off. Repeat at the largest
 supported text scale, where two-line rows grow and the visible row count drops.
 
-**Overview/intro test.** An overview-first or intro-first first viewport is a
-composition decision: `screen-composition-designer` records it, and this
-skill checks the layout of the recorded choice. A recorded overview or intro is
-legitimate when it carries a written reason tied to the brief — a monitoring
-dashboard whose recorded job is several signals at a glance, or a first-run
-orientation screen with a way past it (skip/exit); brand preference alone is
-not sufficient when it delays the recorded primary task. If the recorded intro
-stays, record what it costs at the real content volume (rows or actions below
-the fold) and why that is acceptable; if no reason is recorded, surface the
-missing arrangement decision to its owner instead of assuming it. Whether an
-overview or intro is shown is never decided here: if the recorded arrangement
-has no answer, surface the missing decision to `screen-composition-designer`.
+**Overview/intro test.** Whether an overview or intro leads the first viewport
+is a composition decision recorded by `screen-composition-designer`; this
+test never judges that choice. It reports the layout consequence of a recorded
+overview or intro: the rows or actions it pushes below the fold at the real
+content volume, and the reason the recorded decision cites (for example a
+monitoring dashboard whose recorded job is several signals, or a first-run
+orientation screen with a way past it) so the cost is visible next to the
+decision. If the recorded arrangement has no overview/intro answer, surface
+the missing decision to `screen-composition-designer` instead of
+assuming one; if the recorded choice carries no stated reason, report the
+measured cost and hand the decision back to that owner — weighing brand
+preference is the owner's job, not this skill's.
 
 **No universal above-the-fold button.** Do not turn this into "every screen
 needs the primary button above the fold". Work from the recorded primary task:

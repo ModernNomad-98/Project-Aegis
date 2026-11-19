@@ -143,12 +143,15 @@ network performance on mobile are `frontend-perf-engineer`'s.
    equivalent (tap, disclosure, long-press with a visible alternative).
    Custom gestures must be discoverable and must not fight the browser's
    own (back-swipe, pull-to-refresh, scroll).
-8. **Reflow real content.** Choose reflow (stack columns) vs hide
-   (progressive disclosure — never hide a critical action). For wide
-   tables pick a pattern deliberately: stack-to-cards, horizontal scroll
-   with a frozen key column, or priority-column collapse — and state the
-   tradeoff. Long forms, nav (bottom-bar vs hamburger), and responsive
-   media all get an explicit pattern.
+8. **Reflow real content inside the recorded order.** For each region,
+   choose a reflow pattern for real content (stack columns, long forms,
+   nav, responsive media) and state the tradeoff; hiding, deferring or
+   moving content behind progressive disclosure is an arrangement
+   decision for `screen-composition-designer` — record the measured
+   cost and hand it over rather than choosing it here, and never hide a
+   critical action. For wide tables pick a pattern deliberately:
+   stack-to-cards, horizontal scroll with a frozen key column, or
+   priority-column collapse — and state the tradeoff.
 9. **Support orientation and OS text-scaling.** Rotation doesn't break
    layout or lose state; respect OS text-size / browser zoom (don't clip
    or overlap at 200%) — record this as a11y intent for
@@ -188,8 +191,8 @@ Viewport:     <100vh browser-bar risk; 100svh | 100lvh | 100dvh chosen + why;
 Input:        <HTML input type + inputmode virtual-keyboard hint; font-size ≥16px
               (no focus-zoom); focused field above keyboard>
 Hover/gesture: hover-only affordances → touch equivalents; custom gestures discoverable, no browser conflict
-Layout:       reflow-vs-hide per region; wide-table pattern chosen (cards|scroll+frozen|priority) w/ tradeoff;
-              nav pattern; responsive media
+Layout:       reflow per region inside the recorded order; wide-table pattern chosen (cards|scroll+frozen|priority)
+              w/ tradeoff; nav pattern; responsive media; hiding/deferring content → screen-composition-designer
 Choices, if any: <plain options and reasons; effects/costs; recommendation
                  + why + what could change it; one decision question each>
 Orientation:  rotation-safe; OS text-scale/200% zoom respected (a11y intent)
