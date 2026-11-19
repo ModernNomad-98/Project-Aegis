@@ -103,14 +103,57 @@ for what materially blocks the next useful action.
    record's location so the next agent can find it. This path never invents a new
    project file on its own.
 
-   *No Aegis skill owns the design itself.* When design is the task, the agent
-   produces a reviewable interface structure, a visual direction and a
-   concise rationale tied to the user journey, at the level needed to build
-   from — using the design tool or repository you chose only where you chose
-   one. No particular prototyping application and no fixed number of
-   variants is required. An existing approved design satisfies this step;
-   the agent extends it rather than redrawing it. Handoff: the recorded
-   authority and the reviewable design are what steps 4–6 design against.
+   *Which owner proposes the arrangement.* The design itself — the reviewable
+   interface structure, the visual direction and a concise rationale tied to
+   the user journey — is owned by the project's recorded design authority, not
+   by this path or by the implementing agent. Establish that authority and the
+   revision or snapshot consumed for each known decision **first**, then apply
+   these branches in order:
+   - **An approved composition already covers the request.** Reuse it; do not
+     redraw it. Send any narrow layout or rendered-verification issue to its
+     existing specialist (`mobile-viewport-craft` for layout craft; the
+     manual-only journey-execution skills when a rendered run is needed).
+   - **The experience direction is settled, but the arrangement for this
+     screen is missing.**
+     [`screen-composition-designer`](../../.claude/skills/screen-composition-designer/SKILL.md)
+     proposes only the missing arrangement. A supplied palette or design system
+     settles only the decisions it actually specifies (styling), never the
+     workflow.
+   - **The experience direction is unsettled and the existing iteration offer
+     applies.** The iteration owner
+     ([`ux-design-iteration`](../../.claude/skills/ux-design-iteration/SKILL.md))
+     alone makes or reuses its one method choice. Under **Standard**,
+     `screen-composition-designer` composes the missing screen; the iteration
+     owner does **not** compose it. Under **Explore**, the iteration owner first
+     completes its concept, prototype and review, then
+     `screen-composition-designer` composes only the gaps the reviewed
+     direction leaves. An answered choice is recorded; an unanswered choice
+     retains its recorded status and is never assumed. A generic build request
+     alone does not trigger the offer.
+   - **Fall-through owner (visual direction, or an unsettled direction the
+     offer does not reach).** Where the visual direction is still open, or the
+     experience direction is unsettled and the iteration offer does not apply
+     (a generic build request; a declined offer; an unanswered offer whose
+     recorded status is not a choice), the **bounded default owner is the
+     project's recorded design authority** — or the human design owner it
+     names. The agent may state the options and their reasons but must not
+     choose the direction, compose around it, or substitute itself,
+     `screen-composition-designer` (arrangement only) or
+     `design-system-token-governor` (token governance, not direction). It
+     surfaces that single decision and stops; if no authority is recorded, the
+     decision goes to the human through the project's own stage/state owner
+     before any screen work.
+   - Record the result through this step's design-authority process. The
+     composition skill returns design advice only (a short ordered outline or
+     annotated wireframe description naming the primary task, entry prominence
+     and why, phone/desktop content and action order, deferral, and one
+     complete interaction with a return or recovery state), and it never
+     implements, approves, launches a browser, writes product files or claims
+     a rendered check passed.
+   - No particular prototyping application and no fixed number of variants is
+     required. An existing approved design satisfies this step; the agent
+     extends it rather than redrawing it. **Handoff: the recorded authority
+     and the reviewable design are what steps 4–6 design against.**
 
    *Stale source rule.* Before using that record for any affected decision,
    the agent compares the recorded revision or snapshot with the live
@@ -155,7 +198,14 @@ play (design from scratch, improve existing screens, audit UI consistency, hand
 off a design-system change), names every UX/UI skill in order before starting,
 routes the design work to the existing skills named below, and hands
 implementation and manual-only execution to their owners. It never replaces the
-order above and never starts before steps 1-3 are met.
+order above and never starts before steps 1-3 are met. Its design-from-scratch
+and improve-existing-screens plays run a composition step only when step 3's
+recorded result names it, consuming that result; if the result or its required
+authority is missing, the play hands the missing prerequisite back to the owner
+named in step 3 and stops **before starting the play**. The plays cannot
+bootstrap themselves — they never create the step-3 record, settle the
+direction, choose a method or repeat the iteration method offer. The audit-only
+and design-system-change plays keep their existing scope.
 
 4. **Design the parts teams forget** — use the parts that match the change:
 

@@ -1,0 +1,142 @@
+{
+  "skill": "screen-composition-designer",
+  "description": "Two-way trigger discrimination for the one-job screen-composition advisor (this skill) versus nine neighbours: whole design pass, iteration method offer/concepts, state matrices, mobile layout craft, token governance, app mapping, a11y verification design, whole-journey routing, and technical design-doc review.",
+  "overlaps_with": [
+    "design-orchestrator",
+    "ux-design-iteration",
+    "edge-state-ux-designer",
+    "mobile-viewport-craft",
+    "design-system-token-governor",
+    "frontend-architecture-mapper",
+    "accessibility-test-harness",
+    "project-orchestrator",
+    "design-review-facilitator"
+  ],
+  "cases": [
+    {
+      "id": "brand-supplied-flow-missing",
+      "prompt": "Our brand palette and tone are approved. We still haven't decided what leads the sign-up screen or the order of the steps — design the arrangement.",
+      "expected_skill": "screen-composition-designer",
+      "should_not_trigger": [
+        "design-orchestrator",
+        "ux-design-iteration",
+        "design-system-token-governor"
+      ],
+      "note": "SEAM CASE (primary) — styling authority exists but the arrangement decision is missing; a single arrangement is requested, not a whole pass, not an iteration offer, not token work.",
+      "reason": "Composing the missing screen arrangement from supplied authority is this skill's one job; a palette alone never settles the workflow."
+    },
+    {
+      "id": "settled-direction-arrangement-missing",
+      "prompt": "Here is the approved design direction and snapshots. The empty-state view arrangement is still undefined below the form — tell me the layout order and what can be deferred.",
+      "expected_skill": "screen-composition-designer",
+      "should_not_trigger": [
+        "ux-design-iteration",
+        "edge-state-ux-designer",
+        "design-orchestrator"
+      ],
+      "note": "SEAM CASE (primary) — the direction is settled, so no iteration offer applies; the request is the screen arrangement, not the full non-happy-state matrix.",
+      "reason": "A settled direction with a missing arrangement goes to composition; designing every state is edge-state-ux-designer's separate job."
+    },
+    {
+      "id": "dashboard-overview-question",
+      "prompt": "On our monitoring dashboard, what should lead when the job is watching twelve signals and one flagged exception?",
+      "expected_skill": "screen-composition-designer",
+      "should_not_trigger": [
+        "design-orchestrator",
+        "edge-state-ux-designer"
+      ],
+      "note": "SEAM CASE (counterexample) — entry prominence is a composition decision; several leading signals are legitimate when monitoring is the job.",
+      "reason": "What leads a screen is an arrangement question; it is not a whole design pass and not a state matrix."
+    },
+    {
+      "id": "whole-design-pass-goes-to-design-orchestrator",
+      "prompt": "Help me design my app's UI end to end — decide the whole design process and run every design step.",
+      "expected_skill": "design-orchestrator",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — a whole design pass is the conductor's door: it names every skill in order and routes each step. This skill is one routed step, not a pass.",
+      "reason": "design-orchestrator owns choosing and sequencing a whole design pass; this skill composes one arrangement when routed to it."
+    },
+    {
+      "id": "method-offer-and-concepts-go-to-ux-design-iteration",
+      "prompt": "Offer me the design iteration choice and give me two meaningfully different flows for checkout so I can compare and review them.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — the one up-front method offer, concept generation, prototype and review are iteration ownership; this skill never offers or repeats it.",
+      "reason": "ux-design-iteration owns the method offer and concept/prototype/review cycle; composition happens only after a direction is settled and recorded."
+    },
+    {
+      "id": "state-matrix-goes-to-edge-state-ux-designer",
+      "prompt": "Design the empty, loading, error, offline and permission-denied states for this list view, with first-run versus filtered-empty.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — a full non-happy-state matrix is a separate discipline; composition names a return or recovery state only where one interaction needs it.",
+      "reason": "edge-state-ux-designer owns the per-view state matrix; this skill arranges the screen, not every state."
+    },
+    {
+      "id": "narrow-layout-defect-goes-to-mobile-viewport-craft",
+      "prompt": "On a 390px phone the save button hides under the keyboard and two touch targets overlap. Set the breakpoints and touch-target sizes to fix the layout.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — a narrow layout, keyboard-occlusion and touch-target defect in an existing screen is layout craft, not a missing arrangement.",
+      "reason": "mobile-viewport-craft owns breakpoint, touch-target, safe-area and keyboard-occlusion craft; composition does not fix rendered layout defects."
+    },
+    {
+      "id": "tokens-go-to-design-system-token-governor",
+      "prompt": "Our spacing tokens drift between two sources of truth and one component hard-codes colours. Establish the token source of truth and the migration.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — token governance and one source of truth are design-system work; a palette is an input to composition, never the composition itself.",
+      "reason": "design-system-token-governor owns token/design-system governance; this skill consumes an approved design system read-only."
+    },
+    {
+      "id": "app-map-goes-to-frontend-architecture-mapper",
+      "prompt": "Before we change anything, map this existing frontend's routes, components and client state so we know what we are touching.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — mapping an existing app is inventory and architecture reconnaissance, not a screen arrangement.",
+      "reason": "frontend-architecture-mapper owns the existing-surface map; composition needs the brief and design authority, not a route/component inventory."
+    },
+    {
+      "id": "a11y-verification-goes-to-accessibility-test-harness",
+      "prompt": "Set up the accessibility verification: axe scans in CI, keyboard traversal, contrast thresholds and focus order failures.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — designing the accessibility bar and its checks is verification design; composition does not run or design a11y checks.",
+      "reason": "accessibility-test-harness owns the a11y verification plan; this skill cannot claim a rendered or a11y check passed."
+    },
+    {
+      "id": "whole-journey-goes-to-project-orchestrator",
+      "prompt": "I have an app idea and no idea what to do first. Work out which stage I am at and route the whole journey.",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — whole-product stage routing and journey ownership is the front door; composition is a single design step behind it.",
+      "reason": "project-orchestrator owns stage discovery and the whole journey; this skill is invoked only for its one arrangement job."
+    },
+    {
+      "id": "technical-design-review-goes-to-design-review-facilitator",
+      "prompt": "Review this technical design document for the new notification system — problem, proposal, alternatives and cross-cutting concerns — and frame the decision.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "screen-composition-designer"
+      ],
+      "note": "SEAM CASE (reverse) — reviewing a technical design proposal is a design-doc review; composition produces an arrangement, not a document review.",
+      "reason": "design-review-facilitator reviews reviewable technical design proposals; this skill returns a screen arrangement in the conversation."
+    }
+  ]
+}
