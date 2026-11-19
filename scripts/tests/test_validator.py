@@ -7323,10 +7323,23 @@ STARTER_REQUIRED_PATHS = (
     ".claude/skills/scoped-approval-register/SKILL.md",
     ".claude/skills/scoped-approval-register/references/register-format.md",
 )
-# The only non-skill rows the selectors may carry: the two root startup files.
+# The non-skill rows the selectors may carry: the two root startup files plus the
+# nine Option A guides and the manifest.
 # Every other row must be a file under .claude/skills/, so an extra non-skill
 # row cannot ride along in the selector (I4 advisory F1).
 STARTER_STARTUP_PATHS = ("AGENTS.md", "CLAUDE.md")
+STARTER_EXTRA_PATHS = (
+    "docs/paths/add-ai-safely.md",
+    "docs/paths/after-launch.md",
+    "docs/paths/check-your-app.md",
+    "docs/paths/design-and-build-ui.md",
+    "docs/paths/find-a-specialist.md",
+    "docs/paths/get-audit-ready.md",
+    "docs/paths/release-with-agents.md",
+    "docs/paths/something-is-broken.md",
+    "docs/paths/test-your-app.md",
+    "tools/skills-manifest.json",
+)
 
 _STARTER_TABLE_ROW = re.compile(r"^\| `([^`]+)` \| (\d+) \| (\d+) \|$", re.M)
 _STARTER_TOTAL_ROW = re.compile(
@@ -7417,7 +7430,7 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
 
     allowed_by_skill maps every skill directory in the pinned Git tree to the
     exact paths the package's allow-list rule copies for it: its SKILL.md plus
-    every non-evaluation file under references/. Evaluation answer content is
+    every non-evaluation file under references/ or assets/. Evaluation answer content is
     excluded from the required closure because the selector check forbids
     installing it. The closure is read from the committed object, never from
     the working tree, so a checkout that differs from the pin cannot change the
@@ -7467,7 +7480,8 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
         if len(parts) < 4 or parts[0] != ".claude" or parts[1] != "skills":
             continue
         relative = "/".join(parts[3:])
-        if relative == "SKILL.md" or relative.startswith("references/"):
+        if (relative == "SKILL.md" or relative.startswith("references/")
+                or relative.startswith("assets/")):
             # A pinned package must not install evaluation answer content even
             # when the pin carries it under references/. Excluding it from the
             # required closure keeps the selector satisfiable; selecting it is
@@ -7477,7 +7491,7 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
             allowed.setdefault(parts[2], set()).add(path)
     if not allowed:
         return None, (
-            "PIN-MALFORMED: tree %s carries no SKILL.md or references/ file" % tree
+            "PIN-MALFORMED: tree %s carries no SKILL.md, references/ or assets/ file" % tree
         )
     return {skill: tuple(sorted(paths)) for skill, paths in allowed.items()}, None
 
@@ -7603,8 +7617,9 @@ def check_starter_selection(table, array, required, pinned=None,
     usable without Git. Evaluation answer files are rejected by directory
     segment and by basename, so the two published names are refused even
     outside an `evals/` directory. Every row must also be a file under
-    `.claude/skills/`, one of the two declared root startup files, or a
-    required package path: a stray row that is none of these is refused here,
+    `.claude/skills/`, one of the two declared root startup files, an Option A
+    extra path (nine guides, catalog, manifest), or a required package path: a
+    stray row that is none of these is refused here,
     so the selector layer cannot carry an extra non-skill row that only the
     native install test would notice.
     """
@@ -7630,10 +7645,10 @@ def check_starter_selection(table, array, required, pinned=None,
                 )
 
     # The selector is a skill manifest, not a copy list: a row that is neither a
-    # skill file, one of the two declared startup files, nor a required path
-    # would install an arbitrary file. Refuse it by name in both selectors (I4
-    # advisory F1). The startup files are the only lawful non-skill rows.
-    declared = set(required) | set(STARTER_STARTUP_PATHS)
+    # skill file, one of the two declared startup files, an Option A extra path
+    # (nine guides, catalog, manifest), nor a required path would install an
+    # arbitrary file. Refuse it by name in both selectors (I4 advisory F1).
+    declared = set(required) | set(STARTER_STARTUP_PATHS) | set(STARTER_EXTRA_PATHS)
     for label, rows in selectors:
         for path in rows:
             if path in declared:
@@ -7644,8 +7659,8 @@ def check_starter_selection(table, array, required, pinned=None,
                 continue
             problems.append(
                 "the %s lists %s, which is not a skill file under "
-                ".claude/skills/, a declared startup file or a required "
-                "package path" % (label, path)
+                ".claude/skills/, a declared startup file, an Option A extra "
+                "path or a required package path" % (label, path)
             )
 
     skill_dirs = _starter_skill_dirs(list(table) + list(array))
@@ -7930,8 +7945,8 @@ def test_consumer_starter_selector_pin_closure():
         bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
         for label in ("section 2.3 table", "executable array"):
             assert ("the %s lists %s, which is not a skill file under "
-                    ".claude/skills/, a declared startup file or a required "
-                    "package path" % (label, stray)) in bproblems, bproblems
+                    ".claude/skills/, a declared startup file, an Option A extra "
+                    "path or a required package path" % (label, stray)) in bproblems, bproblems
         ok("S1-1 fixture: an extra non-skill row is refused by both selectors "
            "and named exactly")
 
@@ -8200,8 +8215,8 @@ def test_consumer_starter_git_failure_classes():
 
 STARTER_MODE_HEADING = "### P2 "
 STARTER_HARNESS_HEADING = "### 7.1 "
-STARTER_PIN_COMMIT = "2fef11dd43fe6e943e99c7948ebeaca95d138072"
-STARTER_PIN_TREE = "14133f917b2fc35ccac44fb844fd1664fb6839af"
+STARTER_PIN_COMMIT = "191dbcd5a6f84ab531df1063093830261f936f09"
+STARTER_PIN_TREE = "675dd8c622fa6370e01a0a764becbb9b3e012a7d"
 STARTER_SOLO = ("Peter Nguyen", "263130032+ModernNomad-98@users.noreply.github.com")
 STARTER_AGENT = ("Aegis Agent (DeepSeek V4 Flash)", "agent@example.invalid")
 STARTER_OWNER = ("Owner Person", "owner@example.invalid")
@@ -8718,7 +8733,7 @@ def test_consumer_install_mode_native():
             )
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             files = _install_mode_files(target)
-            assert len(files) == 43, "expected 42 package files plus the record, got %d" % len(files)
+            assert len(files) == 54, "expected 53 package files plus the record, got %d" % len(files)
             assert "docs/consumer-install-record.md" in files
             record = (target / "docs" / "consumer-install-record.md").read_text(encoding="utf-8")
             assert "Install mode: human-only" in record, record[:400]
@@ -8730,7 +8745,7 @@ def test_consumer_install_mode_native():
             assert _install_mode_config(target, env) == config_before, (
                 "the human-only install changed local Git config"
             )
-            ok("S3-1: the published harness completes a human-only install with 42 "
+            ok("S3-1: the published harness completes a human-only install with 53 "
                "files, the mode in the record, 0 commits and byte-identical config")
 
             # F3: a padded human-only token installs as human-only and the record
@@ -8749,7 +8764,7 @@ def test_consumer_install_mode_native():
             )
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             padded_files = _install_mode_files(padded_target)
-            assert len(padded_files) == 43, len(padded_files)
+            assert len(padded_files) == 54, len(padded_files)
             padded_text = padded_record.read_text(encoding="utf-8")
             assert "- Install mode: human-only (owner-stated;" in padded_text, padded_text[:400]
             assert "Install mode:  human-only" not in padded_text, padded_text[:400]
@@ -8968,9 +8983,67 @@ def test_consumer_install_destination_links():
             proc = install(clean, clean / "docs" / "consumer-install-record.md")
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             first = _dest_snapshot(clean)
-            assert len([row for row in first if row[1] == "FILE"]) == 43, first
-            ok("S4-1: an ordinary clean target still installs 42 files plus the "
+            assert len([row for row in first if row[1] == "FILE"]) == 54, first
+            ok("S4-1: an ordinary clean target still installs 53 files plus the "
                "declared record with the containment preflight in place")
+
+            # S4-26 (P5 extension): a populated target with a differing guide is
+            # refused at 20 before any write, and the target is unchanged.
+            differing = _install_mode_repo(tmp / "d-guide-differ", env)
+            guide_rel = Path("docs") / "paths" / "add-ai-safely.md"
+            guide_dst = differing / guide_rel
+            guide_dst.parent.mkdir(parents=True, exist_ok=True)
+            guide_dst.write_text("tampered guide copy\n", encoding="utf-8", newline="\n")
+            differing_before = _dest_snapshot(differing)
+            proc = install(differing)
+            assert proc.returncode == 20, (proc.returncode, proc.stdout, proc.stderr)
+            assert "non-skill destination differs" in proc.stderr, proc.stderr
+            assert guide_rel.as_posix() in proc.stderr, proc.stderr
+            assert _dest_snapshot(differing) == differing_before, (
+                "a package file was written before the differing-guide refusal")
+            ok("S4-26: a differing guide destination exits 20 before any write; "
+               "the target inventory is unchanged")
+
+            # S4-28 (P5 extension): a non-file (directory) sitting at a guide
+            # destination is refused at 20 before any write, and is left intact.
+            nonfile = _install_mode_repo(tmp / "d-guide-nonfile", env)
+            guide_dir = nonfile / guide_rel
+            guide_dir.mkdir(parents=True)
+            (guide_dir / "marker.txt").write_text("not a package file\n", encoding="utf-8")
+            nonfile_before = _dest_snapshot(nonfile)
+            proc = install(nonfile)
+            assert proc.returncode == 20, (proc.returncode, proc.stdout, proc.stderr)
+            assert "not a regular file" in proc.stderr, proc.stderr
+            assert guide_rel.as_posix() in proc.stderr, proc.stderr
+            assert _dest_snapshot(nonfile) == nonfile_before, (
+                "the non-file guide destination was modified before refusal")
+            ok("S4-28: a non-file guide destination exits 20 before any write "
+               "and is left intact")
+
+            # S4-29 (P5 extension, Codex P2): a regular file at a destination
+            # parent path is refused at 20 before any write.
+            parentfile = _install_mode_repo(tmp / "d-parent-file", env)
+            (parentfile / "tools").write_text("not a directory\n", encoding="utf-8", newline="\n")
+            parentfile_before = _dest_snapshot(parentfile)
+            proc = install(parentfile)
+            assert proc.returncode == 20, (proc.returncode, proc.stdout, proc.stderr)
+            assert "destination parent path exists and is not a directory" in proc.stderr, proc.stderr
+            assert "tools/skills-manifest.json" in proc.stderr, proc.stderr
+            assert _dest_snapshot(parentfile) == parentfile_before, (
+                "the parent-file collision modified the target before refusal")
+            ok("S4-29: a regular file at a destination parent path exits 20 before any write")
+
+            # S4-27 (P5 extension): an identical guide is a valid resume and the
+            # install completes successfully.
+            identical = _install_mode_repo(tmp / "d-guide-identical", env)
+            guide_dst = identical / guide_rel
+            guide_dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source / guide_rel, guide_dst)
+            proc = install(identical)
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert guide_dst.read_bytes() == (source / guide_rel).read_bytes(), (
+                "the identical guide was modified")
+            ok("S4-27: an identical guide destination resumes successfully")
 
             # S4-2: a linked target root is refused, and the external tree is
             # byte-for-byte unchanged - nothing is written through the junction.
@@ -8987,6 +9060,22 @@ def test_consumer_install_destination_links():
             ok("S4-2: a linked target root exits 23 naming the Junction before any write; "
                "the external inventory is unchanged")
 
+            # S4-30 (Codex P2 ordering): a linked target root whose external tree
+            # has a regular file at a package parent path must exit 23 (reparse),
+            # never 20: destination links are not followed.
+            ext = _install_mode_repo(tmp / "d-linked-parent-ext", env)
+            (ext / "tools").write_text("not a directory\n", encoding="utf-8", newline="\n")
+            linked = tmp / "d-linked-parent"
+            _dest_junction(linked, ext)
+            ext_before = _dest_snapshot(ext)
+            proc = install(linked)
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert "destination reparse point" in proc.stderr, proc.stderr
+            assert "Junction" in proc.stderr, proc.stderr
+            assert _dest_snapshot(ext) == ext_before, (
+                "the linked-target refusal modified the external tree")
+            ok("S4-30: a linked target root with a parent-path file exits 23, not 20")
+
             # S4-3: an intermediate junction late in the selected array is found
             # before the first package write, not after earlier files were copied.
             late = _install_mode_repo(tmp / "d-late", env)
@@ -9000,7 +9089,7 @@ def test_consumer_install_destination_links():
             assert _dest_snapshot(ext) == [], "a skill file was written through the reference junction"
             assert _dest_snapshot(late) == late_before, "a package file was written before the refusal"
             assert not (late / ".claude" / "skills" / "agent-startup-context-gate" / "SKILL.md").exists()
-            ok("S4-3: an intermediate junction at the 38th package row exits 23 before "
+            ok("S4-3: an intermediate junction at the 40th package row exits 23 before "
                "the first package file is written; target and external trees unchanged")
 
             # S4-4: a broken junction is refused, not treated as a missing path.
@@ -9037,10 +9126,10 @@ def test_consumer_install_destination_links():
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             assert ext_record.is_file(), "the declared ordinary external record was not written"
             rows = [row for row in _dest_snapshot(external) if row[1] == "FILE"]
-            assert len(rows) == 42, rows
+            assert len(rows) == 53, rows
             assert not (external / "docs" / "consumer-install-record.md").exists()
             ok("S4-6: an ordinary external record path remains allowed and is written "
-               "at its declared location, with 42 package files in the target")
+               "at its declared location, with 53 package files in the target")
 
             # S4-7: the existing startup-file refusal is not weakened or pre-empted.
             conflict = _install_mode_repo(tmp / "d-conflict", env)
@@ -9059,11 +9148,18 @@ def test_consumer_install_destination_links():
             proc = install(clean, second_record)
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             assert second_record.is_file()
-            package_rows = [row for row in first
-                            if row[1] != "FILE" or not row[0].startswith("docs/")]
-            resumed_rows = [row for row in _dest_snapshot(clean)
-                            if row[1] != "FILE" or not row[0].startswith("docs/")]
-            assert len([row for row in resumed_rows if row[1] == "FILE"]) == 42, resumed_rows
+            # Exclude only the second declared record path; every package file
+            # (including the ten under docs/) stays in the snapshot comparison, so
+            # the resume check does not lose coverage. The snapshot rows carry the
+            # sha256 digest, so this also compares the first record byte-for-byte.
+            def _without_second_record(row):
+                if row[1] != "FILE":
+                    return True
+                return not row[0].replace("\\", "/").endswith("docs/second-install-record.md")
+
+            package_rows = [row for row in first if _without_second_record(row)]
+            resumed_rows = [row for row in _dest_snapshot(clean) if _without_second_record(row)]
+            assert len([row for row in resumed_rows if row[1] == "FILE"]) == 54, resumed_rows
             assert package_rows == resumed_rows, (
                 "the resume changed an installed package file")
             assert (clean / "docs" / "consumer-install-record.md").is_file()
@@ -9182,7 +9278,7 @@ def test_consumer_install_destination_links():
             assert raced_record.read_bytes().startswith(b"raced-record"), (
                 "the appearing record was overwritten: %r" % raced_record.read_bytes()[:80])
             raced_rows = _dest_snapshot(raced_target)
-            assert len([row for row in raced_rows if row[1] == "FILE"]) == 43, raced_rows
+            assert len([row for row in raced_rows if row[1] == "FILE"]) == 54, raced_rows
             assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
                 "the refused run left a temp file: %s" % (raced_rows,))
             ok("S4-19: a record that appears between the preflight and P9 exits 24 "
@@ -9200,7 +9296,7 @@ def test_consumer_install_destination_links():
             assert raced_record.read_bytes().startswith(b"raced-record"), (
                 "the switch overwrote the record that appeared during the run")
             raced_rows = _dest_snapshot(raced_target)
-            assert len([row for row in raced_rows if row[1] == "FILE"]) == 43, raced_rows
+            assert len([row for row in raced_rows if row[1] == "FILE"]) == 54, raced_rows
             assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
                 "the refused run left a temp file: %s" % (raced_rows,))
             ok("S4-20: -AllowExistingRecord no longer skips a record that appears "
@@ -9890,7 +9986,7 @@ def test_consumer_install_record_temp_collision():
             assert stale_tmp.read_bytes() == sentinel, (
                 "the record write truncated the pre-existing .tmp leaf")
             files = [row for row in _dest_snapshot(stale) if row[1] == "FILE"]
-            assert len(files) == 44, files  # 42 package + record + stale .tmp
+            assert len(files) == 55, files  # 53 package + record + stale .tmp
             assert not list(stale_record.parent.glob("consumer-install-record.md.*.tmp")), (
                 "the record write left a unique GUID temp behind")
             ok("S4-12: a stale file at the old predictable <record>.tmp leaf is "
@@ -9996,7 +10092,7 @@ def test_consumer_install_record_write_failure():
             assert not blocked_record.exists(), "a record was left at the record path"
             assert not list(blocked.rglob("*.tmp")), "a temp file was left behind"
             files = [row for row in _dest_snapshot(blocked) if row[1] == "FILE"]
-            assert len(files) == 43, files  # 42 package + the blocker fixture
+            assert len(files) == 54, files  # 53 package + the blocker fixture
             ok("S4-15: a record-directory creation failure exits 25 with no record "
                "at -RecordPath and no temp, not a generic exit 1")
         finally:
@@ -10053,7 +10149,7 @@ def test_consumer_install_record_nonfile_switch():
             assert not list(fresh_record.parent.glob("consumer-install-record.md.*.tmp")), (
                 "a unique temp file was left behind")
             files = [row for row in _dest_snapshot(fresh) if row[1] == "FILE"]
-            assert len(files) == 43, files  # 42 package + record
+            assert len(files) == 54, files  # 53 package + record
             ok("S4-18: -AllowExistingRecord with no existing record still writes a "
                "fresh record and leaves no temp")
 
