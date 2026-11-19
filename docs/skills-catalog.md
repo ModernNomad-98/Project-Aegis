@@ -1209,6 +1209,14 @@ The user-facing UX/UI design conductor (scope decisions recorded under the stand
 | --- | --- | --- | --- |
 | `design-orchestrator` | scope decisions recorded under the standing decision protocol, D-15/D-16/D-17 (2026-11-16) | yes (writes one report and at most one STATE SNAPSHOT row under Exception 1) | One plain-language door for UX/UI design work: at most four intake questions, exactly one fixed play (design from scratch; improve existing screens; audit UI consistency; hand off a design-system change), every routed design skill named in order before starting, guide steps 1-3 handed to their owners when not met, conditional-step and absent-skill handling, manual-only execution handed to the human, ONE design report plus at most one STATE SNAPSHOT row; never implements, drives a browser or captures evidence. |
 
+### Skills (D124 — UX/UI screen composition addition)
+
+The read-only screen-composition advisor (scope decisions recorded under the standing decision protocol, D-15/D-16/D-17, 2026-11-19; no new family; one skill added to family 14's roster). It starts only from a supplied brief plus the applicable recorded design authority, states which arrangement decision is missing, and returns ONE buildable arrangement in the conversation with the primary task, entry prominence and why, phone/desktop order, deferral and one complete interaction with return/recovery; an approved composition is reused and only the missing decision proposed. Model-invocable, model-agnostic and advisory: it never implements, approves, drives a browser, captures evidence or writes product files, and it preserves ux-design-iteration, design-system and mobile-viewport-craft ownership.
+
+| Skill | Source | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `screen-composition-designer` | scope decisions recorded under the standing decision protocol, D-15/D-16/D-17 (2026-11-19) | yes (read-only advice in the conversation) | One buildable screen arrangement from a supplied brief + design authority: primary task, entry prominence and why, phone/desktop content and action order, deferral, one complete interaction with return/recovery, rationale against the brief; approved compositions reused; routes whole passes, iteration concepts, narrow layout defects, state matrices, token work, requirements work and all execution to their owners. |
+
 ### Skills (D12.4 — technical writing / docs engineering pack)
 
 The 8-skill docs engineering pack (reconciliation §3 D12.4 table, built by
