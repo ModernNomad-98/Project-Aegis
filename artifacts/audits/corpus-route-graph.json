@@ -1006,6 +1006,11 @@
       "declares_read_only": false
     },
     {
+      "name": "screen-composition-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "screenshot-evidence-planner",
       "manual_only": false,
       "declares_read_only": false
@@ -2141,6 +2146,11 @@
       "from": "architecture-designer",
       "to": "saas-platform-architect",
       "type": "description-mention"
+    },
+    {
+      "from": "architecture-designer",
+      "to": "state-machine-modeler",
+      "type": "body-route"
     },
     {
       "from": "architecture-fitness-function-designer",
@@ -3290,6 +3300,26 @@
     {
       "from": "design-orchestrator",
       "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "screen-composition-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "screen-composition-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "screen-composition-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "screen-composition-designer",
       "type": "body-route"
     },
     {
@@ -5293,6 +5323,11 @@
       "type": "description-mention"
     },
     {
+      "from": "plan-of-record-author",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
       "from": "playwright-e2e-engineer",
       "to": "accessibility-test-harness",
       "type": "description-mention"
@@ -5584,6 +5619,11 @@
     },
     {
       "from": "project-orchestrator",
+      "to": "design-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
       "to": "domain-modeler",
       "type": "body-route"
     },
@@ -5614,6 +5654,11 @@
     },
     {
       "from": "project-orchestrator",
+      "to": "plan-of-record-author",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
       "to": "prioritization-frame-picker",
       "type": "body-route"
     },
@@ -5636,6 +5681,11 @@
       "from": "project-orchestrator",
       "to": "product-spec-writer",
       "type": "description-mention"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "qa-orchestrator",
+      "type": "body-route"
     },
     {
       "from": "project-orchestrator",
@@ -6560,6 +6610,86 @@
     {
       "from": "scoped-approval-register",
       "to": "standing-approval-and-auto-advance",
+      "type": "description-mention"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "accessibility-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "design-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "design-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "design-review-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "design-system-token-governor",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "design-system-token-governor",
+      "type": "description-mention"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "edge-state-ux-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "frontend-architecture-mapper",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "mobile-viewport-craft",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "mobile-viewport-craft",
+      "type": "description-mention"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "product-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "ux-design-iteration",
+      "type": "body-route"
+    },
+    {
+      "from": "screen-composition-designer",
+      "to": "ux-design-iteration",
       "type": "description-mention"
     },
     {
@@ -7494,6 +7624,11 @@
     },
     {
       "from": "tenant-modeler",
+      "to": "membership-invitation-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "tenant-modeler",
       "to": "multi-tenant-data-architect",
       "type": "body-route"
     },
@@ -7509,8 +7644,18 @@
     },
     {
       "from": "tenant-modeler",
+      "to": "subscription-lifecycle-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "tenant-modeler",
       "to": "tenant-isolation-reviewer",
       "type": "description-mention"
+    },
+    {
+      "from": "tenant-modeler",
+      "to": "tenant-provisioning-designer",
+      "type": "body-route"
     },
     {
       "from": "tenant-provisioning-designer",
@@ -7999,7 +8144,6 @@
     "cqrs-read-model-designer",
     "data-quality-monitor-designer",
     "demo-tenant-safety-designer",
-    "design-orchestrator",
     "docs-first-implementer",
     "edge-function-designer",
     "export-pipeline-architect",
@@ -8025,7 +8169,6 @@
     "security-regression-harness-designer",
     "skill-selection-advisor",
     "skill-usage-ledger",
-    "state-machine-modeler",
     "technical-debt-classifier",
     "usage-metering-and-cost-attribution-pipeline-designer",
     "user-preference-architect"

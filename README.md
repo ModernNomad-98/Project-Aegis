@@ -125,7 +125,7 @@ practical terms, Aegis can make your coding agent act as:
 | **a product discovery and specification facilitator** | Interviews you to turn a vague idea into clear written requirements and a spec. | `requirements-gathering-facilitator`, `product-spec-writer` |
 | **a product analytics and experimentation architect** | Decides what to measure and designs and analyzes experiments (honest A/B tests; execution is a separately authorized implementation/operations handoff), so decisions rest on evidence, not guesses. | `product-analytics-instrumenter`, `ab-test-designer` |
 | **a data engineer and data-platform architect** | Designs how data moves, lands and stays trustworthy — schemas and migrations that do not break the live app, warehouse/lake layout, event transport between services, and data-quality/PII controls. | `schema-evolution-planner`, `warehouse-lake-architect`, `data-quality-monitor-designer` |
-| **a UX/UI design conductor** | Turns "help me design my app's UI" into one guided design pass: picks one of four fixed plays, names every UX/UI skill in order before starting, hands the design path's context/classification, specification and design-authority steps to their owners, and hands implementation and manual-only execution back to you or your project route. It never writes code, drives a browser, captures screenshots or claims a design was built. | `design-orchestrator`, `ux-design-iteration`, `edge-state-ux-designer` |
+| **a UX/UI design conductor** | Turns "help me design my app's UI" into one guided design pass: picks one of four fixed plays, names every UX/UI skill in order before starting, hands the design path's context/classification, specification and design-authority steps to their owners, and hands implementation and manual-only execution back to you or your project route. It never writes code, drives a browser, captures screenshots or claims a design was built. | `design-orchestrator`, `ux-design-iteration`, `screen-composition-designer`, `edge-state-ux-designer` |
 | **a technical writer and documentation engineer** | Writes the docs — READMEs, guides, application programming interface (API) references — and keeps them from drifting out of date. | `readme-craftsman`, `docs-as-code-architect` |
 | **a staff+ technical leadership advisor** | Brings the senior-engineer judgment call: what's worth building, how to scope it, when to say no. | `staff-scope-selector`, `tech-spec-writer` |
 | **a full-codebase auditor** | Reads an entire codebase and reports its real health, risks, and technical debt. | `full-codebase-auditor`, `principal-code-analyst` |
@@ -894,7 +894,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->258<!-- /SKILL-COUNT --> skills comprise **257 in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->259<!-- /SKILL-COUNT --> skills comprise **258 in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -965,7 +965,7 @@ keeps a human as the approval gate on anything irreversible. See
     plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus performance/load test harnesses. *e.g.*
     `schema-evolution-planner`, `pii-lifecycle-designer`, `query-plan-reader`,
     `n-plus-one-detector`, `load-test-planner`.
-14. **Product, PM & growth** *(D24, 23 + iteration + design conductor, 25)* — turning product intent into shippable, measured work:
+14. **Product, PM & growth** *(D24, 23 + iteration + design conductor, 26)* — turning product intent into shippable, measured work:
     requirements elicitation feeding specs, then prioritization, flag-gated rollout,
     analytics instrumentation, an optional pre-implementation design-iteration
     path, a UX/UI design conductor for whole design passes, and (Batch 3/D110)
@@ -975,7 +975,8 @@ keeps a human as the approval gate on anything irreversible. See
     [Your first session](#your-first-session) for the entry-point walkthrough.
     *e.g.* `requirements-gathering-facilitator`, `product-spec-writer`,
     `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `event-schema-architect`,
-    `ab-test-designer`, `design-orchestrator`, `ux-design-iteration`.
+    `ab-test-designer`, `design-orchestrator`, `ux-design-iteration`,
+    `screen-composition-designer`.
 15. **Docs engineering** *(D25, 8)* — durable documentation as a discipline: README craft,
     ADR-corpus sequencing, Diátaxis organization, the docs-as-code pipeline, generated API
     reference, onboarding. *e.g.* `readme-craftsman`, `diataxis-doc-organizer`,
@@ -1624,6 +1625,12 @@ D123 — UX/UI design conductor addition (scope decisions recorded under the sta
 | Skill | What it does | Invocation |
 |---|---|---|
 | `design-orchestrator` | The design conductor: one plain-language door after the design path guide's steps 1-3, at most four intake questions, exactly one fixed play (design from scratch / improve existing screens / audit UI consistency / hand off a design-system change) with every UX/UI skill named in order before starting, conditional-step and absent-skill handling, manual-only execution handed to the human, and ONE plain-language design report (plus, only when `docs/project-state.md` exists and recording is authorized, one STATE SNAPSHOT row). Routes and records design work; never implements, drives a browser, captures screenshots or claims a built design. | auto + manual |
+
+D124 — UX/UI screen-composition addition (scope decisions recorded under the standing decision protocol, D-15/D-16/D-17; one skill in family 14, no new family):
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `screen-composition-designer` | The read-only screen-composition advisor: from a supplied brief and the applicable recorded design authority it returns one buildable arrangement — primary task, entry prominence and why, phone/desktop content and action order, deferral, and one complete interaction with return/recovery — explained against the brief; reuses an approved composition and proposes only the missing decision; never implements, approves, browses, captures or writes product files; preserves iteration, design-system/UI-lock and mobile-craft ownership. | auto + manual |
 
 D12.4 — technical writing / docs engineering (D25): durable documentation
 as its own discipline. `adr-sequencer` EXTENDS `adr-writer` (longitudinal

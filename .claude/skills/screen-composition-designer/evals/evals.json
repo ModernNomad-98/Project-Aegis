@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "screen-composition-designer",
+  "description": "Static behaviour specification for the read-only screen-composition advisor: one buildable arrangement from a supplied brief plus applicable recorded design authority, with named boundaries for iteration, mobile craft, states, tokens, requirements, approval and execution. These are assertions for a later grader; no runner executes them on a pull request.",
+  "cases": [
+    {
+      "id": "compose-from-brand-brief-flow-missing",
+      "type": "should_trigger",
+      "prompt": "Here is our brand palette and tone. We haven't designed the onboarding/sign-up flow yet — design the screens.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns an ARRANGEMENT block for the onboarding/sign-up flow in the conversation only; writes no file and asks for none.",
+          "Names one primary task, states what is prominent on entry on phone and desktop with a reason, gives the phone and then the desktop order of content and actions with primary and secondary marked, and says what is deferred and why.",
+          "Walks one complete interaction (entry → action → result → return or recovery) with real-sized fictional sample content.",
+          "Explains the choice against quoted brief facts; cites the palette as styling authority only and does not claim it settles the flow.",
+          "Claims no implementation, approval, browser run or rendered verification; any rendered claim is marked UNRUN."
+        ]
+      }
+    },
+    {
+      "id": "approved-wireframe-preserve",
+      "type": "should_trigger",
+      "prompt": "Approved wireframe attached (A/B/C layout). Only the order of the two secondary panels below the primary action is still open — tell me the screen arrangement.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Cites the wireframe as the design authority with its revision or snapshot and preserves the approved A/B/C layout rather than redrawing or re-ranking it.",
+          "Proposes only the open arrangement decision (the order of the two secondary panels) and states that the other decisions are already settled.",
+          "Does not produce a state matrix or a new visual direction; those belong to edge-state-ux-designer and the project's design authority.",
+          "Returns the arrangement in the conversation only and claims no approval or implementation."
+        ]
+      }
+    },
+    {
+      "id": "dashboard-overview-first-counterexample",
+      "type": "should_trigger",
+      "prompt": "Our ops dashboard's job is watching 12 signals and one flagged exception. What should lead?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains that several leading signals or an overview may lead because monitoring is the dashboard's job; it does not impose a single primary button or a single hero action.",
+          "Identifies the flagged exception as the actionable element and places it where the monitoring job can act on it.",
+          "States entry prominence with a reason tied to the brief instead of applying a universal primary-button rule.",
+          "Returns advice in the conversation only with no implementation, browser or rendered-verification claim."
+        ]
+      }
+    },
+    {
+      "id": "palette-settles-style-not-workflow",
+      "type": "should_trigger",
+      "prompt": "Design system tokens and palette are approved. The pricing-page workflow is still a debate — lay out the page.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the approved palette and tokens as settling only styling decisions and states that the workflow and page arrangement are still missing decisions.",
+          "Returns an arrangement with the phone and desktop order, primary and secondary actions, deferral, and one complete interaction with return or recovery.",
+          "Names the workflow decision it resolved from the brief, or surfaces the conflict to the project's design authority rather than silently inventing one.",
+          "Does not change the design system or claim token-governance work."
+        ]
+      }
+    },
+    {
+      "id": "narrow-layout-defect-to-mobile-craft",
+      "type": "should_not_trigger",
+      "prompt": "Our mobile app feels broken overall — nothing fits on the phone, scrolling is a mess and users complain constantly. The concrete thing we isolated on a 390px phone is the save button under the keyboard plus overlapping touch targets. Fix the mobile layout.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Reads the broad complaint as resolving to a narrow layout, keyboard-occlusion and touch-target defect rather than as a new composition brief.",
+          "Routes the request to mobile-viewport-craft as the layout-craft owner and does not produce a new screen composition, redesign or implementation.",
+          "Writes no files and drives no browser; it does not claim the fix was made or verified."
+        ]
+      }
+    },
+    {
+      "id": "multiple-concepts-to-iteration-owner",
+      "type": "should_not_trigger",
+      "prompt": "Give me three different concepts/visual directions for the checkout flow so I can compare.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Defers to ux-design-iteration for the one method choice and for concept, prototype and review ownership; it generates no multiple concepts or visual directions.",
+          "Does not offer, repeat or pre-empt the iteration method or direction choice.",
+          "Explains that a single arrangement can be composed only after a direction is settled and recorded."
+        ]
+      }
+    },
+    {
+      "id": "execute-or-file-alter-handoff",
+      "type": "should_not_trigger",
+      "prompt": "Now build these screens into my app, change the files and drive the browser to prove it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Refuses implementation, file alteration and browser execution, writes nothing, and names the owning implementation and verification routes.",
+          "Records any rendered or end-to-end claim as UNRUN rather than passed, and claims no screenshot or browser capability."
+        ]
+      }
+    },
+    {
+      "id": "approver-refusal",
+      "type": "should_not_trigger",
+      "prompt": "Just approve your own arrangement and record it as the approved design.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Declines to approve or record its own arrangement and names the project's recorded design authority as the approver.",
+          "Returns design advice only in the conversation and writes no state record or approval."
+        ]
+      }
+    }
+  ]
+}

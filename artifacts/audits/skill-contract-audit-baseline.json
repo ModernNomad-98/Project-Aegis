@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.0",
     "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-    "repo_sha": "9b69bd1b7eae07f991c78411196f4fb7b840e3b7",
-    "branch": "p0/design-orchestrator-2026-11-16",
+    "repo_sha": "07f8f9a1d6b3af0a77b2ab533d880f10c6a22d44",
+    "branch": "p0/cards-2-3-screen-composition-2026-11-19",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 1003,
-    "audited_byte_count": 6969370,
-    "corpus_content_hash": "241a2066078f16416e896fdda61ca688f7e50cd15a43560010d94185d8942f0b",
+    "audited_file_count": 1006,
+    "audited_byte_count": 7033027,
+    "corpus_content_hash": "4ef82128972a2e92e7c10938c834d50bfcba506fb75eb1c974a2ec70aca8729e",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "f22573feba16acba977a6b024a9df47bb035907a877684fa9cb70b7f966e3a3b"
+        "sha256": "e74c9b65a03fac2c2678d0d8001b9afb9ec9a51b2f25f2c41a87b4c6a78f24d8"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -32,22 +32,25 @@
         "kind": "enumerated name only (feeds manifest); not in corpus hash",
         "names": [
           "add-ai-safely.md",
+          "after-launch.md",
           "check-your-app.md",
           "design-and-build-ui.md",
+          "find-a-specialist.md",
+          "get-audit-ready.md",
           "release-with-agents.md",
           "something-is-broken.md",
           "test-your-app.md"
         ]
       }
     },
-    "skill_count": 258,
+    "skill_count": 259,
     "rule_count": 28,
-    "finding_count": 475,
+    "finding_count": 481,
     "by_severity": {
       "P0": 3,
-      "P1": 100,
+      "P1": 101,
       "P2": 41,
-      "info": 331
+      "info": 336
     },
     "by_rule": {
       "ARTF-001": 10,
@@ -56,13 +59,13 @@
       "PARITY-001": 38,
       "REF-003": 1,
       "ROUTE-001": 1,
-      "ROUTE-002": 331,
-      "SIDE-004": 85,
+      "ROUTE-002": 336,
+      "SIDE-004": 86,
       "STATE-001": 2,
       "STATE-002": 1
     },
-    "mechanical_count": 375,
-    "semantic_review_candidates": 100
+    "mechanical_count": 380,
+    "semantic_review_candidates": 101
   },
   "rule_inventory": [
     {
@@ -135,7 +138,7 @@
         "AEGIS-057"
       ],
       "limits": "covers the \u00a75 classes (source/test/config writes, VCS mutation, install, network, deploy/provision, data-store/live-state writes, spend, unbound doc/state writes) as lexical verb+noun patterns, at most ONE candidate per class per skill; fenced snippets INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; the approved-write exception applies ONLY to the doc-state-write class and ONLY when exact-path + content-preview + approval markers sit within a few lines of the write \u2014 approval language elsewhere never suppresses anything (extra negative fixture: approved-doc-writer)",
-      "hit_count": 85
+      "hit_count": 86
     },
     {
       "id": "SIDE-005",
@@ -357,7 +360,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 331
+      "hit_count": 336
     },
     {
       "id": "ROUTE-003",
@@ -4994,6 +4997,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/plan-of-record-author/SKILL.md",
+      "line": 0,
+      "owning_skill": "plan-of-record-author",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: \"Stage A rule), Role B the consumer's own recorded class\" \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "plan-of-record-author",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/playwright-e2e-engineer/SKILL.md",
@@ -6367,6 +6387,86 @@
       "remediation_owner": "scoped-approval-register",
       "confidence": "low",
       "mechanical": false
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/screen-composition-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "screen-composition-designer",
+      "related_skills": [
+        "design-orchestrator"
+      ],
+      "evidence": "exclusion toward `design-orchestrator` is not reciprocated (design-orchestrator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "screen-composition-designer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/screen-composition-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "screen-composition-designer",
+      "related_skills": [
+        "design-system-token-governor"
+      ],
+      "evidence": "exclusion toward `design-system-token-governor` is not reciprocated (design-system-token-governor's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "screen-composition-designer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/screen-composition-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "screen-composition-designer",
+      "related_skills": [
+        "edge-state-ux-designer"
+      ],
+      "evidence": "exclusion toward `edge-state-ux-designer` is not reciprocated (edge-state-ux-designer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "screen-composition-designer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/screen-composition-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "screen-composition-designer",
+      "related_skills": [
+        "mobile-viewport-craft"
+      ],
+      "evidence": "exclusion toward `mobile-viewport-craft` is not reciprocated (mobile-viewport-craft's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "screen-composition-designer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/screen-composition-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "screen-composition-designer",
+      "related_skills": [
+        "ux-design-iteration"
+      ],
+      "evidence": "exclusion toward `ux-design-iteration` is not reciprocated (ux-design-iteration's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "screen-composition-designer",
+      "confidence": "low",
+      "mechanical": true
     },
     {
       "rule": "SIDE-004",
@@ -8659,6 +8759,7 @@
     "design-orchestrator": {
       "accepted": 3,
       "prioritized": 2,
+      "proposed": 4,
       "ready": 1,
       "sequenced": 1,
       "verified": 10
@@ -8915,10 +9016,12 @@
       "verified": 3
     },
     "plan-audit-reviewer": {
-      "accepted": 1,
+      "accepted": 2,
       "verified": 5
     },
     "plan-of-record-author": {
+      "accepted": 3,
+      "complete": 7,
       "proposed": 1,
       "verified": 1
     },
@@ -9073,6 +9176,11 @@
       "durable": 2,
       "proposed": 3,
       "verified": 3
+    },
+    "screen-composition-designer": {
+      "accepted": 1,
+      "complete": 4,
+      "verified": 1
     },
     "screenshot-evidence-planner": {
       "accepted": 1,
