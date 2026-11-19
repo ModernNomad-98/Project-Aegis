@@ -1208,21 +1208,6 @@ function Assert-DestinationPath([string]$Path, [string]$Root, [int]$Code = 23) {
   }
 }
 
-# P5b2 - a regular file at any destination parent path would stop P6 from
-# creating that directory; refuse it at 20 before any write (Codex P2 on the
-# final head: a file named tools before tools/skills-manifest.json, for example).
-foreach ($rel in $package) {
-  $parts = $rel -split '/'
-  $walk = $Tgt
-  for ($i = 0; $i -lt $parts.Count - 1; $i++) {
-    $walk = Join-Path $walk $parts[$i]
-    if (Test-Path -LiteralPath $walk) {
-      if (-not (Test-Path -LiteralPath $walk -PathType Container)) {
-        Stop-Step 20 ("destination parent path exists and is not a directory: {0} (for {1}); nothing was written" -f $walk, $rel)
-      }
-    } else { break }
-  }
-}
 # P5 - destination pre-checks. An existing skill directory is accepted only as a
 # resume of a prior partial install: every file already there must be one of that
 # skill's packaged files and byte-identical to the pinned source.
@@ -1251,6 +1236,22 @@ foreach ($rel in $package) {
 Assert-DestinationPath $Tgt $null
 foreach ($rel in $package) {
   Assert-DestinationPath (Join-Path $Tgt ($rel -replace '/', [IO.Path]::DirectorySeparatorChar)) $Tgt
+}
+# P5b2 - after the containment/reparse preflight, so a linked target or ancestor is
+# refused at 23 before anything is followed. A regular file at a package parent
+# path (e.g. a file named tools) would stop P6 from creating that directory, so it
+# is refused at 20 before any write.
+foreach ($rel in $package) {
+  $parts = $rel -split '/'
+  $walk = $Tgt
+  for ($i = 0; $i -lt $parts.Count - 1; $i++) {
+    $walk = Join-Path $walk $parts[$i]
+    if (Test-Path -LiteralPath $walk) {
+      if (-not (Test-Path -LiteralPath $walk -PathType Container)) {
+        Stop-Step 20 ("destination parent path exists and is not a directory: {0} (for {1}); nothing was written" -f $walk, $rel)
+      }
+    } else { break }
+  }
 }
 $recordExistedAtPreflight = $false
 if ($RecordPath) {

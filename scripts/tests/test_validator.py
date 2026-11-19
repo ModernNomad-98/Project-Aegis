@@ -9060,6 +9060,22 @@ def test_consumer_install_destination_links():
             ok("S4-2: a linked target root exits 23 naming the Junction before any write; "
                "the external inventory is unchanged")
 
+            # S4-30 (Codex P2 ordering): a linked target root whose external tree
+            # has a regular file at a package parent path must exit 23 (reparse),
+            # never 20: destination links are not followed.
+            ext = _install_mode_repo(tmp / "d-linked-parent-ext", env)
+            (ext / "tools").write_text("not a directory\n", encoding="utf-8", newline="\n")
+            linked = tmp / "d-linked-parent"
+            _dest_junction(linked, ext)
+            ext_before = _dest_snapshot(ext)
+            proc = install(linked)
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert "destination reparse point" in proc.stderr, proc.stderr
+            assert "Junction" in proc.stderr, proc.stderr
+            assert _dest_snapshot(ext) == ext_before, (
+                "the linked-target refusal modified the external tree")
+            ok("S4-30: a linked target root with a parent-path file exits 23, not 20")
+
             # S4-3: an intermediate junction late in the selected array is found
             # before the first package write, not after earlier files were copied.
             late = _install_mode_repo(tmp / "d-late", env)
