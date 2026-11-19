@@ -312,6 +312,37 @@ and design-system-change plays keep their existing scope.
    a receiver handed a blank or newly redesigned template has not received a
    handoff.
 
+   **Changing chat mid-design.** When the work moves to a fresh chat, fill this
+   copyable record at the actual switch and pass it as the receiving builder's brief;
+   keep its six parts together.
+
+   ```
+   HANDOFF — <task>
+
+   Task: <the next scoped task, in one sentence>
+   Design sources: <each design source and the revision or snapshot actually read; say which one you could open>
+   Approved decisions: <decision ID → what it settles, and which source authorizes it>
+   Open composition decisions: <what is not settled, and who owns it>
+   Target device: <every in-scope viewport and input method>
+   One observable success condition: <what the receiver can show as done>
+
+   Receiver: before starting, state which source you could actually read and what
+   you could render. If a named source is unavailable, name the exact blocked
+   decision, preserve the settled inputs above, and complete any independent part
+   without inventing the missing authority. When you finish, cite the transferred
+   input you used and the resulting output you produced. Ask only what the record
+   does not answer.
+   ```
+
+   A founder can request a one-pass prototype from that session without another
+   round of routine questions. The record projects the step-7 protocol above; the
+   canonical instructions for that protocol remain
+   [`phased-work-handoff-designer`](../../.claude/skills/phased-work-handoff-designer/SKILL.md).
+   When implementation or verification has already begun, this founder-facing
+   projection supplements — it never replaces — the full carry-forward record
+   above, whose decision IDs, changed and deliberately untouched files,
+   proven-invocation evidence and open items still carry.
+
 ## If you bring in an external repository
 
 A public repository or tool you name — or one your agent found for you — is
