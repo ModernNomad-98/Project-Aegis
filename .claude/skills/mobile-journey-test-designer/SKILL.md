@@ -52,17 +52,16 @@ selection state and the detail identity in agreement.
 3. **Specify the list–detail interaction checks.** For every named journey that
    uses a list → detail pattern, specify: select → inspect detail → return,
    recording the visible selected row's identity, the detail's identity and the
-   restored list position and focus at each step; filtering (the result-set
-   identity, the retained filter/query, and the restored position and focus
-   after return); where the list has search or filtering, no results and
+   restored list position and focus at each step; where the list has search or
+   filtering, filtering (the result-set identity, the retained filter/query,
+   and the restored position and focus after return) and no results and
    recovery (the honest zero-match state distinguished from loading and from an
    error, and clearing or correcting the query restoring the previous result
-   set and context) — a journey with no filtering feature records filtering and
-   the zero-match check as not applicable instead of inventing them; adjacent
-   IDs selected
-   by touch and keyboard (tap row n and row n+1, and use the keyboard arrows and
-   Enter where the widget exposes them, checking the detail identity each
-   time); and the agreement of the visible selected row, the accessible
+   set and context) — a journey with no filtering feature records those checks
+   as not applicable instead of inventing them; adjacent IDs selected by touch
+   and keyboard (tap row n and row n+1, and use the keyboard arrows and Enter
+   where the widget exposes them, checking the detail identity each time);
+   and the agreement of the visible selected row, the accessible
    selection semantics where the widget exposes them, and the detail identity —
    for a list that is plain link navigation (activating a row navigates to a
    detail page rather than selecting in a composite widget), compare the
@@ -73,11 +72,11 @@ selection state and the detail identity in agreement.
    selected row, so include a correct control example (focus on one row while
    the selected row and the detail show the same identity) that a reviewer must
    accept, beside the seeded mismatch (the selected row's identity differs from
-   the detail's) that must be flagged with visible evidence. State positioning and focus restoration explicitly,
-   including what is not restored. Layout correctness stays with
-   mobile-viewport-craft; the zero-match state design stays with
-   edge-state-ux-designer; execution stays with the manual-only owners named in
-   this skill's own pass-execution step (step 5 after renumbering).
+   the detail's) that must be flagged with visible evidence. State positioning
+   and focus restoration explicitly, including what is not restored. Layout
+   correctness stays with mobile-viewport-craft; the zero-match state design
+   stays with edge-state-ux-designer; execution stays with the manual-only
+   owners named in this skill's own pass-execution step (step 5).
 4. **Map journeys to a device/viewport + data matrix.** Which journey is checked on which device or viewport, with which persona and dataset.
 5. **Specify pass execution and evidence.** How the pass is run (a manual clickthrough session or Playwright specs — named as handoffs, never executed here) and how evidence is captured, composing `screenshot-evidence-planner`'s naming and masking conventions.
 6. **Emit the design** in the Output Format. State what was chosen, why, and the main rejected alternative.
@@ -95,9 +94,11 @@ Mobile check matrix (per journey):
 Device & data matrix:
   <journey> × <device/viewport> × <persona/data>
 List-detail checks (per list-detail journey):
-  select → inspect detail → return | filtering | no results and recovery |
-  adjacent IDs by touch and keyboard | visible selected row = accessible
-  selection = detail identity | focus vs selection (correct control included)
+  select → inspect detail → return | filtering and no results and recovery
+  only where the journey has a filter or search, else "n/a" | adjacent IDs by
+  touch and keyboard | visible selected row = accessible selection = detail
+  identity, or activated link identity = detail identity for plain link
+  navigation | focus vs selection (correct control included)
 Pass execution:
   <who runs the pass: manual clickthrough → clickthrough-test-engineer;
    permanent specs → playwright-e2e-engineer — named, not executed here>
@@ -117,13 +118,16 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 - [ ] The device/viewport + data matrix is named.
 - [ ] For each list-detail journey, select → inspect detail → return is
       specified with the visible selected row, the accessible selection
-      semantics (or the recorded gap) and the detail identity required to
-      agree.
+      semantics where the widget exposes them, and the detail identity required
+      to agree; for plain link navigation the activated link identity is
+      compared with the detail identity instead, and a gap is recorded only
+      where a widget models selection and exposes none.
 - [ ] Adjacent IDs are selected by touch and keyboard, and a correct control
       separates focus from selection so a reviewer cannot pass by flagging
       every focused row.
-- [ ] Filtering and no-results recovery are covered, with the restored result
-      set, list position and focus checked.
+- [ ] Where the journey has a filter or search, filtering and no-results
+      recovery are covered, with the restored result set, list position and
+      focus checked; otherwise those checks are recorded not applicable.
 - [ ] Evidence conventions follow `screenshot-evidence-planner`; no local naming rules invented.
 - [ ] Out-of-scope list is present and names the owning skills.
 - [ ] The design claims to drive no browser and execute no pass.

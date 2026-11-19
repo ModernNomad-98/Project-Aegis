@@ -108,10 +108,9 @@ network performance on mobile are `frontend-perf-engineer`'s.
    reading surface with content. Never claim a rendered or browser check from
    this step; rendered verification stays with its owners. Entry arrangement —
    what leads and what is deferred — stays with `screen-composition-designer`:
-   where the arrangement is unsettled, or this comparison would change it
-   beyond fitting an approved arrangement, hand that decision to its owner;
-   this step fits the first viewport inside an already approved arrangement and
-   fixes a narrow layout defect.
+   where the arrangement is unsettled, or a candidate would change it, hand
+   that decision to its owner; this step compares candidates inside an
+   already approved arrangement and fixes a narrow layout defect.
 3. **Choose breakpoints by content, not devices.** Add a breakpoint where
    THIS layout starts to break (line length too long, columns too
    cramped), not at a list of named phone widths that dates instantly.
@@ -168,7 +167,9 @@ viewport-unit cheat sheet, and wide-table reflow options:
 MOBILE VIEWPORT CRAFT — <surface(s)>
 Targets:      min-width=<n>; device/input classes; mobile-first stated
 Breakpoints:  <content-driven list + rationale>; container queries where component-scoped
-First viewport: <primary task; what is visible and actionable on entry and why;
+First viewport: <only when first-viewport composition is in scope; a narrow
+               defect repair says "n/a — narrow defect repair": the primary
+               task; what is visible and actionable on entry and why;
                secondary-feature displacement checked with the real content
                volume; overview/intro justified or omitted; no universal
                above-the-fold button>
@@ -191,12 +192,15 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
 
 - [ ] Design is mobile-first with a stated minimum width; breakpoints are
       content-driven, not a list of device widths.
-- [ ] The first viewport is composed against the named primary task using the
-      real content volume (list size, title lengths, row heights), and a
-      secondary feature does not displace the primary task without a recorded
-      justification.
-- [ ] An overview or intro is justified against the brief rather than assumed,
-      and no universal above-the-fold primary-button rule is prescribed.
+- [ ] Where the change composes or changes the first viewport, it is composed
+      against the named primary task using the real content volume (list size,
+      title lengths, row heights), and a secondary feature does not displace
+      the primary task without a recorded justification. A narrow correctness
+      repair that does not change what the first viewport shows is checked
+      only against its own defect, not for composition or content volume.
+- [ ] Where a first-viewport comparison applies, an overview or intro is justified
+      against the brief rather than assumed, and no universal above-the-fold
+      primary-button rule is prescribed.
 - [ ] Touch targets meet a minimum size with spacing, and the tappable
       area matches the visual; primaries are thumb-reachable.
 - [ ] Full-height layouts use dynamic viewport units, not `100vh`; safe-

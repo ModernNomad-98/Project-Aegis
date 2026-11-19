@@ -51,7 +51,7 @@ and two-line rows about 64–72 px, a search field 44–48 px, a filter-chip row
 | List section header | — | ≈ 32 |
 | Approximate used height | ≈ 700–712 incl. gaps (consumes the viewport) | ≈ 232 incl. gaps |
 | Remaining before first scroll | ≈ 0–12 | ≈ 470–490 |
-| Rows fully visible | 0 (no result row visible) | 4–6 at 56–72 px |
+| Rows fully visible | 0 (no result row visible) | 6–8 at 56–72 px |
 | Primary task on entry | not visible or actionable | find/select an entry is visible and actionable |
 
 **The secondary-feature displacement test.** List every element whose top edge is
