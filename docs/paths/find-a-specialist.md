@@ -166,7 +166,7 @@ If the app is already slow or broken rather than being planned, use the symptom 
 
 | The situation, in plain words | Who owns it (and its rules) |
 |---|---|
-| "I know what I want to do — I just do not know which skill." | [`skill-selection-advisor`](../../.claude/skills/skill-selection-advisor/SKILL.md) — recommends a ranked shortlist for a stated outcome and performs no side effect; it uses `docs/skills-catalog.md` and `tools/skills-manifest.json`; a starter copy may carry the manifest but not the source catalog, so the advisor uses its catalog-missing fallback, states the unknown and may stop short of a definitive shortlist, and it refuses to invoke, install or run anything. For the beginner lifecycle, use the journey door instead of this shortlist. If you cannot state an outcome yet, use the symptom map or the journey door first — this advisor needs a stated goal to rank. |
+| "I know what I want to do — I just do not know which skill." | [`skill-selection-advisor`](../../.claude/skills/skill-selection-advisor/SKILL.md) — recommends a ranked shortlist for a stated outcome and performs no side effect; it uses `docs/skills-catalog.md` and `tools/skills-manifest.json`; a starter copy may carry the manifest but not the source catalog, so without the catalog the advisor uses its catalog-missing fallback, states the unknown and may stop short of a definitive shortlist, and it refuses to invoke, install or run anything. For the beginner lifecycle, use the journey door instead of this shortlist. If you cannot state an outcome yet, use the symptom map or the journey door first — this advisor needs a stated goal to rank. |
 
 ### Save and resume
 
