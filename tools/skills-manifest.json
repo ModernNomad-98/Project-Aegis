@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "b27a339d8e93333ed5583e2fedc561d55a433e86",
+  "source_revision": "b683e4d7543e40fd97df5721017ca979f3ca938b",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -696,7 +696,7 @@
     {
       "name": "mobile-viewport-craft",
       "path": ".claude/skills/mobile-viewport-craft/SKILL.md",
-      "sha256": "04bd4a84115aa3230eb0c2a8a073b5919530088bb07db20de30152fce8fd62f2"
+      "sha256": "75e51039943878dec6658d56c8ab93be33ed197ca520421139999d0e5156f8dc"
     },
     {
       "name": "model-context-designer",
