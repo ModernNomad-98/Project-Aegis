@@ -29,6 +29,52 @@ density-independent pixels; the viewport-height units are defined below.
 Rule: full-height mobile layouts use `dvh` (or `svh` when you must never
 overflow). `100vh` is the classic "bottom cut off" bug.
 
+## First viewport — worked comparison (390×844 phone)
+
+Assumptions: 390×844 CSS px (a common small phone); browser chrome with the
+URL bar shown takes roughly 120 px, so the guaranteed visible content height
+is about 700–724 px — use `svh` for the guaranteed region and `dvh`
+for a panel that must track the chrome. Text at 100% scale; 16 px body text;
+32 px horizontal padding. Content is the guide fixture shape: **73 entries**,
+at least 12 long titles that wrap to two lines, single-line rows about 48–56 px
+and two-line rows about 64–72 px, a search field 44–48 px, a filter-chip row
+36–40 px and an app bar 52–56 px.
+
+| Above-the-fold element | Candidate A — welcome hero first | Candidate B — task first |
+| --- | --- | --- |
+| App bar | 56 | 56 |
+| Title / intro | hero headline + subhead ≈ 108 | compact title ≈ 32 |
+| Hero media | ≈ 160 | — |
+| Search + filters | below the first viewport | search ≈ 48 + chips ≈ 40 |
+| Primary app button | ≈ 48 | search is the primary action |
+| Secondary card (newsletter / sign-up) | ≈ 120 | below the list or deferred |
+| List section header | — | ≈ 32 |
+| Approximate used height | ≈ 552 incl. gaps | ≈ 232 incl. gaps |
+| Remaining before first scroll | ≈ 150–170 | ≈ 470–490 |
+| Rows fully visible | 0 (search partly cut) | 6–8 at 56–72 px |
+| Primary task on entry | not visible or actionable | find/select an entry is visible and actionable |
+
+**The secondary-feature displacement test.** List every element whose top edge is
+inside the first viewport; mark each primary or secondary. If a secondary
+element consumes space that would otherwise show the primary content or its
+first action, move it below the primary task or put it behind deliberate
+disclosure, then re-measure; record the before/after counts and the remaining
+trade-off. Repeat at the largest supported text scale, where two-line rows grow
+and the visible row count drops.
+
+**Overview/intro test.** An overview-first or intro-first first viewport is
+legitimate only with a written reason tied to the brief: a monitoring
+dashboard whose primary job is several signals at a glance, or a first-run
+orientation screen with a way past it (skip/exit). Brand preference alone is
+not sufficient when it delays the primary task; if the intro stays, record
+what it costs (rows or actions below the fold) and why that is acceptable.
+
+**No universal above-the-fold button.** Do not turn this into "every screen
+needs the primary button above the fold". Name the actual primary task first:
+list search and selection, record inspection, dashboard monitoring (signals
+may be the prominence) or reading (content may lead). A button is one possible
+control, not the rule.
+
 ## Safe areas
 
 ```css

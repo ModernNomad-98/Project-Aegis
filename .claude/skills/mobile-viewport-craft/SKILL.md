@@ -43,6 +43,10 @@ network performance on mobile are `frontend-perf-engineer`'s.
   focus-zoom, the focused field hidden behind the on-screen keyboard.
 - Use when: reflowing wide content (tables, dashboards) onto small
   screens, or supporting orientation and operating-system (OS) text-scaling.
+- Use when: composing the first phone viewport — deciding the primary task and
+  what is visible and actionable on entry — including when a welcome hero,
+  sign-up button, newsletter or other secondary feature pushes the primary task
+  below the fold.
 - Do NOT use when: the task is mobile PERFORMANCE — bundle weight, image
   payload, JavaScript (JS) execution cost on low-end devices — that is
   `frontend-perf-engineer`; this skill owns layout/touch, not kilobytes.
@@ -77,41 +81,61 @@ network performance on mobile are `frontend-perf-engineer`'s.
 1. **Set the target context and go mobile-first.** State the minimum
    supported width, the device/input classes that matter, and design up
    from the smallest — progressive enhancement, not desktop shrunk down.
-2. **Choose breakpoints by content, not devices.** Add a breakpoint where
+2. **Compose the first viewport against the primary task.** Name the primary
+   task this screen must support at the supported phone size (for example
+   finding one entry in a 73-entry list, or seeing several monitoring signals)
+   and say what is visible and actionable in the first viewport — the initial
+   visible area before scrolling, with the browser chrome included — and why.
+   Compare at least two candidate first-viewport arrangements using the real
+   content volume: the actual list size, realistic title lengths and row
+   heights, and the secondary features the brief wants — not a generic hero.
+   State what each candidate puts above the fold, what it pushes down, and the
+   primary task's distance from its first action. A secondary feature must not
+   displace the primary task below the first viewport unless the brief makes
+   that feature the job for this screen; if it does, record the justification
+   and the measured comparison. An overview or intro is legitimate when the
+   brief's first job is orientation — a monitoring dashboard whose job is
+   several signals, or an intentional welcome screen with a way past it — and
+   the comparison must justify it rather than assume it. Do not prescribe a
+   universal above-the-fold primary button: a button is one way to make the
+   primary task actionable, not a rule; a dashboard may lead with signals and a
+   reading surface with content. Never claim a rendered or browser check from
+   this step; rendered verification stays with its owners.
+3. **Choose breakpoints by content, not devices.** Add a breakpoint where
    THIS layout starts to break (line length too long, columns too
    cramped), not at a list of named phone widths that dates instantly.
    Fluid between breakpoints; reach for container queries when a
    component's layout depends on its own space, not the viewport's.
-3. **Design touch targets.** Minimum hit area (~44×44px guideline) with
+4. **Design touch targets.** Minimum hit area (~44×44px guideline) with
    adequate spacing so adjacent targets aren't mis-hit; put primary
    actions in the thumb-reachable zone; ensure the tappable area matches
    the visual (padding, not just the icon glyph).
-4. **Handle the viewport chrome honestly.** Replace `100vh` with dynamic
+5. **Handle the viewport chrome honestly.** Replace `100vh` with dynamic
    viewport units (`dvh`/`svh`/`lvh`) so full-height layouts account for
    the collapsing URL bar; apply `safe-area-inset-*` for notches and the
    home indicator; verify fixed headers/footers don't cover content or
    collide with the keyboard.
-5. **Design input and keyboard behavior.** Correct input types and
+6. **Design input and keyboard behavior.** Correct input types and
    `inputmode` for the right on-screen keyboard; input font-size that
    avoids iOS focus-zoom (≥16px); ensure the focused field scrolls above
    the keyboard rather than hiding behind it; sensible autofill/
    autocomplete.
-6. **Eliminate hover dependence and design gestures.** Every hover-only
+7. **Eliminate hover dependence and design gestures.** Every hover-only
    affordance (tooltip, menu, row action) needs a touch-reachable
    equivalent (tap, disclosure, long-press with a visible alternative).
    Custom gestures must be discoverable and must not fight the browser's
    own (back-swipe, pull-to-refresh, scroll).
-7. **Reflow real content.** Choose reflow (stack columns) vs hide
+8. **Reflow real content.** Choose reflow (stack columns) vs hide
    (progressive disclosure — never hide a critical action). For wide
    tables pick a pattern deliberately: stack-to-cards, horizontal scroll
    with a frozen key column, or priority-column collapse — and state the
    tradeoff. Long forms, nav (bottom-bar vs hamburger), and responsive
    media all get an explicit pattern.
-8. **Support orientation and OS text-scaling.** Rotation doesn't break
+9. **Support orientation and OS text-scaling.** Rotation doesn't break
    layout or lose state; respect OS text-size / browser zoom (don't clip
    or overlap at 200%) — record this as a11y intent for
    `accessibility-test-harness` to verify.
-9. **Name boundaries and deliver** the per-surface craft spec: weight/
+10. **Name boundaries and deliver** the per-surface craft spec: weight/
    network → `frontend-perf-engineer`; states → `edge-state-ux-designer`;
    a11y verification → `accessibility-test-harness`.
    For any user-facing layout choice (including wide-table or navigation
@@ -133,6 +157,10 @@ viewport-unit cheat sheet, and wide-table reflow options:
 MOBILE VIEWPORT CRAFT — <surface(s)>
 Targets:      min-width=<n>; device/input classes; mobile-first stated
 Breakpoints:  <content-driven list + rationale>; container queries where component-scoped
+First viewport: <primary task; what is visible and actionable on entry and why;
+               secondary-feature displacement checked with the real content
+               volume; overview/intro justified or omitted; no universal
+               above-the-fold button>
 Touch:        min target ~44px + spacing; thumb-zone for primaries; hit-area = visual
 Viewport:     <100vh browser-bar risk; 100svh | 100lvh | 100dvh chosen + why;
               safe-area inset applied; fixed elements vs keyboard checked>
@@ -152,6 +180,12 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
 
 - [ ] Design is mobile-first with a stated minimum width; breakpoints are
       content-driven, not a list of device widths.
+- [ ] The first viewport is composed against the named primary task using the
+      real content volume (list size, title lengths, row heights), and a
+      secondary feature does not displace the primary task without a recorded
+      justification.
+- [ ] An overview or intro is justified against the brief rather than assumed,
+      and no universal above-the-fold primary-button rule is prescribed.
 - [ ] Touch targets meet a minimum size with spacing, and the tappable
       area matches the visual; primaries are thumb-reachable.
 - [ ] Full-height layouts use dynamic viewport units, not `100vh`; safe-
@@ -195,6 +229,13 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
   win space is not.
 - Custom left-swipe gestures fight the browser's back-swipe and pull-to-
   refresh; design gestures that coexist with the platform, not against it.
+- A welcome hero, newsletter card or onboarding intro looks fine in a mock with
+  three short rows and can still push a 73-entry search and its first results
+  below the first viewport. Compare with the real content volume at the
+  supported phone height, not the sample.
+- "The primary button must be above the fold" is not a universal rule: a
+  monitoring dashboard may lead with signals and a reading surface with
+  content. Naming the primary task is the rule; the control shape is not.
 
 ## Stop Conditions
 
@@ -226,8 +267,11 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
 
 - [references/mobile-viewport-sheet.md](references/mobile-viewport-sheet.md)
   — content-driven breakpoint patterns, the touch-target and safe-area
-  reference, the viewport-unit cheat sheet, input-type/keyboard table, and
-  wide-table reflow options.
+  reference, the viewport-unit cheat sheet, input-type/keyboard table,
+  wide-table reflow options, and the worked first-viewport comparison
+  (390×844 phone, 73 entries, Candidate A vs Candidate B, the
+  secondary-feature displacement test, the overview/intro test and the
+  no-universal-above-the-fold-button rule).
 - `evals/evals.json` — behavior cases including the `100vh` trap fix, the
   hover-only-to-touch conversion, and the wide-table reflow.
 - `evals/trigger-evals.json` — discrimination against `frontend-perf-engineer`

@@ -63,6 +63,49 @@
           "States the handoff explicitly rather than silently dropping the execution half of the ask."
         ]
       }
+    },
+    {
+      "id": "list-detail-select-inspect-return",
+      "type": "should_trigger",
+      "prompt": "Design the mobile journey checks for a 73-entry guide list on a 390x844 phone: search/filter, select a deep named entry, inspect its detail, return to the list. Include what can go wrong when adjacent records look alike.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Specifies select -> inspect detail -> return for the journey, recording the visible selected row identity, the detail identity and the returned list position and focus at each step.",
+          "Requires the visible selected row, the accessible selection semantics where the widget exposes them, and the detail identity to agree on the same entry ID; where the widget exposes none, records that as a gap, not a pass.",
+          "Checks filtering and the return after a filter: the result-set identity, the retained filter/query, and the restored list position and focus.",
+          "Selects adjacent IDs (n and n+1, near-duplicate titles) by touch and by keyboard, and requires the detail identity to match on each selection, while distinguishing focus from selection.",
+          "Hands execution to clickthrough-test-engineer or playwright-e2e-engineer (manual-only) rather than running it, and keeps layout with mobile-viewport-craft."
+        ]
+      }
+    },
+    {
+      "id": "edge-no-results-recovery",
+      "type": "should_trigger",
+      "prompt": "Add the no-results and recovery checks to the mobile journey coverage for our guide search. Users type a query with no matches and then need to get back.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Specifies the zero-match (no results) state as its own check: the honest no results message and a visible way back, distinguished from loading and from an error.",
+          "Specifies recovery: clearing or correcting the filter restores the previous result set and the list context (position and focus), and the journey verifies the restored identities.",
+          "Keeps state design with edge-state-ux-designer and layout with mobile-viewport-craft; this case designs coverage only.",
+          "Names the evidence captured for the no-results state and for the recovery step so a reviewer can verify the restored list."
+        ]
+      }
+    },
+    {
+      "id": "reviewer-focus-vs-selection-control",
+      "type": "should_trigger",
+      "prompt": "Our reviewer flags every list row that shows a focus outline as a selection bug. Write the mobile journey check that separates focus from selection, including a correct example the reviewer must accept and a real mismatch it must flag.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the three things independently: keyboard focus (the focus ring or caret), selection (the chosen record, with its accessible selection semantics where exposed) and the detail identity.",
+          "Includes a correct control where a different row has focus while the selected row and the detail show the same ID - the reviewer must accept it and must not flag every focused row.",
+          "Includes a seeded mismatch where the highlighted or selected row's ID differs from the detail's ID - the reviewer must flag it and cite the visible evidence.",
+          "Requires the check to cite visible evidence (the row ID, the selection state, the detail ID) rather than the presence of a focus outline alone."
+        ]
+      }
     }
   ]
 }

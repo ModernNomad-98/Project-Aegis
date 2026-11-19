@@ -85,6 +85,34 @@
           "Viewport craft concerns layout/touch/viewport correctness, not payload size or JS execution cost."
         ]
       }
+    },
+    {
+      "id": "first-viewport-primary-task-comparison",
+      "type": "should_trigger",
+      "prompt": "Our founder guide app has 73 reference entries with long titles. The landing screen is supposed to show a welcome hero, a sign-up button and a newsletter card, and the search field plus the entries can start below the fold. Design the phone first viewport so users can actually do the primary task.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the primary task (finding or selecting an entry) and what is visible and actionable in the first viewport on a 390x844 phone, and why.",
+          "Compares at least two first-viewport compositions using the real content volume - 73 entries, long titles that wrap, realistic row heights - and the approximate visible height after browser chrome, instead of a generic hero.",
+          "Shows the secondary features (welcome hero, sign-up, newsletter) displacing the primary task below the first viewport, and prescribes the smallest composition change or records a justification for keeping them.",
+          "Does not prescribe a universal above-the-fold primary button; states the primary task and the prominence it needs, and keeps rendered verification with its owners."
+        ]
+      }
+    },
+    {
+      "id": "edge-overview-intro-no-universal-button",
+      "type": "should_trigger",
+      "prompt": "Two phone screens: (1) a monitoring dashboard whose job is seeing fleet health at a glance, and (2) a new app's first-run welcome that explains the product before the list. Our design lead says every phone screen must have the primary button above the fold. Decide whether an overview or intro is justified on each, and what belongs in the first viewport.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Justifies an overview-first first viewport for the monitoring dashboard because several signals serve the primary task, and an intentional intro for the first-run screen only with a stated reason and a way past it (skip/exit), rather than assuming either.",
+          "Does not apply a universal above-the-fold primary-button rule; explains that the primary task can be signals, content or search/filter rather than a button.",
+          "Uses the real content volume of each screen to decide what fits, and names the secondary items that must not displace the primary task.",
+          "States that the answer sets the design only and does not authorize implementing or shipping it."
+        ]
+      }
     }
   ]
 }
