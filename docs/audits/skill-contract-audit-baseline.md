@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `04487c16fbc5fc83a02649202489f0a41d21e0dd` (branch `p0/card4-mobile-2026-11-19`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `6015769a68b41442f7152b47625dd446b34089f3b0505609ce18fa3db99d99a7` (1006 files, 7051024 bytes)
+- Repo SHA: `fea6753ed1b81431ba10da55f94c749f3e4aa75f` (branch `p0/card4-mobile-2026-11-19`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `3188c74f4fe9fc63cb391426cbb330da9f58956538d13769982f95e14fb3e309` (1006 files, 7054336 bytes)
 - Skills scanned: **259**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **481** (380 mechanical, 101 semantic-review candidates)
 
