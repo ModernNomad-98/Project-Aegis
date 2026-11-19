@@ -256,6 +256,22 @@ and design-system-change plays keep their existing scope.
      Yields the naming, masking, metadata (build, viewport, revision, case)
      and storage rules every capture follows, so a reviewer can tie each
      image to the output revision it came from.
+   - **If the change alters an in-scope phone interaction —
+     [`mobile-journey-test-designer`](../../.claude/skills/mobile-journey-test-designer/SKILL.md).**
+     Yields the mobile journey coverage design for the changed interaction:
+     select → inspect detail → return with the visible selected row, the
+     accessible selection semantics where the widget exposes them, and the
+     detail identity required to agree; filtering and no results and recovery
+     where the journey has a filter or search (a journey without them records
+     the check as not applicable); adjacent-ID selection by touch and keyboard;
+     and restored position/focus on return, with focus and selection
+     distinguished and a correct control
+     included so a reviewer cannot pass by flagging every focused row. The
+     skill designs coverage only: layout correctness stays with
+     [`mobile-viewport-craft`](../../.claude/skills/mobile-viewport-craft/SKILL.md),
+     and the manual-only execution owners named below keep execution ownership. A
+     static, non-interactive change (copy, colour, spacing, or screenshot-only
+     verification) skips this handoff and records the skip.
 
    Verification inspects the implemented interface, exercises the named
    journey using the states the specification actually defines (for example

@@ -29,6 +29,70 @@ density-independent pixels; the viewport-height units are defined below.
 Rule: full-height mobile layouts use `dvh` (or `svh` when you must never
 overflow). `100vh` is the classic "bottom cut off" bug.
 
+## First viewport — worked comparison (390×844 phone)
+
+Assumptions: 390×844 CSS px (a common small phone); browser chrome with the
+URL bar shown takes roughly 120 px, so the guaranteed visible content height
+is about 700–724 px — use `svh` for the guaranteed region and `dvh`
+for a panel that must track the chrome. Text at 100% scale; 16 px body text;
+32 px horizontal padding. Content is the guide fixture shape: **73 entries**,
+at least 12 long titles that wrap to two lines, single-line rows about 48–56 px
+and two-line rows about 64–72 px, a search field 44–48 px, a filter-chip row
+36–40 px and an app bar 52–56 px.
+
+Both columns are the SAME recorded arrangement: the recorded order and
+prominence come from `screen-composition-designer` — app bar, the recorded
+welcome hero and subhead, the recorded sign-up button, the recorded newsletter
+card, the search field, the filter chips, and the 73-entry list. The comparison
+measures two LAYOUTS of that one recorded arrangement: Candidate A renders the
+recorded blocks at their recorded size, Candidate B renders the same recorded
+order and prominence more compactly. It does not compare arrangements and it
+does not decide what leads, what is deferred, or whether an intro is shown.
+
+| Above-the-fold element | Candidate A — recorded arrangement at recorded size | Candidate B — same recorded arrangement, compact layout |
+| --- | --- | --- |
+| App bar | 56 | 56 |
+| Title / intro (recorded) | hero headline + subhead ≈ 128 | compact rendering ≈ 96 |
+| Hero media (recorded) | ≈ 288 | ≈ 200 |
+| Search + filters | below the first viewport | search ≈ 48 + chips ≈ 40 (visible) |
+| Primary app button (recorded) | ≈ 56 | ≈ 48 |
+| Secondary card (recorded newsletter / sign-up) | ≈ 144 | ≈ 120 |
+| List section header | — | ≈ 32 |
+| Approximate used height | ≈ 700–712 incl. gaps (consumes the viewport) | ≈ 560 incl. gaps |
+| Remaining before first scroll | ≈ 0–24 | ≈ 140–164 |
+| Rows fully visible | 0 (no result row visible) | 0 (search, chips and header fit; no 56–72 px result row fits) |
+| Primary task on entry | not visible or actionable | search visible; no result row visible, so selecting an entry is not actionable |
+
+**The secondary-feature displacement test.** List every element whose top edge is
+inside the first viewport; mark each primary or secondary. If a secondary
+element consumes space that would otherwise show the primary content or its
+first action, measure the cost at the real content volume and report the layout
+options inside the same recorded order; moving it below the primary task,
+deferring it, or putting it behind deliberate disclosure changes the
+arrangement, so record the trade-off and hand that decision to
+`screen-composition-designer`. Record the before/after counts and the
+remaining trade-off. Repeat at the largest
+supported text scale, where two-line rows grow and the visible row count drops.
+
+**Overview/intro test.** Whether an overview or intro leads the first viewport
+is a composition decision recorded by `screen-composition-designer`; this
+test never judges that choice. It reports the layout consequence of a recorded
+overview or intro: the rows or actions it pushes below the fold at the real
+content volume, and the reason the recorded decision cites (for example a
+monitoring dashboard whose recorded job is several signals, or a first-run
+orientation screen with a way past it) so the cost is visible next to the
+decision. If the recorded arrangement has no overview/intro answer, surface
+the missing decision to `screen-composition-designer` instead of
+assuming one; if the recorded choice carries no stated reason, report the
+measured cost and hand the decision back to that owner — weighing brand
+preference is the owner's job, not this skill's.
+
+**No universal above-the-fold button.** Do not turn this into "every screen
+needs the primary button above the fold". Work from the recorded primary task:
+list search and selection, record inspection, dashboard monitoring (signals
+may be the recorded prominence) or reading (recorded content may lead). A
+button is one possible control, not the rule.
+
 ## Safe areas
 
 ```css

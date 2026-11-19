@@ -1,10 +1,11 @@
 {
   "skill": "mobile-viewport-craft",
-  "description": "Trigger discrimination for mobile layout/touch/viewport CRAFT (this skill) vs mobile page WEIGHT/performance (frontend-perf-engineer), vs non-happy-path STATES (edge-state-ux-designer), vs a11y VERIFICATION (accessibility-test-harness).",
+  "description": "Trigger discrimination for mobile layout/touch/viewport CRAFT (this skill) vs mobile page WEIGHT/performance (frontend-perf-engineer), vs non-happy-path STATES (edge-state-ux-designer), vs a11y VERIFICATION (accessibility-test-harness), vs first-viewport ARRANGEMENT (screen-composition-designer).",
   "overlaps_with": [
     "frontend-perf-engineer",
     "edge-state-ux-designer",
-    "accessibility-test-harness"
+    "accessibility-test-harness",
+    "screen-composition-designer"
   ],
   "cases": [
     {
@@ -37,6 +38,22 @@
       "expected_skill": "accessibility-test-harness",
       "should_not_trigger": ["mobile-viewport-craft"],
       "reason": "Designing the a11y verification harness (scans, keyboard/contrast/zoom checks in CI) is accessibility-test-harness. This skill designs touch-target and zoom-safe craft and records the a11y intent that harness verifies."
+    },
+    {
+      "id": "first-viewport-layout-of-recorded-arrangement-wins",
+      "prompt": "The approved composition for our guide's landing screen is recorded (welcome hero, sign-up, newsletter, then the 73-entry search and list), and at 390x844 the phone layout puts the search below the fold. Craft the phone first-viewport layout inside that recorded arrangement and measure what it costs.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": ["screen-composition-designer"],
+      "note": "SEAM CASE (primary) — the arrangement is settled and recorded; the question is layout/craft inside it (what fits above the fold, measured against the real content volume), not what should lead.",
+      "reason": "mobile-viewport-craft owns how a recorded arrangement lays out at the phone size; deciding what leads or what is deferred is screen-composition-designer's job."
+    },
+    {
+      "id": "first-viewport-arrangement-goes-to-screen-composition-designer",
+      "prompt": "Our guide app has no approved screen composition: the primary task, what should lead on entry, and the order of content and actions are all undecided. Decide what goes first on the phone and desktop and what can be deferred.",
+      "expected_skill": "screen-composition-designer",
+      "should_not_trigger": ["mobile-viewport-craft"],
+      "note": "SEAM CASE (primary, reverse) — the arrangement itself is missing; entry prominence and content order are composition decisions, and layout craft can only lay out an arrangement that exists.",
+      "reason": "screen-composition-designer owns the screen arrangement (primary task, entry prominence, order, deferral); mobile-viewport-craft owns the layout/touch craft of a settled arrangement."
     }
   ]
 }

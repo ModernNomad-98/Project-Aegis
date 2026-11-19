@@ -43,6 +43,17 @@ network performance on mobile are `frontend-perf-engineer`'s.
   focus-zoom, the focused field hidden behind the on-screen keyboard.
 - Use when: reflowing wide content (tables, dashboards) onto small
   screens, or supporting orientation and operating-system (OS) text-scaling.
+- Use when: laying out the first phone viewport of an already approved or
+  recorded entry arrangement — the craft that makes the recorded primary task
+  as visible and actionable on entry as the layout allows at the supported
+  phone size — including when a welcome hero, sign-up button, newsletter or
+  other secondary feature in that arrangement would push the primary task
+  below the fold; surface the displacement and hand any arrangement decision
+  to `screen-composition-designer`.
+- Do NOT use when: the screen's arrangement is missing or unsettled — its
+  primary task, what is prominent on entry, or the order of content and
+  actions is a composition decision for `screen-composition-designer`;
+  this skill lays out and checks a settled arrangement, it does not decide one.
 - Do NOT use when: the task is mobile PERFORMANCE — bundle weight, image
   payload, JavaScript (JS) execution cost on low-end devices — that is
   `frontend-perf-engineer`; this skill owns layout/touch, not kilobytes.
@@ -77,43 +88,79 @@ network performance on mobile are `frontend-perf-engineer`'s.
 1. **Set the target context and go mobile-first.** State the minimum
    supported width, the device/input classes that matter, and design up
    from the smallest — progressive enhancement, not desktop shrunk down.
-2. **Choose breakpoints by content, not devices.** Add a breakpoint where
+2. **Lay out the first viewport inside the settled arrangement.** Apply this
+   step when the entry arrangement is already approved or recorded (or an
+   existing screen's arrangement is settled) and you are crafting how it lays
+   out at the phone size. Name the recorded primary task (for example finding
+   one entry in a 73-entry list, or seeing several monitoring signals) and say
+   what the layout makes visible and actionable in the first viewport — the
+   initial visible area before scrolling, with the browser chrome included —
+   and why. Compare at least two candidate first-viewport layouts inside that
+   arrangement using the real content volume: the actual list size, realistic
+   title lengths and row heights, and the secondary features the arrangement
+   already contains — not a generic hero. State what each layout fits above
+   the fold, what it pushes down, and the recorded primary task's distance
+   from its first action. If a secondary feature in the arrangement displaces
+   the primary task below the first viewport, name the displacement, measure
+   its cost at the real content volume and report the layout options that fit
+   more inside the same recorded order (for example a shorter hero, a compact
+   title or a tighter spacing scale); any arrangement change — what leads,
+   what is deferred, or whether an overview/intro is shown — is
+   `screen-composition-designer`'s decision, so record the trade-off
+   and hand it to that owner instead of deciding it here. An overview or intro
+   that the recorded arrangement makes the screen's job is measured like any
+   other recorded content: the layout fits it and never decides whether it is
+   shown. Do not prescribe a universal above-the-fold
+   primary button: a button is one way to make the recorded primary task
+   actionable, not a rule; a dashboard may lead with signals and a reading
+   surface with content. Never claim a rendered or browser check from this
+   step; rendered verification stays with its owners. A narrow layout defect
+   that does not change what the first viewport shows (a `100vh` clipping
+   fix, a mis-sized target, a hover-only affordance or a wide-table reflow) is
+   handled by the existing steps below — not by this layout comparison and not
+   by redrawing the arrangement.
+3. **Choose breakpoints by content, not devices.** Add a breakpoint where
    THIS layout starts to break (line length too long, columns too
    cramped), not at a list of named phone widths that dates instantly.
    Fluid between breakpoints; reach for container queries when a
    component's layout depends on its own space, not the viewport's.
-3. **Design touch targets.** Minimum hit area (~44×44px guideline) with
+4. **Design touch targets.** Minimum hit area (~44×44px guideline) with
    adequate spacing so adjacent targets aren't mis-hit; put primary
    actions in the thumb-reachable zone; ensure the tappable area matches
    the visual (padding, not just the icon glyph).
-4. **Handle the viewport chrome honestly.** Replace `100vh` with dynamic
+5. **Handle the viewport chrome honestly.** Replace `100vh` with dynamic
    viewport units (`dvh`/`svh`/`lvh`) so full-height layouts account for
    the collapsing URL bar; apply `safe-area-inset-*` for notches and the
    home indicator; verify fixed headers/footers don't cover content or
    collide with the keyboard.
-5. **Design input and keyboard behavior.** Correct input types and
+6. **Design input and keyboard behavior.** Correct input types and
    `inputmode` for the right on-screen keyboard; input font-size that
    avoids iOS focus-zoom (≥16px); ensure the focused field scrolls above
    the keyboard rather than hiding behind it; sensible autofill/
    autocomplete.
-6. **Eliminate hover dependence and design gestures.** Every hover-only
+7. **Eliminate hover dependence and design gestures.** Every hover-only
    affordance (tooltip, menu, row action) needs a touch-reachable
    equivalent (tap, disclosure, long-press with a visible alternative).
    Custom gestures must be discoverable and must not fight the browser's
    own (back-swipe, pull-to-refresh, scroll).
-7. **Reflow real content.** Choose reflow (stack columns) vs hide
-   (progressive disclosure — never hide a critical action). For wide
-   tables pick a pattern deliberately: stack-to-cards, horizontal scroll
-   with a frozen key column, or priority-column collapse — and state the
-   tradeoff. Long forms, nav (bottom-bar vs hamburger), and responsive
-   media all get an explicit pattern.
-8. **Support orientation and OS text-scaling.** Rotation doesn't break
+8. **Reflow real content inside the recorded order.** For each region,
+   choose a reflow pattern for real content (stack columns, long forms,
+   nav, responsive media) and state the tradeoff; hiding, deferring or
+   moving content behind progressive disclosure is an arrangement
+   decision for `screen-composition-designer` — record the measured
+   cost and hand it over rather than choosing it here, and never hide a
+   critical action. For wide tables pick a pattern deliberately:
+   stack-to-cards, horizontal scroll with a frozen key column, or
+   priority-column collapse — and state the tradeoff.
+9. **Support orientation and OS text-scaling.** Rotation doesn't break
    layout or lose state; respect OS text-size / browser zoom (don't clip
    or overlap at 200%) — record this as a11y intent for
    `accessibility-test-harness` to verify.
-9. **Name boundaries and deliver** the per-surface craft spec: weight/
+10. **Name boundaries and deliver** the per-surface craft spec: weight/
    network → `frontend-perf-engineer`; states → `edge-state-ux-designer`;
-   a11y verification → `accessibility-test-harness`.
+   a11y verification → `accessibility-test-harness`; arrangement/
+   composition (what leads, what is deferred, whether an intro is shown) →
+   `screen-composition-designer`.
    For any user-facing layout choice (including wide-table or navigation
    pattern), define unfamiliar terms and explain why each viable pattern
    fits this content, what it preserves or loses, accessibility and use
@@ -133,25 +180,46 @@ viewport-unit cheat sheet, and wide-table reflow options:
 MOBILE VIEWPORT CRAFT — <surface(s)>
 Targets:      min-width=<n>; device/input classes; mobile-first stated
 Breakpoints:  <content-driven list + rationale>; container queries where component-scoped
+First viewport: <layout of the recorded arrangement only: the recorded primary
+               task; what the layout makes visible and actionable on entry and
+               why; secondary-feature displacement measured with the real
+               content volume; no universal above-the-fold button; a narrow
+               defect repair says "n/a — narrow defect repair">
 Touch:        min target ~44px + spacing; thumb-zone for primaries; hit-area = visual
 Viewport:     <100vh browser-bar risk; 100svh | 100lvh | 100dvh chosen + why;
               safe-area inset applied; fixed elements vs keyboard checked>
 Input:        <HTML input type + inputmode virtual-keyboard hint; font-size ≥16px
               (no focus-zoom); focused field above keyboard>
 Hover/gesture: hover-only affordances → touch equivalents; custom gestures discoverable, no browser conflict
-Layout:       reflow-vs-hide per region; wide-table pattern chosen (cards|scroll+frozen|priority) w/ tradeoff;
-              nav pattern; responsive media
+Layout:       reflow per region inside the recorded order; wide-table pattern chosen (cards|scroll+frozen|priority)
+              w/ tradeoff; nav pattern; responsive media; hiding/deferring content → screen-composition-designer
 Choices, if any: <plain options and reasons; effects/costs; recommendation
                  + why + what could change it; one decision question each>
 Orientation:  rotation-safe; OS text-scale/200% zoom respected (a11y intent)
+Handoff:      any arrangement/composition decision (what leads, what is deferred,
+              whether an overview/intro is shown) → screen-composition-designer
 Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-ux-designer;
-              a11y verify → accessibility-test-harness
+              a11y verify → accessibility-test-harness; composition/arrangement →
+              screen-composition-designer
 ```
 
 ## Validation Checklist
 
 - [ ] Design is mobile-first with a stated minimum width; breakpoints are
       content-driven, not a list of device widths.
+- [ ] When an already-recorded arrangement calls for first-viewport layout work,
+      the layout is measured against the recorded primary task using the real
+      content volume (list size, title lengths, row heights), and any secondary
+      feature's measured cost is reported rather than resolved by changing the
+      arrangement; a composition change — what leads, what is deferred, or
+      whether an overview/intro is shown — is handed to
+      `screen-composition-designer`. A narrow correctness repair that
+      does not change what the first viewport shows is checked only against its
+      own defect, not for composition or content volume.
+- [ ] No universal above-the-fold primary-button rule is prescribed; the layout
+      works inside the recorded entry prominence rather than deciding it, and no
+      overview/intro choice is made here — it is handed to
+      `screen-composition-designer`.
 - [ ] Touch targets meet a minimum size with spacing, and the tappable
       area matches the visual; primaries are thumb-reachable.
 - [ ] Full-height layouts use dynamic viewport units, not `100vh`; safe-
@@ -191,10 +259,18 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
   input or a fixed "Save" bar down there disappears behind it unless you
   scroll it into view or adjust for the keyboard.
 - Hiding "secondary" content to fit mobile often hides the thing the user
-  came for. Progressive disclosure is fine; hiding the primary action to
-  win space is not.
+  came for. Progressive disclosure is an arrangement decision for
+  `screen-composition-designer`; hiding the primary action to win space
+  is not a layout fix.
 - Custom left-swipe gestures fight the browser's back-swipe and pull-to-
   refresh; design gestures that coexist with the platform, not against it.
+- A welcome hero, newsletter card or onboarding intro looks fine in a mock with
+  three short rows and can still push a 73-entry search and its first results
+  below the first viewport. Compare with the real content volume at the
+  supported phone height, not the sample.
+- "The primary button must be above the fold" is not a universal rule: a
+  monitoring dashboard may lead with signals and a reading surface with
+  content. Naming the primary task is the rule; the control shape is not.
 
 ## Stop Conditions
 
@@ -226,8 +302,11 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
 
 - [references/mobile-viewport-sheet.md](references/mobile-viewport-sheet.md)
   — content-driven breakpoint patterns, the touch-target and safe-area
-  reference, the viewport-unit cheat sheet, input-type/keyboard table, and
-  wide-table reflow options.
+  reference, the viewport-unit cheat sheet, input-type/keyboard table,
+  wide-table reflow options, and the worked first-viewport comparison
+  (390×844 phone, 73 entries, Candidate A vs Candidate B, the
+  secondary-feature displacement test, the overview/intro test and the
+  no-universal-above-the-fold-button rule).
 - `evals/evals.json` — behavior cases including the `100vh` trap fix, the
   hover-only-to-touch conversion, and the wide-table reflow.
 - `evals/trigger-evals.json` — discrimination against `frontend-perf-engineer`

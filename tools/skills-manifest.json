@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "0626ea07a1ec275a1962d98d06f46abc1eec0060",
+  "source_revision": "b683e4d7543e40fd97df5721017ca979f3ca938b",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -691,12 +691,12 @@
     {
       "name": "mobile-journey-test-designer",
       "path": ".claude/skills/mobile-journey-test-designer/SKILL.md",
-      "sha256": "0cba3e154cc4efbe86b9c0be8ca67a40377bb6654a3ff90f8ed336121fe10af6"
+      "sha256": "81edb394e410242980c7a1441b56afa8d3130c55d7fe1646e0457ac6157f8b8d"
     },
     {
       "name": "mobile-viewport-craft",
       "path": ".claude/skills/mobile-viewport-craft/SKILL.md",
-      "sha256": "f70c87a0ce1c2750b670cbd4dab9db1ab44e9f17cc5c1075bd4b7e82e41056c2"
+      "sha256": "75e51039943878dec6658d56c8ab93be33ed197ca520421139999d0e5156f8dc"
     },
     {
       "name": "model-context-designer",
