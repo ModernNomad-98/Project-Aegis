@@ -43,10 +43,17 @@ network performance on mobile are `frontend-perf-engineer`'s.
   focus-zoom, the focused field hidden behind the on-screen keyboard.
 - Use when: reflowing wide content (tables, dashboards) onto small
   screens, or supporting orientation and operating-system (OS) text-scaling.
-- Use when: composing the first phone viewport — deciding the primary task and
-  what is visible and actionable on entry — including when a welcome hero,
-  sign-up button, newsletter or other secondary feature pushes the primary task
-  below the fold.
+- Use when: laying out the first phone viewport of an already approved or
+  recorded entry arrangement — the craft that makes the recorded primary task
+  as visible and actionable on entry as the layout allows at the supported
+  phone size — including when a welcome hero, sign-up button, newsletter or
+  other secondary feature in that arrangement would push the primary task
+  below the fold; surface the displacement and hand any arrangement decision
+  to `screen-composition-designer`.
+- Do NOT use when: the screen's arrangement is missing or unsettled — its
+  primary task, what is prominent on entry, or the order of content and
+  actions is a composition decision for `screen-composition-designer`;
+  this skill lays out and checks a settled arrangement, it does not decide one.
 - Do NOT use when: the task is mobile PERFORMANCE — bundle weight, image
   payload, JavaScript (JS) execution cost on low-end devices — that is
   `frontend-perf-engineer`; this skill owns layout/touch, not kilobytes.
@@ -81,36 +88,35 @@ network performance on mobile are `frontend-perf-engineer`'s.
 1. **Set the target context and go mobile-first.** State the minimum
    supported width, the device/input classes that matter, and design up
    from the smallest — progressive enhancement, not desktop shrunk down.
-2. **Compose the first viewport against the primary task.** Apply this step
-   when the request composes or changes what the first phone viewport shows —
-   a new or redesigned entry screen, or a change that adds or removes entry
-   content or prominence. For a narrow correctness repair that does not change
-   what the first viewport shows (a `100vh` clipping fix, a hover-only
-   affordance, a wide-table reflow), keep the existing flow and do not invent
-   content volumes or a second arrangement. Name the primary
-   task this screen must support at the supported phone size (for example
-   finding one entry in a 73-entry list, or seeing several monitoring signals)
-   and say what is visible and actionable in the first viewport — the initial
-   visible area before scrolling, with the browser chrome included — and why.
-   Compare at least two candidate first-viewport arrangements using the real
-   content volume: the actual list size, realistic title lengths and row
-   heights, and the secondary features the brief wants — not a generic hero.
-   State what each candidate puts above the fold, what it pushes down, and the
-   primary task's distance from its first action. A secondary feature must not
-   displace the primary task below the first viewport unless the brief makes
-   that feature the job for this screen; if it does, record the justification
-   and the measured comparison. An overview or intro is legitimate when the
-   brief's first job is orientation — a monitoring dashboard whose job is
-   several signals, or an intentional welcome screen with a way past it — and
-   the comparison must justify it rather than assume it. Do not prescribe a
-   universal above-the-fold primary button: a button is one way to make the
-   primary task actionable, not a rule; a dashboard may lead with signals and a
-   reading surface with content. Never claim a rendered or browser check from
-   this step; rendered verification stays with its owners. Entry arrangement —
-   what leads and what is deferred — stays with `screen-composition-designer`:
-   where the arrangement is unsettled, or a candidate would change it, hand
-   that decision to its owner; this step compares candidates inside an
-   already approved arrangement and fixes a narrow layout defect.
+2. **Lay out the first viewport inside the settled arrangement.** Apply this
+   step when the entry arrangement is already approved or recorded (or an
+   existing screen's arrangement is settled) and you are crafting how it lays
+   out at the phone size. Name the recorded primary task (for example finding
+   one entry in a 73-entry list, or seeing several monitoring signals) and say
+   what the layout makes visible and actionable in the first viewport — the
+   initial visible area before scrolling, with the browser chrome included —
+   and why. Compare at least two candidate first-viewport layouts inside that
+   arrangement using the real content volume: the actual list size, realistic
+   title lengths and row heights, and the secondary features the arrangement
+   already contains — not a generic hero. State what each layout fits above
+   the fold, what it pushes down, and the recorded primary task's distance
+   from its first action. If a secondary feature in the arrangement displaces
+   the primary task below the first viewport, name the displacement, the
+   measured cost and the layout options that reduce it (for example a shorter
+   hero, a compact title or a deferred newsletter card); an arrangement change —
+   what leads or what is deferred — is `screen-composition-designer`'s
+   decision, so record the trade-off and hand it to that owner instead of
+   deciding it here. Legitimate overview or intro layouts are those the
+   recorded arrangement makes the screen's job, and the layout must justify
+   them rather than assume them. Do not prescribe a universal above-the-fold
+   primary button: a button is one way to make the recorded primary task
+   actionable, not a rule; a dashboard may lead with signals and a reading
+   surface with content. Never claim a rendered or browser check from this
+   step; rendered verification stays with its owners. A narrow layout defect
+   that does not change what the first viewport shows (a `100vh` clipping
+   fix, a mis-sized target, a hover-only affordance or a wide-table reflow) is
+   handled by the existing steps below — not by this layout comparison and not
+   by redrawing the arrangement.
 3. **Choose breakpoints by content, not devices.** Add a breakpoint where
    THIS layout starts to break (line length too long, columns too
    cramped), not at a list of named phone widths that dates instantly.

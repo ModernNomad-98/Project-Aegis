@@ -89,28 +89,28 @@
     {
       "id": "first-viewport-primary-task-comparison",
       "type": "should_trigger",
-      "prompt": "Our founder guide app has 73 reference entries with long titles. The landing screen is supposed to show a welcome hero, a sign-up button and a newsletter card, and the search field plus the entries can start below the fold. Design the phone first viewport so users can actually do the primary task.",
+      "prompt": "An approved, recorded composition for our founder guide's landing screen leads with a welcome hero, a sign-up button and a newsletter card, then the 73-entry search and list. On a 390x844 phone the reviewed layout puts the search field and entries below the fold. The arrangement is settled and the primary task is finding or selecting an entry. Craft the phone first-viewport layout inside the recorded arrangement, and say plainly if the arrangement itself is what blocks the primary task.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Names the primary task (finding or selecting an entry) and what is visible and actionable in the first viewport on a 390x844 phone, and why.",
-          "Compares at least two first-viewport compositions using the real content volume - 73 entries, long titles that wrap, realistic row heights - and the approximate visible height after browser chrome, instead of a generic hero.",
-          "Shows the secondary features (welcome hero, sign-up, newsletter) displacing the primary task below the first viewport, and prescribes the smallest composition change or records a justification for keeping them.",
-          "Does not prescribe a universal above-the-fold primary button; states the primary task and the prominence it needs, and keeps rendered verification with its owners."
+          "Names the recorded primary task (finding or selecting an entry) and what the layout makes visible and actionable in the first viewport on a 390x844 phone, and why.",
+          "Compares at least two first-viewport layouts inside the recorded arrangement using the real content volume - 73 entries, long titles that wrap, realistic row heights - and the visible height after browser chrome, instead of a generic hero.",
+          "Shows the secondary features (welcome hero, sign-up, newsletter) consuming the first viewport and names the measured cost to the recorded primary task; layout options that reduce it are proposed inside the arrangement, and any arrangement change - what leads or what is deferred - is handed to screen-composition-designer rather than decided here.",
+          "Does not prescribe a universal above-the-fold button and does not redraw the recorded composition; rendered verification stays with its owners and the answer authorizes no implementation."
         ]
       }
     },
     {
       "id": "edge-overview-intro-no-universal-button",
       "type": "should_trigger",
-      "prompt": "Two phone screens: (1) a monitoring dashboard whose job is seeing fleet health at a glance, and (2) a new app's first-run welcome that explains the product before the list. Our design lead says every phone screen must have the primary button above the fold. Decide whether an overview or intro is justified on each, and what belongs in the first viewport.",
+      "prompt": "Two phone screens: (1) a monitoring dashboard whose recorded job leads with several fleet-health signals, and (2) a first-run welcome that is recorded as an intentional intro with a way past it. Our design lead says every phone screen must have the primary button above the fold. For each recorded arrangement, craft the phone first-viewport layout and explain what the no-universal-button claim means here.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Justifies an overview-first first viewport for the monitoring dashboard because several signals serve the primary task, and an intentional intro for the first-run screen only with a stated reason and a way past it (skip/exit), rather than assuming either.",
-          "Does not apply a universal above-the-fold primary-button rule; explains that the primary task can be signals, content or search/filter rather than a button.",
-          "Uses the real content volume of each screen to decide what fits, and names the secondary items that must not displace the primary task.",
-          "States that the answer sets the design only and does not authorize implementing or shipping it."
+          "Treats both arrangements as recorded composition decisions (an overview-first dashboard whose job is several signals, an intentional intro with a way past it) and justifies the layout of each rather than re-deciding the arrangement.",
+          "Does not apply a universal above-the-fold primary-button rule; explains that the recorded primary task can be signals, content or search/filter rather than a button.",
+          "Uses the real content volume of each screen to lay out what fits in the first viewport, and names the secondary items that must not displace the recorded primary task.",
+          "States that the answer sets the layout only, does not authorize implementing or shipping it, and hands any arrangement change to screen-composition-designer."
         ]
       }
     }

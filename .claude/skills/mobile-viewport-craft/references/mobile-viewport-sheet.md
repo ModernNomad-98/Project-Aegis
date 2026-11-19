@@ -50,24 +50,30 @@ and two-line rows about 64–72 px, a search field 44–48 px, a filter-chip row
 | Secondary card (newsletter / sign-up) | ≈ 144 | below the list or deferred |
 | List section header | — | ≈ 32 |
 | Approximate used height | ≈ 700–712 incl. gaps (consumes the viewport) | ≈ 232 incl. gaps |
-| Remaining before first scroll | ≈ 0–12 | ≈ 470–490 |
+| Remaining before first scroll | ≈ 0–24 | ≈ 470–490 |
 | Rows fully visible | 0 (no result row visible) | 6–8 at 56–72 px |
 | Primary task on entry | not visible or actionable | find/select an entry is visible and actionable |
 
 **The secondary-feature displacement test.** List every element whose top edge is
 inside the first viewport; mark each primary or secondary. If a secondary
 element consumes space that would otherwise show the primary content or its
-first action, move it below the primary task or put it behind deliberate
-disclosure, then re-measure; record the before/after counts and the remaining
-trade-off. Repeat at the largest supported text scale, where two-line rows grow
-and the visible row count drops.
+first action, measure the cost at the real content volume and propose layout
+options inside the recorded arrangement; moving it below the primary task or
+putting it behind deliberate disclosure changes the arrangement, so record the
+trade-off and hand that decision to `screen-composition-designer`. Record
+the before/after counts and the remaining trade-off. Repeat at the largest
+supported text scale, where two-line rows grow and the visible row count drops.
 
-**Overview/intro test.** An overview-first or intro-first first viewport is
-legitimate only with a written reason tied to the brief: a monitoring
-dashboard whose primary job is several signals at a glance, or a first-run
-orientation screen with a way past it (skip/exit). Brand preference alone is
-not sufficient when it delays the primary task; if the intro stays, record
-what it costs (rows or actions below the fold) and why that is acceptable.
+**Overview/intro test.** An overview-first or intro-first first viewport is a
+composition decision: `screen-composition-designer` records it, and this
+skill checks the layout of the recorded choice. A recorded overview or intro is
+legitimate when it carries a written reason tied to the brief — a monitoring
+dashboard whose recorded job is several signals at a glance, or a first-run
+orientation screen with a way past it (skip/exit); brand preference alone is
+not sufficient when it delays the recorded primary task. If the recorded intro
+stays, record what it costs at the real content volume (rows or actions below
+the fold) and why that is acceptable; if no reason is recorded, surface the
+missing arrangement decision to its owner instead of assuming it.
 
 **No universal above-the-fold button.** Do not turn this into "every screen
 needs the primary button above the fold". Name the actual primary task first:
