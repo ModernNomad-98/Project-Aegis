@@ -88,6 +88,19 @@
           "Returns ACCEPT or REVISE/REJECT bound to the captured revision hash and never authors, fixes, implements or merges."
         ]
       }
+    },
+    {
+      "id": "unclassified-plan-rejected",
+      "type": "should_trigger",
+      "prompt": "Audit this captured plan-of-record revision for our consumer repository. It says the change classification was skipped because the work is 'unclassified', and asks you to ACCEPT the plan anyway.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects 'unclassified' as a substitute for a recorded change class and does not accept the plan's own claim as classification evidence.",
+          "Returns REVISE (the Stage-B verdict vocabulary) with a minimal fix list bound to the captured revision hash, not REVISE/UNRUN.",
+          "Does not issue ACCEPT while the plan's classification is missing or acknowledged-unclassified."
+        ]
+      }
     }
   ]
 }
