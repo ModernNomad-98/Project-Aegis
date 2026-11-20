@@ -4,10 +4,7 @@ A deterministic, offline, read-only check that reports when the shipped Aegis sk
 skill, a required supporting file, discovery coverage or availability. It **reports only**: it never
 repairs, prunes, deletes, installs or writes inside the scanned tree.
 
-**Status of this slice:** local-only tool plus a generated baseline. **It is NOT wired into CI.**
-CI wiring is a separate owner-gated decision (program decision OD-W04-1; it would touch the
-gate-guard-protected workflow surface and needs its own authorization and review). The repository's
-required merge gate is unchanged; this tool does not block merges today.
+**Status of this slice:** repository tool plus a generated baseline. Its test suite is wired into the `tools-tests-linux` and `tools-tests-windows` CI jobs through the `skill-preservation` record-check label (#1164); those jobs run on pull requests that change `tools/` and on every push to main. The tests run the checker over synthetic fixture trees; no CI job runs it as a library gate and it is not a required check; the repository's required merge gate remains `validate-skills` plus `gate-guard`, unchanged, and the tool's findings do not gate merges.
 
 ## Quick start
 
