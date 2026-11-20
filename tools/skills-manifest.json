@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "bb22c24dde611c58c9df5b424dd9d10c77521817",
+  "source_revision": "50567415948eb0cad5fc555dcbc18deb48842993",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -1216,7 +1216,7 @@
     {
       "name": "tenant-modeler",
       "path": ".claude/skills/tenant-modeler/SKILL.md",
-      "sha256": "a4d36e86e2cc7d3949a0f533c42830aa1651fc027ce5419543c55dc279dee840"
+      "sha256": "3163e5b4334a2acdef1b94bd7019cdae548b408732f4b411107a3ccb94068360"
     },
     {
       "name": "tenant-provisioning-designer",
