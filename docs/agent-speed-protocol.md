@@ -29,6 +29,14 @@ none is claimed to.
   head in CI. Local full-suite runs are optional and never repeated per
   candidate.
 
+### Delta re-audits
+When a minor or nit finding is fixed after the plan audit, the same auditor checks only the delta:
+- **Inputs:** the original capture hash, the fix diff, and the changed-lines context.
+- **Check:** the fix addresses the finding, the agreed scope is unchanged, and no new risk was introduced.
+- **Verdict:** `DELTA PASS` or `DELTA REVISE`, recorded in the PR body (or the run log); a `DELTA REVISE` returns to the author for another delta check; no full re-audit and no new full audit cycle.
+
+A blocking or major finding still requires a new capture and a full re-audit.
+
 ## Scope freeze
 
 The captured plan is the scope. Anything requested after capture becomes (a) a
