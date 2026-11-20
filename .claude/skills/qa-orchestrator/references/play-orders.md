@@ -35,7 +35,7 @@ With an existing test suite:
 2. `qa-strategy-architect` — product-wide strategy (risk inventory, layer split, manual-vs-automated).
 3. `qa-automation-architect` — framework/tooling/parallelization design; its blueprint selects the tools and layers for THIS repo stack.
 4. `test-data-architect` — deterministic test data per layer (no secrets; non-production only).
-5. `test-tenant-provisioner` *(manual-only)* — ONLY when non-production test accounts are missing, drifted or hand-made, or need validation or repair (including stale auth fixtures); validate-only is the default; BEFORE any engineer run that needs them.
+5. `test-tenant-provisioner` *(manual-only)* — ONLY when non-production test accounts are missing, drifted or hand-made, or need validation or repair (including stale auth fixtures); validate-only is the default; BEFORE any engineer run that needs them; if validation leaves any needed account BLOCKED, UNVERIFIED, MISSING or DRIFTED, STOP before the engineer step, hand the validation result to the human, and continue only after a clean re-validation.
 6. The engineer skill(s) the blueprint SELECTS — for example `vitest-unit-component-engineer` *(manual-only)* and/or `playwright-e2e-engineer` *(manual-only)*, not automatically both; a stack with no browser layer names no browser engineer.
 7. `regression-suite-curator` — ONLY when the suite has CI history and runtimes; otherwise name the curator as the next action once the suite has run in CI.
 
