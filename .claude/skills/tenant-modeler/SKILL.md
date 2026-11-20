@@ -128,9 +128,11 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 Handoffs: multi-tenant-data-architect (schema), authorization-matrix-designer
   (permissions), saas-platform-architect (platform flows); if the request
   includes the invitation flow, subscription state machine, or tenant-creation
-  path, add membership-invitation-designer (invitation flow),
-  subscription-lifecycle-designer (subscription state machine),
-  tenant-provisioning-designer (tenant-creation path)
+  path and that specialist is installed, add membership-invitation-designer
+  (invitation flow), subscription-lifecycle-designer (subscription state
+  machine), or tenant-provisioning-designer (tenant-creation path); otherwise
+  keep the invitation lifecycle in this model and record the other design as
+  an open question
 ```
 
 ## Validation Checklist
