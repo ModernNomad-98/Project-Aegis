@@ -12,7 +12,9 @@ import copy
 import io
 import json
 import pathlib
+import shutil
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -94,6 +96,31 @@ def rewrite_envelope(path, mutate):
     document = json.loads(path.read_text(encoding="utf-8"))
     mutate(document["payload"])
     _fixtures._write_envelope(path, document["payload"], document["provenance"])
+
+
+def evaluate_paths(paths):
+    """Run the checker against one built fixture bundle."""
+
+    return gate.evaluate(
+        repo_root=paths["root"],
+        verdict_path=paths["verdict"],
+        freeze_path=paths["freeze"],
+        settlement_path=paths["settlement"],
+        head_history_path=paths["head_history"],
+        stage_records_dir=paths["stage_records_dir"],
+        supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+        fixture_mode=True,
+    )
+
+
+def relocated(paths, root):
+    """The same built bundle after its repository has moved to root."""
+
+    base = paths["root"]
+    moved = {}
+    for key, value in paths.items():
+        moved[key] = root / value.relative_to(base) if isinstance(value, pathlib.Path) else value
+    return moved
 
 
 class FixtureBundleTest(unittest.TestCase):
@@ -842,29 +869,63 @@ class StaticHygieneTest(unittest.TestCase):
 
 
 class DeterminismTest(unittest.TestCase):
+    def assert_no_location_leak(self, rendered, root):
+        """The JSON must not name the location it was produced from.
+
+        The raw form catches POSIX paths; the JSON-escaped form catches Windows
+        paths, which a raw substring check misses - the platform-dependent gap
+        that let the CI failure hide in a local Windows run.
+        """
+
+        for needle in (str(root), pathlib.PurePath(root).as_posix(), json.dumps(str(root))[1:-1]):
+            self.assertNotIn(needle, rendered)
+
     def test_same_inputs_produce_identical_json(self):
         bundle = _fixtures.load_bundle("fourth-head-active-exception")
         result, paths = _fixtures.run_bundle(bundle, keep=True)
         try:
-            def evaluate():
-                return gate.evaluate(
-                    repo_root=paths["root"],
-                    verdict_path=paths["verdict"],
-                    freeze_path=paths["freeze"],
-                    settlement_path=paths["settlement"],
-                    head_history_path=paths["head_history"],
-                    stage_records_dir=paths["stage_records_dir"],
-                    supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
-                    fixture_mode=True,
-                )
-
-            first = json.dumps(evaluate().as_dict(), sort_keys=True)
-            second = json.dumps(evaluate().as_dict(), sort_keys=True)
+            first = json.dumps(evaluate_paths(paths).as_dict(), sort_keys=True)
+            second = json.dumps(evaluate_paths(paths).as_dict(), sort_keys=True)
             self.assertEqual(first, second)
             self.assertNotIn("generated_at", first)
-            self.assertNotIn(str(paths["root"]), first)
+            self.assert_no_location_leak(first, paths["root"])
+            labels = result.inputs_sha256
+            for name in ("verdict", "freeze", "settlement", "head_history"):
+                label = labels[name]["path"]
+                self.assertFalse(
+                    pathlib.PurePath(label).is_absolute(),
+                    "%s input path must not be absolute: %r" % (name, label),
+                )
+                self.assertEqual(label, "inputs/%s.json" % name.replace("_", "-"))
         finally:
             _fixtures.cleanup(paths["root"])
+
+    def test_same_inputs_at_two_locations_produce_identical_json(self):
+        """Identical inputs in different checkout locations must be identical JSON.
+
+        This is the platform-independent form of the CI failure: the output may
+        not depend on where the fixture repository was built.
+        """
+
+        bundle = _fixtures.load_bundle("fourth-head-active-exception")
+        result, paths = _fixtures.run_bundle(bundle, keep=True)
+        copy_root = pathlib.Path(tempfile.mkdtemp(prefix="aegis-verdict-gate-copy-"))
+        try:
+            shutil.copytree(str(paths["root"]), str(copy_root), dirs_exist_ok=True)
+            moved = relocated(paths, copy_root)
+            first = json.dumps(evaluate_paths(paths).as_dict(), sort_keys=True)
+            second = json.dumps(evaluate_paths(moved).as_dict(), sort_keys=True)
+            self.assertEqual(
+                first,
+                second,
+                "the same inputs built at two locations must produce identical JSON",
+            )
+            self.assert_no_location_leak(first, paths["root"])
+            self.assert_no_location_leak(second, copy_root)
+            self.assertEqual(result.as_dict()["inputs_sha256"], evaluate_paths(moved).as_dict()["inputs_sha256"])
+        finally:
+            _fixtures.cleanup(paths["root"])
+            _fixtures.cleanup(copy_root)
 
     def test_store_digest_is_reported_and_stable(self):
         bundle = _fixtures.load_bundle("valid-verdict")

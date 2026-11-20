@@ -10,7 +10,11 @@ Every required input is a JSON envelope:
 The declared payload hash covers the canonical serialization of the payload,
 so the binding is not circular and the checker can always re-derive it.  The
 checker re-hashes every file and reports file bytes/sha256 in inputs_sha256;
-a declared hash is never trusted when the file can be re-hashed.
+a declared hash is never trusted when the file can be re-hashed.  The reported
+path label is location-independent (repository-relative when the input is under
+the repository root, otherwise the file name), never an absolute environment
+path, so identical inputs produce identical output JSON from any checkout or
+temporary-directory location.
 
 No predicate term defaults to true.  An absent, unparseable, tampered or
 unverifiable input becomes a fail-closed finding (REQUIRED_INPUT_UNAVAILABLE
@@ -73,15 +77,40 @@ class Envelope:
     provenance: typing.Dict[str, object]
     issues: typing.List[Issue]
 
-    def report(self) -> typing.Dict[str, object]:
+    def report(
+        self, base: typing.Optional[typing.Union[str, Path]] = None
+    ) -> typing.Dict[str, object]:
+        """Report the file identity with a location-independent path label.
+
+        The output JSON must be identical for the same inputs whatever
+        directory the checker runs from, so the reported path is never an
+        absolute environment path: it is repository-relative (POSIX form) when
+        the input is under base, and the bare file name otherwise.  The bytes
+        and sha256 still bind the exact file content.
+        """
+
         return {
-            "path": self.path,
+            "path": _portable_path(self.path, base),
             "bytes": self.file_bytes,
             "sha256": self.file_sha256,
             "source_ref": self.provenance.get("source_ref"),
             "as_of": self.provenance.get("as_of"),
             "producer_role": self.provenance.get("producer_role"),
         }
+
+
+def _portable_path(
+    path: typing.Union[str, Path], base: typing.Optional[typing.Union[str, Path]]
+) -> str:
+    """A path label that does not depend on the checkout or run directory."""
+
+    candidate = Path(path)
+    if base is not None:
+        try:
+            return candidate.resolve().relative_to(Path(base).resolve()).as_posix()
+        except (OSError, ValueError):
+            pass
+    return candidate.name
 
 
 @dataclasses.dataclass

@@ -116,11 +116,13 @@ Every input is a JSON envelope:
      "status"?}}
 
 The declared hash covers the canonical serialization of the payload (so the
-binding is not circular); the checker re-hashes every file and reports file
-bytes/sha256 in `inputs_sha256`, and never trusts a declared hash that the
-bytes do not support. An absent, unparseable, tampered or unverifiable
-required input yields `REQUIRED_INPUT_UNAVAILABLE` and readiness false. No predicate
-term defaults to true; UNRUN never becomes PASS.
+binding is not circular); the checker re-hashes every file and reports its
+bytes/sha256 plus a **location-independent path label** in `inputs_sha256`
+(repository-relative when the input is under `--repo-root`, otherwise the file
+name, never an absolute environment path), and never trusts a declared hash
+that the bytes do not support. An absent, unparseable, tampered or
+unverifiable required input yields `REQUIRED_INPUT_UNAVAILABLE` and readiness
+false. No predicate term defaults to true; UNRUN never becomes PASS.
 
 Required inputs: `--verdict`, `--freeze`, `--settlement`, `--head-history`,
 `--stage-records-dir`, and the record store at `--records-dir`.
@@ -262,8 +264,9 @@ blocked rather than reported as unchecked.
 
 Guarantees: standard library only; no network/`gh`/provider call; no writes; no
 timestamps or environment values in output; identical inputs produce
-byte-identical JSON; internal errors never exit 0; every UNRUN/UNKNOWN stays
-named.
+byte-identical JSON from any checkout or temporary-directory location (the
+determinism test evaluates one fixture at two different roots); internal errors
+never exit 0; every UNRUN/UNKNOWN stays named.
 
 Limitations, stated rather than hidden:
 
@@ -284,7 +287,7 @@ Limitations, stated rather than hidden:
 
     python scripts/aegis_verdict_gate/tests/run_tests.py
 
-186 tests: catalogue, canonicalization (including the pinned vector), records,
+247 tests: catalogue, canonicalization (including the pinned vector), records,
 inputs, gate (26 fixture bundles plus the errata D1/D2/D3 vectors and the
 blocking-fix vectors), provenance, determinism and exit codes. The fixtures
 under `tests/fixtures/` are synthetic (each one builds a throw-away git

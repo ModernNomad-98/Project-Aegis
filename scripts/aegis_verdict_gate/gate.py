@@ -1329,7 +1329,7 @@ def evaluate(
                 raise
             return _empty_result(error.code, "%s: %s" % (name, error.detail), inputs_sha, fixture_mode)
         loaded[name] = envelope
-        inputs_sha[name] = envelope.report()
+        inputs_sha[name] = envelope.report(root)
         if envelope.issues:
             code = envelope.issues[0].code
             detail = "; ".join(issue.detail for issue in envelope.issues)

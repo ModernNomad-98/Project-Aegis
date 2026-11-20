@@ -99,6 +99,24 @@ class EnvelopeTest(unittest.TestCase):
         self.assertEqual(envelope.file_bytes, path.stat().st_size)
         self.assertEqual(envelope.issues, [])
 
+    def test_report_path_is_location_independent(self):
+        nested = self.root / "inputs"
+        nested.mkdir()
+        path = write_envelope(nested, "freeze.json", base_freeze())
+        envelope = inputs.load_envelope(path)
+        inside = envelope.report(self.root)
+        self.assertEqual(inside["path"], "inputs/freeze.json")
+        self.assertEqual(inside["bytes"], envelope.file_bytes)
+        self.assertEqual(inside["sha256"], envelope.file_sha256)
+        elsewhere = envelope.report(self.root.parent / "not-this-repository")
+        self.assertEqual(elsewhere["path"], "freeze.json")
+        self.assertEqual(envelope.report()["path"], "freeze.json")
+        for report in (inside, elsewhere):
+            self.assertFalse(pathlib.PurePath(report["path"]).is_absolute())
+            rendered = json.dumps(report, sort_keys=True)
+            self.assertNotIn(str(self.root), rendered)
+            self.assertNotIn(json.dumps(str(self.root))[1:-1], rendered)
+
     def test_absent_input_is_a_gate_condition(self):
         with self.assertRaises(inputs.InputError) as caught:
             inputs.load_envelope(self.root / "absent.json")
