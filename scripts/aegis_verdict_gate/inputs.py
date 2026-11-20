@@ -10,7 +10,11 @@ Every required input is a JSON envelope:
 The declared payload hash covers the canonical serialization of the payload,
 so the binding is not circular and the checker can always re-derive it.  The
 checker re-hashes every file and reports file bytes/sha256 in inputs_sha256;
-a declared hash is never trusted when the file can be re-hashed.
+a declared hash is never trusted when the file can be re-hashed.  The reported
+path label is location-independent (repository-relative when the input is under
+the repository root, otherwise the file name), never an absolute environment
+path, so identical inputs produce identical output JSON from any checkout or
+temporary-directory location.
 
 No predicate term defaults to true.  An absent, unparseable, tampered or
 unverifiable input becomes a fail-closed finding (REQUIRED_INPUT_UNAVAILABLE
@@ -73,15 +77,45 @@ class Envelope:
     provenance: typing.Dict[str, object]
     issues: typing.List[Issue]
 
-    def report(self) -> typing.Dict[str, object]:
+    def report(
+        self, base: typing.Optional[typing.Union[str, Path]] = None
+    ) -> typing.Dict[str, object]:
+        """Report the file identity with a location-independent path label.
+
+        The output JSON must be identical for the same inputs whatever
+        directory the checker runs from, so the reported path is never an
+        absolute environment path: it is repository-relative (POSIX form) when
+        the input is under base, and the bare file name otherwise.  The bytes
+        and sha256 still bind the exact file content.
+        """
+
         return {
-            "path": self.path,
+            "path": portable_path(self.path, base),
             "bytes": self.file_bytes,
             "sha256": self.file_sha256,
             "source_ref": self.provenance.get("source_ref"),
             "as_of": self.provenance.get("as_of"),
             "producer_role": self.provenance.get("producer_role"),
         }
+
+
+def portable_path(
+    path: typing.Union[str, Path], base: typing.Optional[typing.Union[str, Path]] = None
+) -> str:
+    """A path label that does not depend on the checkout or run directory.
+
+    Used for the reported input path and, with the same base, for every
+    diagnostic message that names a file, so a blocked or invalid-input run
+    also produces identical JSON from two checkout locations.
+    """
+
+    candidate = Path(path)
+    if base is not None:
+        try:
+            return candidate.resolve().relative_to(Path(base).resolve()).as_posix()
+        except (OSError, ValueError):
+            pass
+    return candidate.name
 
 
 @dataclasses.dataclass
@@ -120,25 +154,35 @@ class HeadHistory:
     issues: typing.List[Issue]
 
 
-def load_envelope(path: typing.Union[str, Path], require_provenance: bool = True) -> Envelope:
-    """Load one input envelope and validate its provenance binding."""
+def load_envelope(
+    path: typing.Union[str, Path],
+    require_provenance: bool = True,
+    base: typing.Optional[typing.Union[str, Path]] = None,
+) -> Envelope:
+    """Load one input envelope and validate its provenance binding.
+
+    base is the repository root when known; every diagnostic message names the
+    file through portable_path(path, base) so the messages, and therefore the
+    gate output, do not depend on the checkout or temporary-directory location.
+    """
 
     file_path = Path(path)
+    label = portable_path(file_path, base)
     issues: typing.List[Issue] = []
     if not file_path.is_file():
-        raise InputError(CODE_REQUIRED_INPUT, "required input is absent: %s" % file_path)
+        raise InputError(CODE_REQUIRED_INPUT, "required input is absent: %s" % label)
     raw = file_path.read_bytes()
     try:
         document = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, ValueError) as error:
-        raise InputError(CODE_CANONICAL, "input is not valid UTF-8 JSON: %s (%s)" % (file_path, error), fatal=True)
+        raise InputError(CODE_CANONICAL, "input is not valid UTF-8 JSON: %s (%s)" % (label, error), fatal=True)
     if not isinstance(document, dict) or not isinstance(document.get("payload"), dict):
-        raise InputError(CODE_CANONICAL, "input envelope has no payload object: %s" % file_path, fatal=True)
+        raise InputError(CODE_CANONICAL, "input envelope has no payload object: %s" % label, fatal=True)
     payload = typing.cast(typing.Dict[str, object], document["payload"])
     provenance = document.get("provenance")
     if not isinstance(provenance, dict):
         if require_provenance:
-            issues.append(Issue(CODE_REQUIRED_INPUT, "input has no provenance block: %s" % file_path))
+            issues.append(Issue(CODE_REQUIRED_INPUT, "input has no provenance block: %s" % label))
         provenance = {}
     if require_provenance:
         for key, expected in (
@@ -150,18 +194,18 @@ def load_envelope(path: typing.Union[str, Path], require_provenance: bool = True
         ):
             value = provenance.get(key)
             if not isinstance(value, expected) or (expected is str and not value):
-                issues.append(Issue(CODE_REQUIRED_INPUT, "provenance.%s is missing or invalid: %s" % (key, file_path)))
+                issues.append(Issue(CODE_REQUIRED_INPUT, "provenance.%s is missing or invalid: %s" % (key, label)))
         declared_sha = provenance.get("declared_payload_sha256")
         declared_bytes = provenance.get("declared_payload_bytes")
         recomputed_sha = canonical.digest(payload)
         recomputed_bytes = len(canonical.canonical_bytes(payload))
         if isinstance(declared_sha, str) and declared_sha != recomputed_sha:
             issues.append(
-                Issue(CODE_CANONICAL, "declared payload hash does not match the payload: %s" % file_path)
+                Issue(CODE_CANONICAL, "declared payload hash does not match the payload: %s" % label)
             )
         if isinstance(declared_bytes, int) and declared_bytes != recomputed_bytes:
             issues.append(
-                Issue(CODE_CANONICAL, "declared payload bytes do not match the payload: %s" % file_path)
+                Issue(CODE_CANONICAL, "declared payload bytes do not match the payload: %s" % label)
             )
     return Envelope(
         path=str(file_path),
