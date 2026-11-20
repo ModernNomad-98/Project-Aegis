@@ -82,6 +82,24 @@ Per PR, record plan-audit rounds, candidate count, Codex findings by class, and
 wall-clock time from branch to merge. Target: at most two plan audits, two
 candidates, two Codex cycles, and the heavy suite once.
 
+### Per-PR cycle metrics
+Copy this block into the PR body (or the run log) before merge:
+
+| Metric | This PR |
+| --- | --- |
+| Plan-audit rounds | `<n>` — target at most 2; one per capture, with a delta check for minor/nit fixes |
+| Candidates | `<n>` (cap: 2) |
+| Codex review cycles | `<n>` (cap: 2) |
+| Local blind-review passes | `<n>` (cap: 1, at the final candidate) |
+| Heavy-suite runs | `<n>` (cap: 1, at the final head via CI) |
+| Codex findings by class | `<P1/P2/P3 with disposition>` |
+| Wall clock, branch to merge | `<hh:mm>` |
+| Cap exceeded? | no — or yes, with the recorded deviation and the follow-up issue |
+
+If a cap is exceeded, record the deviation in the PR body and a follow-up issue
+(or an explicitly scheduled plan revision); do not extend the running PR. A real
+P1 still blocks regardless.
+
 The protocol was applied once, to the design-orchestrator lane (the design
 workstream), including a recorded cap deviation; that application is history,
 not a standing rule.
