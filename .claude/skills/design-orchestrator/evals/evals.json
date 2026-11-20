@@ -98,6 +98,22 @@
           "Does not use the DECISION entry type and does not transcribe an approval the human did not give."
         ]
       }
+    },
+    {
+      "id": "guided-play-a-with-verified-preconditions",
+      "type": "should_trigger",
+      "prompt": "Guided mode. This is a new settings screen (no existing screen yet). Steps 1-3 are already satisfied: workspace role and context verified, the change has a classification with its scope lock, the settings-screen spec is accepted, and a recorded design authority's revision matches the live source. The experience direction is unsettled; step 3's recorded result names the composition branch; the target is a web app on phones with responsive/touch scope; the change adds new design tokens; the screen has interactive forms; no screenshots or visual-regression design is requested. Design the settings screen and tell me what to hand to the build.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies the supplied steps 1-3 evidence instead of re-running classification, requirements or authority recording.",
+          "Chooses Play A and records the play rationale, naming Play B as the rejected alternative because there is no existing screen.",
+          "Runs the determinate Play A order: ux-design-iteration (unsettled direction), screen-composition-designer (recorded composition branch), edge-state-ux-designer, mobile-viewport-craft (web + responsive/touch), design-system-token-governor (new tokens) and accessibility-test-harness (interactive forms).",
+          "Skips visual-regression-test-designer and screenshot-evidence-planner with the recorded 'not requested' condition.",
+          "Compares the recorded authority revision with the live source, finds a match and continues; the stale-authority stop remains covered by the existing guided case.",
+          "Ends with one design report, no implementation, browser driving or screenshot capture, and a handoff to the project's implementation route."
+        ]
+      }
     }
   ]
 }

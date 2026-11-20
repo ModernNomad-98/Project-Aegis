@@ -1,10 +1,11 @@
 {
   "skill": "design-orchestrator",
-  "description": "Trigger discrimination for the design conductor (this skill) vs the project journey front door (project-orchestrator), bounded UX design iteration (ux-design-iteration), the non-happy-state matrix designer (edge-state-ux-designer), the technical design-doc review facilitator (design-review-facilitator), design-token governance (design-system-token-governor), the QA conductor (qa-orchestrator) and security scanning (security-scan-orchestrator).",
+  "description": "Trigger discrimination for the design conductor (this skill) vs the project journey front door (project-orchestrator), bounded UX design iteration (ux-design-iteration), the non-happy-state matrix designer (edge-state-ux-designer), bounded web-viewport/layout craft (mobile-viewport-craft), the technical design-doc review facilitator (design-review-facilitator), design-token governance (design-system-token-governor), the QA conductor (qa-orchestrator) and security scanning (security-scan-orchestrator).",
   "overlaps_with": [
     "project-orchestrator",
     "ux-design-iteration",
     "edge-state-ux-designer",
+    "mobile-viewport-craft",
     "design-review-facilitator",
     "design-system-token-governor",
     "qa-orchestrator",
@@ -94,6 +95,16 @@
       ],
       "note": "SECURITY SCAN — a different deliverable.",
       "reason": "Whole-repo static security scanning/aggregation is security-scan-orchestrator; the design conductor designs UI only."
+    },
+    {
+      "id": "direct-viewport-goes-to-mobile-viewport-craft",
+      "prompt": "Design the phone layout for this existing web screen — just the phone layout, no broader design pass.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "design-orchestrator"
+      ],
+      "note": "DIRECT CRAFT SEAM — one bounded web-viewport design change, not a design pass.",
+      "reason": "A single web viewport/layout design task is owned by mobile-viewport-craft; the conductor chooses and sequences a whole design pass."
     }
   ]
 }
