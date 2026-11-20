@@ -3,8 +3,9 @@
 
 Compares a candidate tree against a frozen, schema-versioned baseline of the shipped skill
 library and reports any reduction, hiding or silent degradation. It reports only: it never
-repairs, prunes, deletes, installs or writes inside the scanned tree. It is NOT wired into CI
-(the separately owner-gated enforcement slice owns wiring).
+repairs, prunes, deletes, installs or writes inside the scanned tree. Its test suite is wired
+into CI (tools-tests-linux and tools-tests-windows, #1164); enforcement, a library-wide gate
+and any required-check status remain a separate owner decision.
 
 Verbs
   baseline --tree PATH --out PATH [--source-revision HEX] [--source-tree HEX] [--base-commit HEX]

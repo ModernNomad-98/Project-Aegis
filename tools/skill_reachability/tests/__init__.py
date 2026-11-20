@@ -1,1 +1,1 @@
-"""Tests for the local-only skill-reachability reporter tool (T-13)."""
+"""Tests for the skill-reachability reporter tool (T-13)."""
