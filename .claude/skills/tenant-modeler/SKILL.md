@@ -1,6 +1,6 @@
 ---
 name: tenant-modeler
-description: Define the tenant model for a SaaS product — what a tenant IS (organization, workspace, account), the hierarchy between those concepts, user-to-tenant membership (roles attached to membership, invitations, users in multiple tenants), ownership semantics, and the full tenant lifecycle from provisioning through suspension to offboarding and purge. Produces a tenant model definition, a lifecycle state machine with per-state access/billing/data posture, and a membership + invitation model. Use when tenant, organization, or workspace concepts are undefined or contested, when membership or invitation semantics keep causing confusion or rework, or BEFORE any multi-tenant schema, authorization, or platform design work. Do NOT use to review an existing system for cross-tenant leakage (tenant-isolation-reviewer) or for tenant-scoped storage (multi-tenant-data-architect), tenancy architecture (saas-platform-architect), or sub-tenant scopes (intra-tenant-scope-architect).
+description: Define the tenant model for a SaaS product — what a tenant IS (organization, workspace, account), the hierarchy between them, user-to-tenant membership (roles on membership, invitations, multi-tenant users), ownership semantics, and the tenant lifecycle from provisioning through suspension to offboarding and purge. Produces the tenant model, a lifecycle state machine with per-state access/billing/data posture, and a membership + invitation model. Use when tenant, organization, or workspace concepts are undefined or contested, when membership semantics keep causing confusion or rework, or BEFORE any multi-tenant schema, authorization, or platform design work. Do NOT use for cross-tenant leakage review (tenant-isolation-reviewer), tenant-scoped storage (multi-tenant-data-architect), tenancy architecture (saas-platform-architect), sub-tenant scopes (intra-tenant-scope-architect), or the invitation flow itself — token/link acceptance, expiry/revocation, identity binding (membership-invitation-designer).
 ---
 
 # Tenant Modeler
@@ -39,6 +39,10 @@ tenant semantics get rebuilt; this skill exists so they are built once.
   tenants — that is `tenant-isolation-reviewer`.
 - Do NOT use when: choosing tenant_id-vs-schema-vs-database scoping — that is
   `multi-tenant-data-architect`, which consumes this skill's output.
+- Do NOT use when: designing the invitation flow itself — token/link
+  acceptance, expiry/revocation races, identity binding — that is
+  `membership-invitation-designer`, which owns the flow and composes
+  this skill's invitation states.
 - Do NOT use when: modeling the business domain broadly — `domain-modeler`
   owns general concept modeling; this skill owns the tenancy axis
   specifically.
@@ -122,7 +126,11 @@ Lifecycle state machine: <state — access posture — data posture — billing
 Findings: <code/doc/UI contradictions discovered>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 Handoffs: multi-tenant-data-architect (schema), authorization-matrix-designer
-  (permissions), saas-platform-architect (platform flows)
+  (permissions), saas-platform-architect (platform flows); if the request
+  includes the invitation flow, subscription state machine, or tenant-creation
+  path, add membership-invitation-designer (invitation flow),
+  subscription-lifecycle-designer (subscription state machine),
+  tenant-provisioning-designer (tenant-creation path)
 ```
 
 ## Validation Checklist
@@ -184,5 +192,7 @@ Handoffs: multi-tenant-data-architect (schema), authorization-matrix-designer
   guest, service account), and the invitation state machine.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against
-  `tenant-isolation-reviewer`, `multi-tenant-data-architect`, and
-  `saas-platform-architect` (tenant cluster).
+  `tenant-isolation-reviewer`, `multi-tenant-data-architect`,
+  `saas-platform-architect`, `membership-invitation-designer`,
+  `subscription-lifecycle-designer`, and `tenant-provisioning-designer`
+  (tenant cluster).
