@@ -39,7 +39,9 @@ auditor still needs a target framework, which you provide.
 **2. "We need to prepare for ISO 27001."** The order is
 [`compliance-control-foundation`](../../.claude/skills/compliance-control-foundation/SKILL.md)
 → [`multi-framework-crosswalk`](../../.claude/skills/multi-framework-crosswalk/SKILL.md)
-*(only when more than one framework is in scope)* →
+*(always, even when ISO 27001 is the only framework: the foundation catalog is
+framework-neutral, so the ISMS and Statement of Applicability steps consume these
+crosswalk rows as their framework references)* →
 [`iso-27001-isms-architect`](../../.claude/skills/iso-27001-isms-architect/SKILL.md) →
 [`statement-of-applicability-author`](../../.claude/skills/statement-of-applicability-author/SKILL.md)
 →
@@ -58,6 +60,9 @@ requires; create them before mapping)
 [`soc2-trust-criteria-mapper`](../../.claude/skills/soc2-trust-criteria-mapper/SKILL.md)
 →
 [`compliance-evidence-collector`](../../.claude/skills/compliance-evidence-collector/SKILL.md)
+*(only for a Type 2 period or another stated evidence window — the collector is
+evidence over time; a Type 1-only outcome is design as of a date, so it ends with the
+mapper's scope and evidence items and there is no window to collect against)*
 → [`compliance-gap-auditor`](../../.claude/skills/compliance-gap-auditor/SKILL.md). The
 mapper needs a named system and a customer driver; criteria-level mapping needs the TSC
 text or the AICPA guide, otherwise only category-level scoping with verification items
@@ -69,9 +74,15 @@ is honest; the audit window must not start before the key controls existed.
 *(RMF programme)* and/or
 [`iso-42001-aims-architect`](../../.claude/skills/iso-42001-aims-architect/SKILL.md)
 *(AIMS)* →
+[`multi-framework-crosswalk`](../../.claude/skills/multi-framework-crosswalk/SKILL.md)
+*(ISO 42001 only, after the AIMS and before the Statement of Applicability — the SoA
+consumes its rows)* →
 [`statement-of-applicability-author`](../../.claude/skills/statement-of-applicability-author/SKILL.md)
 *(ISO 42001 only)* →
 [`compliance-evidence-collector`](../../.claude/skills/compliance-evidence-collector/SKILL.md)
+*(ISO 42001 or another separately established period-based evidence cycle only — the
+NIST AI RMF is a voluntary risk method with no audit window, so an RMF-only programme
+does not run the period collector)*
 → [`compliance-gap-auditor`](../../.claude/skills/compliance-gap-auditor/SKILL.md). The
 risk programme needs an AI system inventory and a programme owner; the AIMS needs that
 inventory and top-management sponsorship; the Statement of Applicability keeps its
