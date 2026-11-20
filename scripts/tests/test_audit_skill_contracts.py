@@ -230,6 +230,16 @@ def test_route_rules(a) -> None:
     ok("ROUTE-003 (Stage-2 route gap) fires with a gap-driven aegis_map (AEGIS-035 + AEGIS-044)")
 
 
+def test_route_play_label_is_not_a_skill_ref() -> None:
+    """ROUTE-001 must not treat qa-orchestrator's written-walkthrough route label as a skill."""
+    ra = real_audit()
+    bad = [f for f in ra.findings if f.rule == "ROUTE-001"
+           and "references `written-walkthrough`" in f.evidence]
+    assert not bad, (
+        "qa-orchestrator's written-walkthrough route label is not a skill and "
+        f"must not be a ROUTE-001 reference: {[f.evidence for f in bad]}")
+
+
 def test_route002_is_unmapped_census(a) -> None:
     r2 = [f for f in a.findings if f.rule == "ROUTE-002"]
     assert r2, "ROUTE-002 must fire on the stale-linker fixture"
@@ -589,12 +599,15 @@ def test_audit_engine_version_marks_corrected_eval004_semantics() -> None:
     # 1.13.2 adds whole-name skill matching (ROUTE-002 false positive fix).
     # 1.13.3 changes only the Markdown report format; 1.13.4 extends its key;
     # 1.14.0 adds SIDE-005 (manual-only annotation/setting/catalog posture).
-    assert audit_mod.TOOL_VERSION == "1.14.0", (
-        f"corrected EVAL-004 semantics + SIDE-005 require a minor bump; got "
-        f"{audit_mod.TOOL_VERSION!r}"
+    # 1.14.1 removes the ROUTE-001 false positive on qa-orchestrator's
+    # `written-walkthrough` Play A/C route label (a route label, not a skill).
+    assert audit_mod.TOOL_VERSION == "1.14.1", (
+        f"corrected EVAL-004 semantics + SIDE-005 + the ROUTE-001 route-label "
+        f"fix require a patch bump; got {audit_mod.TOOL_VERSION!r}"
     )
-    ok("audit engine reports v1.14.0 for corrected EVAL-004 semantics and SIDE-005, "
-       "raw ARTF-001 anchors, whole-name skill matching and the extended report key")
+    ok("audit engine reports v1.14.1 for corrected EVAL-004 semantics, SIDE-005 and "
+       "the written-walkthrough ROUTE-001 route-label fix, raw ARTF-001 anchors, "
+       "whole-name skill matching and the extended report key")
 
 
 def test_mentions_skill_name_matches_whole_names_only() -> None:
@@ -1977,6 +1990,7 @@ def main() -> int:
     test_exact_rule_multisets(a)
     test_every_rule_has_own_positive_and_negative(a)
     test_route_rules(a)
+    test_route_play_label_is_not_a_skill_ref()
     test_route002_is_unmapped_census(a)
     test_markdown_glossary_and_whole_examples(a)
     test_side004_fixture_classes(a)

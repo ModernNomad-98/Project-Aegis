@@ -104,7 +104,12 @@ TOOL_NAME = "audit-skill-contracts"
 # the report "freezes the state of the corpus BEFORE remediation" is reworded
 # (baselines are regenerated after remediation). Findings, census, inventory,
 # graph and manifest content are unchanged (owner decision 2026-09-28).
-TOOL_VERSION = "1.14.0"
+# 1.14.1 — removes the ROUTE-001 false positive on qa-orchestrator's
+# `written-walkthrough` route label. That token is the Play A/C ROUTE label, not
+# a skill, so it joins the curated NON_SKILL_TOKENS set instead of being reported
+# as an unknown skill reference. The version makes a corrected live report
+# distinguishable from a 1.14.0 report that still carried the finding.
+TOOL_VERSION = "1.14.1"
 
 
 class InputContainmentError(Exception):
@@ -532,6 +537,7 @@ NON_SKILL_TOKENS = {
     # curated from the live corpus (non-skill kebab tokens on routing lines):
     "pre-existing-on-main",  # local-ci-mirror-preflight failure category
     "happy-dom",             # npm test-environment package
+    "written-walkthrough",  # qa-orchestrator Play A/C route label
 }
 ROUTING_LINE = re.compile(
     r"(?i)(→|\broutes? to\b|\binvoke[sd]?\b|\bhand(?:s|ed)? (?:off|over|to)\b|"
