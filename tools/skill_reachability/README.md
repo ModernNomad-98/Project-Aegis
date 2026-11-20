@@ -100,6 +100,23 @@ The fixture tests are local-only and use temporary directories; no fixture files
 python -P -m unittest discover -s tools/skill_reachability/tests -p 'test_*.py' -v
 ```
 
+Run the suite under the workspace guard. The guard snapshots every file and directory in the checkout
+(tracked and untracked alike; the top-level `.git` metadata entry is the only exclusion) before and after
+the run, and fails on any entry added, removed or modified. This is the issue #1140 test-hygiene guard: the
+T-13 review found that a test had deleted a pre-existing repository file, and the guard makes that class of
+regression fail instead of passing silently. The committed unit tests plant a deleting test in a temporary
+fixture tree and prove the guard catches it.
+
+```console
+python -P tools/skill_reachability/tests/workspace_guard.py            # guard the default local suite
+python -P tools/skill_reachability/tests/workspace_guard.py -- COMMAND # guard any other command
+```
+
+Guard exit codes: `0` = the command exited 0 and the tree is unchanged; `1` = the tree changed or the
+command exited non-zero; `2` = usage error (bad option, missing tree, empty command). The guarded command
+runs with `PYTHONDONTWRITEBYTECODE=1` so interpreter bytecode caches written inside the tree are not
+misreported as mutations.
+
 ## Limitations
 
 - It counts name mentions in a fixed set of front-door and routing sources; it does not build a dependency graph
