@@ -1,4 +1,4 @@
-"""Local-only fixture tests for tools/skill_reachability/measure_routed.py.
+"""Fixture tests for tools/skill_reachability/measure_routed.py.
 
 Fixtures are built in temporary directories and removed; no fixture file is committed.
 Run:

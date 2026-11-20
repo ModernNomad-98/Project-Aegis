@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Workspace-mutation guard for the local-only skill-reachability tests (#1140).
+"""Workspace-mutation guard for the skill-reachability tests (#1140).
 
 Issue #1140 is a T-13 residual: a review round found that a test had deleted a
 pre-existing repository file inside the checkout, and nothing then failed if

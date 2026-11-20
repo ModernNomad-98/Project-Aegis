@@ -27,7 +27,7 @@ gets there if an earlier skill sends them on.
 A mention never counts when its line contains "do not use" (any case): an exclusion is not
 a route. Names match as whole kebab names, so ai-threat-modeler is not threat-modeler.
 
---check-allow-list is an additive local-only mode: after the normal measure it validates
+--check-allow-list is an additive opt-in mode: after the normal measure it validates
 the sibling allow-list (or --allow-list PATH) against the scanned tree and reports whether
 the recorded name-only-by-design skills are still present, still unrouted, and structurally
 valid. The default mode is unchanged and never reads the allow-list.
