@@ -502,6 +502,15 @@ class GateJobIsolationTests(_GateIsolationMixin, unittest.TestCase):
     TOOLS_LABELS["tools-tests-linux"].append("usage-tests")
     TOOLS_LABELS["tools-tests-windows"].append("readability-tests")
     TOOLS_LABELS["tools-tests-windows"].append("usage-tests")
+    # Issue #1145: the three tool suites wired into the tools jobs after the
+    # usage-tests step, in workflow step order. Insert-only, like the four
+    # statements above: the expected-label dict keeps its original bytes.
+    TOOLS_LABELS["tools-tests-linux"].append("skill-reachability")
+    TOOLS_LABELS["tools-tests-linux"].append("skill-preservation")
+    TOOLS_LABELS["tools-tests-linux"].append("plan-preservation")
+    TOOLS_LABELS["tools-tests-windows"].append("skill-reachability")
+    TOOLS_LABELS["tools-tests-windows"].append("skill-preservation")
+    TOOLS_LABELS["tools-tests-windows"].append("plan-preservation")
 
     @classmethod
     def setUpClass(cls):

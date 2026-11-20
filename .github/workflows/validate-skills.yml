@@ -179,6 +179,15 @@ jobs:
       - name: Run PR-body bound-field checker self-tests
         run: python -P scripts/ci/record-check.py pr-body-skills-tests -- python -P scripts/tests/test_pr_body_skills_check.py
 
+      # Issue #1143 shipped the bound-fields hash tool's regression tests and
+      # issue #1145 found no CI step ran them. Same placement rule as the
+      # PR-body checker above: the tool and its tests live under scripts/,
+      # which gate-guard protects, so they belong in this gate job and not in
+      # a tools-tests job. The test file is executed directly, as its
+      # docstring's documented command says.
+      - name: Run bound-fields hash self-tests
+        run: python -P scripts/ci/record-check.py bound-fields-hash-tests -- python -P scripts/tests/test_bound_fields_hash.py
+
       # Who validates the validator (decision D55). The gate's own hard checks
       # are exercised against good/bad fixtures BEFORE it is trusted to judge
       # the library, so a refactor cannot silently disarm one.
@@ -345,6 +354,12 @@ jobs:
       - name: Run PR-body bound-field checker self-tests
         run: python -P scripts/ci/record-check.py pr-body-skills-tests -- python -P scripts/tests/test_pr_body_skills_check.py
 
+      # Bound-fields hash self-tests (issues #1143/#1145). Same file and
+      # placement rule as the Linux gate job; this host is where the cp1252
+      # host-locale regression the test pins is actually reproducible.
+      - name: Run bound-fields hash self-tests
+        run: python -P scripts/ci/record-check.py bound-fields-hash-tests -- python -P scripts/tests/test_bound_fields_hash.py
+
       - name: Run validator self-tests
         run: python -P scripts/ci/record-check.py validator-tests -- python -P scripts/tests/test_validator.py
 
@@ -459,6 +474,21 @@ jobs:
       - name: Run workflow-outcomes reporter and calculator tests
         run: python -P scripts/ci/record-check.py usage-tests -- python -m unittest discover -s tools/aegis_usage/tests -p 'test_*.py' -v
 
+      # Issue #1145: the three local-only tool suites below were never
+      # enumerated by any workflow. All three are offline, fixture-only and
+      # cross-platform (measured on Windows: 29 / 66 / 46 tests, with one
+      # symlink-privilege case in skill_preservation that skips rather than
+      # fails). `-m unittest` needs the checkout root on sys.path, so like
+      # the suites above the inner run takes no -P.
+      - name: Run skill-reachability tests
+        run: python -P scripts/ci/record-check.py skill-reachability -- python -m unittest discover -s tools/skill_reachability/tests -p 'test_*.py' -v
+
+      - name: Run skill-preservation tests
+        run: python -P scripts/ci/record-check.py skill-preservation -- python -m unittest discover -s tools/skill_preservation/tests -p 'test_*.py' -v
+
+      - name: Run plan-preservation tests
+        run: python -P scripts/ci/record-check.py plan-preservation -- python -m unittest discover -s tools/plan_preservation/tests -p 'test_*.py' -v
+
       - name: Retain tools-test evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
@@ -535,6 +565,18 @@ jobs:
       # -P on the inner run.
       - name: Run workflow-outcomes reporter and calculator tests
         run: python -P scripts/ci/record-check.py usage-tests -- python -m unittest discover -s tools/aegis_usage/tests -p 'test_*.py' -v
+
+      # Same three issue #1145 suites and reasons as the Linux job. The
+      # cross-platform measurement covered this host too, including the one
+      # symlink-privilege case in skill_preservation that skips, not fails.
+      - name: Run skill-reachability tests
+        run: python -P scripts/ci/record-check.py skill-reachability -- python -m unittest discover -s tools/skill_reachability/tests -p 'test_*.py' -v
+
+      - name: Run skill-preservation tests
+        run: python -P scripts/ci/record-check.py skill-preservation -- python -m unittest discover -s tools/skill_preservation/tests -p 'test_*.py' -v
+
+      - name: Run plan-preservation tests
+        run: python -P scripts/ci/record-check.py plan-preservation -- python -m unittest discover -s tools/plan_preservation/tests -p 'test_*.py' -v
 
       - name: Retain tools-test evidence
         if: always()

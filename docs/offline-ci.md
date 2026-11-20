@@ -64,6 +64,19 @@ protection is unchanged.
 
 **Update (2026-10-15):** the two `tools-tests-*` rows above now additionally run the readability-acceptance suite (`tools/readability_acceptance/tests`), matching the workflow's `readability-tests` record-check step.
 
+**Update (2026-11-20):** the required `validate-skills` job and the Windows
+verification job above now additionally run the bound-fields hash self-tests
+(`scripts/tests/test_bound_fields_hash.py`, recorded as
+`bound-fields-hash-tests`) after the PR-body bound-field checker self-tests.
+The two `tools-tests-*` rows above now additionally run the three issue-#1145
+suites — skill-reachability (`tools/skill_reachability/tests`),
+skill-preservation (`tools/skill_preservation/tests`) and plan-preservation
+(`tools/plan_preservation/tests`) — matching the workflow's
+`skill-reachability`, `skill-preservation` and `plan-preservation`
+record-check steps. Each suite is offline and cross-platform; one
+skill-preservation case needs symlink-creation privilege and skips on a host
+that lacks it (an explicit UNRUN, never a pass).
+
 The two verification jobs run independently, without cross-platform fail-fast,
 automatic retries, quarantine or `continue-on-error`. A delivery closeout waits
 for each verification job that runs on the head. Record a skipped job as
@@ -85,6 +98,9 @@ host-bridge Node tests, `tools/aegis_setup/tests` and
 make a failing gate pass. A separate job shares no runner, environment file,
 `PATH` or checkout with the gates, so this code cannot reach them.
 The readability-acceptance suite (`tools/readability_acceptance/tests`) also runs in those two jobs (added 2026-10-15).
+The issue-#1145 suites (`tools/skill_reachability/tests`,
+`tools/skill_preservation/tests` and `tools/plan_preservation/tests`) also run
+in those two jobs (added 2026-11-20).
 
 The tools jobs use a read-only token, reference no secrets and do not persist
 checkout credentials. `scripts/tests/test_offline_ci.py` checks this layout. The
