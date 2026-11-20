@@ -70,7 +70,7 @@
     {
       "id": "handoff-invitation-lifecycle",
       "type": "should_trigger",
-      "prompt": "We're modeling the tenant and account structure for a B2B SaaS: the tenant is the customer company, users work inside it through memberships, and owners can invite teammates by email. Design the tenant/membership model — including what invitation states exist — so it stays coherent as roles and seats grow.",
+      "prompt": "We're modeling the tenant and account structure for a B2B SaaS: the tenant is the customer company, users work inside it through memberships, and owners can invite teammates by email. Design the tenant/membership model — including what invitation states exist — and say how invite token/link acceptance, expiry and revocation races, and identity binding should be handled, so it stays coherent as roles and seats grow.",
       "expect": {
         "triggers": true,
         "assertions": [

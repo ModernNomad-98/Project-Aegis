@@ -48,6 +48,60 @@
         "tenant-modeler"
       ],
       "reason": "Tenant semantics are settled; pooled/siloed deployment and the control-plane split are tenancy architecture, which tenant-modeler yields to saas-platform-architect."
+    },
+    {
+      "id": "invitation-flow-goes-to-membership-invitation-designer",
+      "prompt": "We already know what a tenant and a membership are. Now design the invite-by-email flow: single-use token/link acceptance, expiry and revocation races, identity binding at acceptance, seat checks and invite-spam limits.",
+      "expected_skill": "membership-invitation-designer",
+      "should_not_trigger": [
+        "tenant-modeler"
+      ],
+      "reason": "The invitation flow itself is membership-invitation-designer's design; the tenant model is settled."
+    },
+    {
+      "id": "subscription-states-go-to-subscription-lifecycle-designer",
+      "prompt": "The tenant and membership model is settled. Design the subscription state machine itself: trial, upgrade, downgrade, cancellation, renewal, payment-failure grace, and the entitlement each state grants.",
+      "expected_skill": "subscription-lifecycle-designer",
+      "should_not_trigger": [
+        "tenant-modeler"
+      ],
+      "reason": "The subscription state machine is subscription-lifecycle-designer's artifact once tenant semantics are settled."
+    },
+    {
+      "id": "tenant-creation-goes-to-tenant-provisioning-designer",
+      "prompt": "Tenant semantics and membership roles are signed off. Design how tenants come into existence: self-serve signup, sales-led creation, import, idempotent creation order, first-owner assignment, and partial-creation rollback.",
+      "expected_skill": "tenant-provisioning-designer",
+      "should_not_trigger": [
+        "tenant-modeler"
+      ],
+      "reason": "The tenant-creation workflow is tenant-provisioning-designer's design; tenant semantics are its input, not its task."
+    },
+    {
+      "id": "tenant-semantics-win-over-invitation-flow",
+      "prompt": "Our product calls everything 'workspace' and invite rules are inconsistent. Define what a tenant, a membership and an invitation state ARE in this product before anyone touches the invite flow; do not design the token or email flow.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "Tenant, membership and invitation-state semantics are the task; the flow design is explicitly out of scope and stays with membership-invitation-designer."
+    },
+    {
+      "id": "tenant-lifecycle-win-over-subscription-state",
+      "prompt": "Model the tenant lifecycle for a B2B SaaS: what suspension blocks, what offboarding exports, and when purge is irreversible, with the billing posture of each state. The subscription's dunning and grace timing are already designed elsewhere; keep them out.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "subscription-lifecycle-designer"
+      ],
+      "reason": "Tenant lifecycle semantics are the task; the subscription state machine is settled and out of scope."
+    },
+    {
+      "id": "tenant-model-win-over-tenant-provisioning",
+      "prompt": "Enterprise buyers own many workspaces under one company account while self-serve teams buy one workspace at a time. Define the tenant concept, the hierarchy and the ownership semantics. The signup and sales-led creation paths are a separate design; do not design tenant creation.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "Tenant definition, hierarchy and ownership are the task; the creation path is explicitly another owner's design."
     }
   ]
 }
