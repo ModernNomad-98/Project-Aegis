@@ -115,9 +115,7 @@ runs on identical input are byte-identical.
 - Without `--declared-basis` the stale-basis check is skipped; the warning is
   shown in human output and also written to standard error under `--quiet`.
 - Flagging aid only; it is not a substitute for review.
-- No `.github/` workflow wiring was added for this tool (owner constraint), so
-  its unit tests are not yet run by the fixed `tools-tests` CI suites; run them
-  locally with the command below until an owner decision permits wiring.
+- The test suite is wired into the `tools-tests-linux` and `tools-tests-windows` CI jobs through the `plan-preservation` record-check label (#1164); those jobs run on pull requests that change `tools/` and on every push to main. The tests run the linter over inline fixture plans; no CI job runs it as a library gate and it is not a required check. Run the tests locally with the command below for a fast loop.
 
 ## Tests
 

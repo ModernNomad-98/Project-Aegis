@@ -1,6 +1,6 @@
-# Skill reachability reporter (local-only)
+# Skill reachability reporter
 
-This directory is a **local-only** tool. It is **not wired into CI**, and it runs no network calls. It ports the
+This directory is a repository tool. It runs no network calls. Its test suite runs in the `tools-tests-linux` and `tools-tests-windows` CI jobs on pull requests that change `tools/` and on every push to main; its allow-list tests execute the tool against the checkout in allow-list mode, but no CI job runs it as a library gate. It ports the
 `_gap-plans/measure-routed.py` D-23 measure into the repository so the same tier counts can be reproduced from a
 checkout. It is read-only inside the scanned tree; the only write is an explicit `--json OUT` path outside the tree.
 
@@ -76,7 +76,7 @@ guarantee inside the tree.
 Exit codes: `0` = ran (and every `--require` name is routed; in check mode the allow-list is valid); `1` = a
 `--require` name is not routed or the allow-list check failed; `2` = a usage/role/containment error — the path
 does not look like the Project Aegis source library, the README door section is missing, an option has no value,
-or `--json OUT` resolves inside REPO. `--check-allow-list` is an additive local-only mode: default output is
+or `--json OUT` resolves inside REPO. `--check-allow-list` is an additive opt-in mode: default output is
 unchanged and the allow-list is never read in default mode.
 
 ## Provenance and status
@@ -88,13 +88,11 @@ added behaviour is the optional `--check-allow-list` mode and its `--allow-list`
 operand validation and output-containment guards described above; usage text documents those flags. Standard
 library only.
 
-Local-only status: this tool is not referenced by `.github/workflows/` or any script and is not part of CI.
-CI wiring, a validator/engine rule, or a skill-standard line for it is a separate owner-gated decision (P-2) and
-is deliberately out of this task; the precedent `tools/skill_preservation/` is likewise local-only.
+CI status: the test suite is wired into the `tools-tests-linux` and `tools-tests-windows` jobs through the `record-check.py` label `skill-reachability` (#1164); those jobs run on pull requests that change `tools/` and on every push to main. Its allow-list tests execute the tool against the checkout; no CI job runs it as a library gate and it is not a required check. Making it a required check, adding a library-wide CI check, a validator/engine rule, or a skill-standard line remains a separate owner/branch-protection decision.
 
 ## Tests
 
-The fixture tests are local-only and use temporary directories; no fixture files are committed.
+The test suite also runs locally and uses temporary directories for its fixture cases; no fixture files are committed.
 
 ```console
 python -P -m unittest discover -s tools/skill_reachability/tests -p 'test_*.py' -v
