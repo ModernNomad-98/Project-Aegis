@@ -99,6 +99,26 @@ class EnvelopeTest(unittest.TestCase):
         self.assertEqual(envelope.file_bytes, path.stat().st_size)
         self.assertEqual(envelope.issues, [])
 
+    def test_absent_input_message_is_location_independent(self):
+        with self.assertRaises(inputs.InputError) as caught:
+            inputs.load_envelope(self.root / "inputs" / "absent.json", base=self.root)
+        self.assertEqual(caught.exception.code, "REQUIRED_INPUT_UNAVAILABLE")
+        self.assertEqual(
+            caught.exception.detail, "required input is absent: inputs/absent.json"
+        )
+        with self.assertRaises(inputs.InputError) as plain:
+            inputs.load_envelope(self.root / "inputs" / "absent.json")
+        self.assertEqual(plain.exception.detail, "required input is absent: absent.json")
+
+    def test_tampered_input_issue_is_location_independent(self):
+        path = write_envelope(self.root, "freeze.json", base_freeze(), tamper_hash=True)
+        envelope = inputs.load_envelope(path, base=self.root)
+        self.assertEqual(
+            envelope.issues[0].detail,
+            "declared payload hash does not match the payload: freeze.json",
+        )
+        self.assertNotIn(str(self.root), envelope.issues[0].detail)
+
     def test_report_path_is_location_independent(self):
         nested = self.root / "inputs"
         nested.mkdir()

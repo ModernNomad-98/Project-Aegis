@@ -769,7 +769,14 @@ def load_store(
 
     manifest_path = store_dir / "manifest.json"
     if not manifest_path.is_file():
-        issues.append(Issue(BLOCKER_REQUIRED_INPUT, "record store manifest is absent: %s" % manifest_path))
+        # Report a location-independent label (this module must not import
+        # inputs.py: inputs imports records), so a missing-manifest run also
+        # produces identical JSON from two checkout locations.
+        try:
+            manifest_label = manifest_path.resolve().relative_to(root.resolve()).as_posix()
+        except (OSError, ValueError):
+            manifest_label = manifest_path.name
+        issues.append(Issue(BLOCKER_REQUIRED_INPUT, "record store manifest is absent: %s" % manifest_label))
         return StoreResult(
             repo_root=root,
             records_dir=store_dir,

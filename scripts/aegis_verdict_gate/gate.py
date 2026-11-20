@@ -1170,6 +1170,7 @@ CHECKS: typing.Tuple[typing.Tuple[str, typing.Callable[[Context], typing.List[Is
 
 def _load_stage_declarations(
     directory: Path,
+    base: Path,
 ) -> typing.Tuple[typing.Dict[str, typing.Dict[str, object]], typing.List[Issue]]:
     """Load the required B/D/E declaration envelopes, fail closed.
 
@@ -1177,7 +1178,8 @@ def _load_stage_declarations(
     empty directory, an unusable or malformed envelope, a non-B/D/E stage or a
     duplicate stage is a finding, never a silent omission.  The declarations
     are cross-checked against VB-D01 in C8 and the records themselves are
-    re-hashed by inputs.validate_stage_records.
+    re-hashed by inputs.validate_stage_records.  base (the repository root) is
+    used only to render location-independent labels in the finding details.
     """
 
     declarations: typing.Dict[str, typing.Dict[str, object]] = {}
@@ -1188,7 +1190,8 @@ def _load_stage_declarations(
             [
                 _issue(
                     "REQUIRED_INPUT_UNAVAILABLE",
-                    "required --stage-records-dir is absent or not a directory: %s" % directory,
+                    "required --stage-records-dir is absent or not a directory: %s"
+                    % inputs.portable_path(directory, base),
                 )
             ],
         )
@@ -1199,13 +1202,14 @@ def _load_stage_declarations(
             [
                 _issue(
                     "REQUIRED_INPUT_UNAVAILABLE",
-                    "--stage-records-dir holds no stage declaration envelope: %s" % directory,
+                    "--stage-records-dir holds no stage declaration envelope: %s"
+                    % inputs.portable_path(directory, base),
                 )
             ],
         )
     for path in paths:
         try:
-            envelope = inputs.load_envelope(path)
+            envelope = inputs.load_envelope(path, base=base)
         except inputs.InputError as error:
             issues.append(
                 _issue(error.code, "stage declaration %s is unusable: %s" % (path.name, error.detail))
@@ -1323,7 +1327,7 @@ def evaluate(
         ("head_history", head_history_path),
     ):
         try:
-            envelope = inputs.load_envelope(path)
+            envelope = inputs.load_envelope(path, base=root)
         except inputs.InputError as error:
             if error.fatal:
                 raise
@@ -1350,7 +1354,7 @@ def evaluate(
     freeze = inputs.derive_freeze(loaded["freeze"], doc)
     settlement = inputs.derive_settlement(loaded["settlement"], doc, root)
     history = inputs.validate_head_history(loaded["head_history"], doc)
-    declarations, declaration_issues = _load_stage_declarations(Path(stage_records_dir))
+    declarations, declaration_issues = _load_stage_declarations(Path(stage_records_dir), root)
     inputs_sha["stage_records"] = {
         stage: {
             "stage": stage,

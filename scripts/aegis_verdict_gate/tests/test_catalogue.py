@@ -31,6 +31,7 @@ BOUND_SET_LABEL = "aegis.verdict-bound"
 VB_ENTRY_ID = re.compile(r"\bVB-[A-J][0-9]{2}\b")
 RESTATED_ENTRY_ID_COUNT = 2
 RESTATED_PATH_COUNT = 3
+RESTATED_TOTAL_TOKENS = 3
 DENSE_PATH_COUNT = 12
 
 # Canonical paths whose names also belong to unrelated schemas (git identity,
@@ -84,10 +85,16 @@ def second_field_list_evidence(text: str) -> str:
     entry_ids = sorted(set(VB_ENTRY_ID.findall(text)))
     contract_paths = [path for path in CONTRACT_ONLY_PATHS if path in text]
     labelled = BOUND_SET_LABEL in text
+    restated_tokens = len(entry_ids) + len(contract_paths)
     if labelled and len(entry_ids) >= RESTATED_ENTRY_ID_COUNT:
         return "contract label plus %d bound-verdict entry ids" % len(entry_ids)
     if labelled and len(contract_paths) >= RESTATED_PATH_COUNT:
         return "contract label plus %d contract-only field paths" % len(contract_paths)
+    if labelled and restated_tokens >= RESTATED_TOTAL_TOKENS:
+        # Entry ids and field paths can be mixed in one list; counting them
+        # separately would let a mixed three-row list evade both thresholds
+        # (Codex P2 on the first head).
+        return "contract label plus %d mixed restatement tokens" % restated_tokens
     if len(contract_paths) >= DENSE_PATH_COUNT:
         return "%d contract-only field paths" % len(contract_paths)
     return ""
@@ -216,6 +223,20 @@ class OneSourceRuleTest(unittest.TestCase):
         self.assertEqual(
             second_field_list_evidence(text),
             "contract label plus 3 contract-only field paths",
+        )
+
+    def test_a_mixed_restatement_beside_the_label_is_a_second_list(self):
+        # Codex P2 on the first head: one entry id plus two contract-only paths
+        # is a three-row list and must not evade the separate thresholds.
+        text = (
+            "aegis.verdict-bound/v2.1:\n"
+            "VB-B01 head_sha\n"
+            "reviewer.auth_verified\n"
+            "witness.probes\n"
+        )
+        self.assertEqual(
+            second_field_list_evidence(text),
+            "contract label plus 3 mixed restatement tokens",
         )
 
     def test_a_dense_restatement_without_the_label_is_a_second_list(self):

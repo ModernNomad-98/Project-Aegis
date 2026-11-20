@@ -927,6 +927,51 @@ class DeterminismTest(unittest.TestCase):
             _fixtures.cleanup(paths["root"])
             _fixtures.cleanup(copy_root)
 
+    def test_relocated_blocked_input_produces_identical_json(self):
+        """A blocked run must be location-independent too.
+
+        Codex P2 on the first head: an absent/tampered input still embedded its
+        absolute path in the blocker detail, so the same fixture evaluated from
+        two roots produced different JSON; the valid-fixture test above missed
+        it.  The required-input-missing bundle is that relocated invalid case.
+        """
+
+        bundle = _fixtures.load_bundle("required-input-missing")
+        result, paths = _fixtures.run_bundle(bundle, keep=True)
+        copy_root = pathlib.Path(tempfile.mkdtemp(prefix="aegis-verdict-gate-copy-"))
+        try:
+            shutil.copytree(str(paths["root"]), str(copy_root), dirs_exist_ok=True)
+            moved = relocated(paths, copy_root)
+            first = json.dumps(evaluate_paths(paths).as_dict(), sort_keys=True)
+            second = json.dumps(evaluate_paths(moved).as_dict(), sort_keys=True)
+            self.assertEqual(
+                first,
+                second,
+                "a blocked run's JSON must not depend on the checkout location",
+            )
+            self.assert_no_location_leak(first, paths["root"])
+            self.assert_no_location_leak(second, copy_root)
+            self.assertEqual(result.blockers[0].code, "REQUIRED_INPUT_UNAVAILABLE")
+            self.assertIn("inputs/settlement.json", result.blockers[0].detail)
+            self.assertNotIn(str(paths["root"]), result.blockers[0].detail)
+
+            # The same guarantee must hold for a store-level blocked run: a
+            # missing manifest must not leak the root either.
+            (paths["root"] / "docs" / "approvals" / "revision-state" / "manifest.json").unlink()
+            (copy_root / "docs" / "approvals" / "revision-state" / "manifest.json").unlink()
+            missing_first = json.dumps(evaluate_paths(paths).as_dict(), sort_keys=True)
+            missing_second = json.dumps(evaluate_paths(moved).as_dict(), sort_keys=True)
+            self.assertEqual(missing_first, missing_second)
+            self.assert_no_location_leak(missing_first, paths["root"])
+            self.assert_no_location_leak(missing_second, copy_root)
+            self.assertIn(
+                "docs/approvals/revision-state/manifest.json",
+                " ".join(blocker.detail for blocker in evaluate_paths(paths).blockers),
+            )
+        finally:
+            _fixtures.cleanup(paths["root"])
+            _fixtures.cleanup(copy_root)
+
     def test_store_digest_is_reported_and_stable(self):
         bundle = _fixtures.load_bundle("valid-verdict")
         first, paths = _fixtures.run_bundle(bundle, keep=True)

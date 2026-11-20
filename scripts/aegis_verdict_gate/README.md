@@ -287,7 +287,7 @@ Limitations, stated rather than hidden:
 
     python scripts/aegis_verdict_gate/tests/run_tests.py
 
-247 tests: catalogue, canonicalization (including the pinned vector), records,
+251 tests: catalogue, canonicalization (including the pinned vector), records,
 inputs, gate (26 fixture bundles plus the errata D1/D2/D3 vectors and the
 blocking-fix vectors), provenance, determinism and exit codes. The fixtures
 under `tests/fixtures/` are synthetic (each one builds a throw-away git
