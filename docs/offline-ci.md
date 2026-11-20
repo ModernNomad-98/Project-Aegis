@@ -456,3 +456,44 @@ scripts/acceptance/Test-ScenarioAEvidence.ps1` for Desktop, and `pwsh -NoProfile
 -File scripts/acceptance/Test-ScenarioAEvidence.ps1` for Core, each on one line.
 Missing local shells are unrun coverage, not passing checks; the hosted jobs
 exercise their declared shells before delivery is closed.
+
+## Manifest ancestry pre-push check
+
+The skills manifest (`tools/skills-manifest.json`) records the commit whose
+skill content it describes in `source_revision`. Prove that revision is part
+of this branch's history before pushing:
+
+```text
+python -P scripts/check-manifest-ancestry.py
+python -P scripts/check-manifest-ancestry.py --json
+```
+
+`--repo-root` defaults to `.`; `--manifest` defaults to
+`tools/skills-manifest.json` and is resolved against the repository root. An
+absolute path, or one containing a `..` component, is rejected. `--json`
+prints the result's `status`, `source_revision`, `head` and `reason`
+fields.
+
+The check proves one narrow fact: the recorded revision is an ancestor of
+`HEAD`. PASS means `git merge-base --is-ancestor <source_revision> HEAD`
+exited 0. FAIL means the revision is a commit in this repository but not an
+ancestor of `HEAD`, or is not a commit at all. The check does not prove that
+the manifest hashes match the working tree; `scripts/validate-skills.py`
+checks the manifest content.
+
+Exit codes:
+
+- `0` PASS: the recorded revision is an ancestor of `HEAD`.
+- `1` FAIL: the recorded revision is not an ancestor of `HEAD`, or is not a
+  commit in this repository.
+- `2` ERROR: the manifest is missing, unreadable or invalid; `HEAD` cannot
+  be resolved; Git cannot run; or history is shallow. Argument-parsing usage
+  errors also exit `2`.
+
+A shallow clone is always ERROR (`history is shallow; ancestry cannot be
+proven`), never PASS or FAIL: truncated history cannot distinguish a missing
+ancestor from a revision that never existed.
+
+**No git hook is installed.** This is a MANUAL command run by hand before
+pushing, not a hook and not a CI gate; nothing runs it automatically. Wiring it
+into CI would need a protected `.github/` change and a separate owner grant.
