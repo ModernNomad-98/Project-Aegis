@@ -114,6 +114,22 @@
           "Ends with one design report, no implementation, browser driving or screenshot capture, and a handoff to the project's implementation route."
         ]
       }
+    },
+    {
+      "id": "direct-play-a-new-screen",
+      "type": "should_trigger",
+      "prompt": "Direct mode: design a new onboarding screen from scratch. Steps 1-3 are satisfied: the workspace role/context is verified, the change has a classification with its scope lock, the onboarding spec is accepted, and a recorded design authority's revision matches the live source. The experience direction is settled; step 3's recorded result does NOT name the composition branch and instead names an approved composition to reuse. The target is a web app; no small-screen/responsive/touch scope; no new design tokens or components; the recorded authority is not a design system; no interactive controls and no accessibility obligation or request; no screenshots or visual-regression design. All applying skills, including edge-state-ux-designer, are installed in this copy. No report-file write and no STATE SNAPSHOT row are authorized.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Acknowledges direct mode and reports tersely; asks no unnecessary questions.",
+          "Chooses Play A because this is a new screen, and rejects Play B because no existing screen exists.",
+          "Skips ux-design-iteration with the recorded settled-direction condition and skips screen-composition-designer with the recorded 'no composition branch' condition; the approved composition from step 3 is cited and reused, not redrawn.",
+          "Confirms the applying skill(s), including edge-state-ux-designer, are installed before running them; runs edge-state-ux-designer; skips mobile-viewport-craft (no responsive/touch scope), design-system-token-governor (no new tokens/components and the authority is not a design system) and accessibility-test-harness (no interactive controls, no a11y obligation or request), each with its recorded condition.",
+          "Skips visual-regression-test-designer and screenshot-evidence-planner with the recorded 'not requested' condition.",
+          "Verifies the recorded authority revision against the live source, finds a match and continues; shows the report in the conversation but writes NO report file and NO STATE SNAPSHOT row because no write is authorized; ends with one design report, no implementation/browser/screenshot, and a handoff."
+        ]
+      }
     }
   ]
 }
