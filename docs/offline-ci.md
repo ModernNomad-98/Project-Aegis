@@ -497,3 +497,54 @@ ancestor from a revision that never existed.
 **No git hook is installed.** This is a MANUAL command run by hand before
 pushing, not a hook and not a CI gate; nothing runs it automatically. Wiring it
 into CI would need a protected `.github/` change and a separate owner grant.
+
+## Evidence pack (generated facts)
+
+Auditors re-measure mechanical facts (commit identities, changed-file hashes
+and line counts, manifest provenance) in prose and find stale numbers.
+Generate those facts once instead:
+
+```text
+python -P scripts/generate-evidence-pack.py --base origin/main \
+    --gate-pattern '^scripts/' --gate-pattern '^docs/' \
+    --plan docs/offline-ci.md --out ../evidence-pack.json
+```
+
+`--repo-root` defaults to `.`; `--base` is required; `--head` defaults to
+`HEAD` and must resolve to the commit the working tree has checked out;
+`--manifest` defaults to `tools/skills-manifest.json` and must be
+repository-relative (an absolute path or one containing `..` is rejected);
+`--plan` optionally hashes one more file, and an absolute path is recorded
+relative to the repository root; `--gate-pattern` repeats. `--out` is
+required, must be outside the repository, and needs `--force` to replace an
+existing file.
+
+The pack records the schema (`aegis.evidence-pack/1`) and a status, the
+resolved base and head commits and their merge base, and for each changed path
+its status, mode, added/deleted line counts and, for regular files, its
+sha256, byte count and line count. Deleted files and symlinks or submodules
+record nulls for the content facts. It also records the manifest's
+working-tree sha256 and the manifest-ancestry result verbatim, reusing
+`scripts/check-manifest-ancestry.py`; the caller's gate patterns and the
+changed paths each matched; and the optional plan file's sha256/bytes/lines.
+
+Two runs with the same inputs produce byte-identical JSON: there are no
+timestamps, run ids or absolute repository paths. Blob content is read as
+bytes from the named commit, so a binary file and a path containing a tab or
+non-ASCII characters are recorded without text conversion.
+
+Gate patterns are caller-supplied. The workflow that invokes the generator
+owns the real pattern; the pack records the pattern it was given verbatim and
+the paths it matched, so a pack cannot by itself assert which gate should have
+run.
+
+The generator runs no shell commands and no repository hooks or scripts: it
+invokes Git only as an argument list (`shell=False`, 60 second timeout) and
+imports the repository's `scripts/check-manifest-ancestry.py` in-process,
+calling `check_manifest_ancestry` for the manifest fact (that module issues
+its own Git calls). It has no network access and writes nothing except
+`--out`. It is a local/PR aid, not a CI gate: nothing runs it automatically,
+and its output is evidence for a reviewer. Wiring it into CI would need a
+protected `.github/` change and a separate owner grant. Exit `0` means the
+pack was written, even when the recorded ancestry result is `FAIL` or
+`ERROR`; exit `2` means the pack could not be generated.
