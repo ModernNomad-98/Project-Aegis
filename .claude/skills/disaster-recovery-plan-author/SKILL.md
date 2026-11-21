@@ -47,8 +47,9 @@ recovery, invents no target, designs no topology and certifies nothing.
   `business-continuity-planner` owns those and this skill consumes them.
 - Do NOT use when: the ask is to review whether a cloud design can survive a
   dependency, zone or region failure — `resilience-architecture-reviewer`
-  reviews that design; the DR plan's failover playbooks are this skill's under
-  the reciprocal handoff named in Workflow.
+  reviews that design; this skill owns the DR plan's failover playbooks, and
+  the reviewer's route to incident-response-runbook or rollback-runbook-author
+  is an open seam, not yet reciprocal.
 - Do NOT use when: the ask is to prove a backup restores or to run any drill
   — `database-backup-verifier` (manual-only) owns restore verification; this
   skill designs what evidence a test must produce.
@@ -136,11 +137,11 @@ recovery, invents no target, designs no topology and certifies nothing.
    `incident-response-runbook` (the incident process),
    `rollback-runbook-author` (release backouts) and
    `secrets-identity-hardener` (manual-only key and credential recovery).
-   Name the reciprocal route: `resilience-architecture-reviewer` currently
-   hands failover-playbook authoring to `incident-response-runbook` or
-   `rollback-runbook-author`; for a DR plan's failover playbooks this skill
-   is the owner, so the reviewer hands that request here. Carry every open
-   item into an owner-and-date list.
+   Record the reviewer seam: `resilience-architecture-reviewer` currently
+   routes failover-playbook authoring to `incident-response-runbook` or
+   `rollback-runbook-author`; this skill owns the DR plan's failover
+   playbooks, and the reviewer route is an open seam, not yet reciprocal.
+   Carry every open item into an owner-and-date list.
 
 ## Output Format
 
@@ -198,8 +199,10 @@ Not claimed: <no target invented; no tier called tested without a dated
 - [ ] The test schedule covers tabletop, partial and full failover, and every
       claimed result has a dated record; no result is called TESTED without
       it.
-- [ ] Handoffs name the reciprocal reviewer route and the manual-only
-      boundaries, and do not absorb restore or execution work.
+- [ ] Handoffs record the reviewer seam — the reviewer's current
+      failover-playbook route to incident-response-runbook/rollback-runbook-author
+      is not yet reciprocal — plus the manual-only boundaries, and do not
+      absorb restore or execution work.
 - [ ] The plan claims no execution, no certification and no tested
       resilience it cannot evidence.
 

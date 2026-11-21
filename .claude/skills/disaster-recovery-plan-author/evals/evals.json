@@ -159,7 +159,7 @@
         "triggers": false,
         "assertions": [
           "The design review is resilience-architecture-reviewer and the restore proof is database-backup-verifier (manual-only); this skill consumes both and authors neither.",
-          "Hands the reviewer the plan's failover playbooks under the reciprocal route, and names database-backup-verifier explicitly for the restore evidence instead of writing or running the restore itself.",
+          "Names the reviewer seam alongside the reviewer's current route (an open seam): the plan's failover playbooks are this skill's, while the reviewer still routes that authoring to incident-response-runbook or rollback-runbook-author, and names database-backup-verifier explicitly for the restore evidence instead of writing or running the restore itself.",
           "Does not claim the design is resilient or the backup restores."
         ]
       }
