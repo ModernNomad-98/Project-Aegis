@@ -56,6 +56,7 @@ What happened: two changes needed five plan-audit rounds each, mostly for wordin
 Effect: audit time, not measured.
 Idea: a determinacy checklist before capture.
 Status: open.
+Status update: fixed for the project (checklist added); open as a default.
 
 ### A-3 — An advisory gate blocks merges without a machine-readable input
 Stage: deliver. Category: approvals.
@@ -70,6 +71,7 @@ What happened: reviewers' shells were blocked, so they read packet files only an
 Effect: extra coordinator verification, not measured.
 Idea: a machine-readable checks/hash export in the packet.
 Status: open.
+Status update: fixed for the project (packet tool added); the reviewers' shell limit remains.
 
 ### A-5 — New tool self-tests are not CI-wired
 Stage: validate. Category: testing.
@@ -84,6 +86,13 @@ What happened: the docs said the tool runs no repository script, but it imports 
 Effect: one review round.
 Idea: describe in-process imports explicitly.
 Status: fixed for the project.
+
+### A-7 — A review verdict was not posted before the merge attempt
+Stage: review. Category: records.
+What happened: a review returned ACCEPT but the verdict was not posted; the merger refused because no posted head-bound verdict existed, and a second merger was needed.
+Effect: one extra merger cycle, not measured.
+Idea: require the posted verdict id in the merger brief and post it first.
+Status: fixed for the project; open.
 
 ## Worked well
 

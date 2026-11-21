@@ -58,6 +58,7 @@ What happened: PR #1176 needed five plan-audit rounds and PR #1180 five, mostly 
 Effect: audit time; not measured.
 Idea for Aegis: a determinacy checklist before capture (every condition stated, every step run/skip named).
 Status: open for Aegis.
+Status update (2026-11-20): fixed for this project — checklist added in PR #1187 (merge f37fd8f4, as reported by the build session); still open as an Aegis default.
 
 ### B-003 — Advisory gate blocks merges but has no machine-readable input (2026-11-20)
 In the owner's words: no direct quote; the owner supplied the exception in U-3.
@@ -72,6 +73,7 @@ What happened: several Stage F reviewers reported that the sandbox blocked shell
 Effect: extra coordinator verification; not measured.
 Idea for Aegis: put a machine-readable checks/hash export in the review packet.
 Status: open for Aegis.
+Status update (2026-11-20): fixed for this project — packet tool in PR #1188 (merge d525a2b9, as reported by the build session); the reviewers' shell limit remains an environment constraint.
 
 ### B-005 — New tool self-tests are not CI-wired (2026-11-20)
 In the owner's words: no direct quote.
@@ -86,6 +88,13 @@ What happened: the evidence-pack docs said the tool runs no repository script, b
 Effect: one review round; the false claim would have misled reviewers.
 Idea for Aegis: describe in-process imports explicitly in tool docs.
 Status: fixed for this project.
+
+### B-007 — The Stage F verdict was not posted before the merger was dispatched (2026-11-20)
+In the owner's words: no direct quote.
+What happened: on the tracker PR #1186 the Stage F review returned ACCEPT but the verdict comment was not posted; the merger correctly refused because no posted head-bound verdict existed, and a second merger was needed. Record: PR #1186 comments (as reported by the build session).
+Effect: one extra merger cycle. Not measured.
+Idea for Aegis: the merger brief must require the posted Stage F comment id, and the coordinator must post the verdict before dispatching it.
+Status: fixed for this project (verdict posted, then merged 46bd3b40). Open for Aegis.
 
 ## Worked well
 
