@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.1",
     "engine_sha256": "bff7782400676476c270d26f4a453e2bdd6f096912f629a3c56303fb0af64877",
-    "repo_sha": "9bae3f06fa39ff8d01f9b0cd74b0cdede3071d6a",
+    "repo_sha": "7ebe96c4291c2e8cad929345873b9b399532f230",
     "branch": "",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 1018,
-    "audited_byte_count": 7189815,
-    "corpus_content_hash": "00fa276635ea19e99eae707e2cecd72883d63b4b6a2dba4a81f1a20d293ed5f2",
+    "audited_file_count": 1022,
+    "audited_byte_count": 7218920,
+    "corpus_content_hash": "934b74187fbfca5efb60dd606e6d8a8fe17fcbcf2786b749502ff60c6deba0d1",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "9837115fd53af170b76e6a888d06b493b48bfcbff865df4750c0b747127c4b9e"
+        "sha256": "c16ebdc0985bce657021bb1e2f9b2e474a24349a3bc0d75cf82276d52dc4e0fc"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -43,7 +43,7 @@
         ]
       }
     },
-    "skill_count": 262,
+    "skill_count": 263,
     "rule_count": 28,
     "finding_count": 489,
     "by_severity": {
@@ -8860,6 +8860,11 @@
     },
     "dast-safety-harness-designer": {
       "complete": 1
+    },
+    "data-encryption-architect": {
+      "accepted": 3,
+      "complete": 2,
+      "verified": 2
     },
     "data-flow-diagrammer": {
       "verified": 3
