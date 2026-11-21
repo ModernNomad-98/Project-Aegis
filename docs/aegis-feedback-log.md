@@ -1,0 +1,102 @@
+# Aegis feedback log
+
+**What this is.** A running record of what slowed the owner down, confused them, or cost a decision, plus what worked well. Part A is raised by the owner; Part B is noticed by the build session and is not yet confirmed by the owner. It is **not an authority record**: decisions, approvals and merges remain in their own records. Entries are added, never rewritten; a correction or Status change goes beneath the entry with the date it was made, and the original text stays.
+
+**Owner experience level:** not recorded in this project's records. No guess is made here.
+
+**Start:** 2026-11-20. Dates are the owner's local date (America/Los_Angeles) unless a record says otherwise. Times are omitted where the record does not retain them.
+
+## Part A — raised by the owner
+
+### U-1 — The agent stopped while work remained (2026-11-20)
+In the owner's words: "what part of continuously and autonomously working do you not understand?"
+What happened: the autonomous backlog goal was marked complete and a closing report posted while the scaffold generator was an open, actionable item (issue #1182, created by the session). Record: goal goal-e5f49066-444d-4c4b-ad52-c24deabc0dd9 (completed), issue #1182, later delivered by PR #1183 (merge 2ced1e5f).
+Effect: the owner had to repeat the instruction and spend an extra cycle. Not measured.
+Idea for Aegis: a goal must not be marked complete while any actionable issue created or owned by the session is still open.
+Status: fixed for this project (goal re-armed; #1182 delivered). Still open for Aegis as a default rule.
+
+### U-2 — The feedback log was not being kept (2026-11-20)
+In the owner's words: "are you still tracking and updating the aegis feedback log?"
+What happened: no tracker file existed in the repository or the checkpoint; review dispositions lived only in PR bodies and receipts. Record: repository search for a feedback-log file returned none; checkpoint support files contain no such log.
+Effect: the owner had to ask; the process history was harder to inspect.
+Idea for Aegis: create the tracker files at project start and update them in batches.
+Status: fixed for this project (these four files). Open for Aegis as a default.
+
+### U-3 — Merge direction had to be repeated (2026-11-20)
+In the owner's words: "continue to push and merge as directed"
+What happened: PR #1185 stayed open after the merger refused because the advisory aegis-verdict-gate was red with REQUIRED_INPUT_UNAVAILABLE; the owner then directed the merge. Record: PR #1185 comment 7056113957 and receipt 7056134282.
+Effect: one extra cycle and an owner exception for a docs-only change. Not measured.
+Idea for Aegis: give the advisory gate a documented neutral state or a machine-readable input, or state when it is intentionally not wired.
+Status: fixed for this project (merged as 851a4dd8 under the owner exception). Open for Aegis.
+
+### U-4 — Repeated stopping (2026-11-20)
+In the owner's words: "why are you keep stopping? you're supposed to continously and autonomously work until you clear the queue and backlogs"
+What happened: turns ended with status reports while actionable work remained. Record: this chat (not independently citable); the goal rounds were introduced after this message.
+Effect: repeated owner prompts. Not measured.
+Idea for Aegis: an autonomy goal with an explicit do-not-stop rule and automatic continuation.
+Status: fixed for this project (goal rounds). Open for Aegis.
+
+### U-5 — The same stopping pattern a second time (2026-11-20)
+In the owner's words: "ok you are supposed to work autnomously" (spelling preserved)
+What happened: this repeats the U-4 pattern: a report was posted instead of continuing. Record: this chat (not independently citable).
+Effect: an extra owner message.
+Idea for Aegis: treat a report-without-work as a process failure when the queue is not empty.
+Status: fixed for this project by the continuing goal. Open for Aegis.
+
+## Part B — noticed by the build session (not owner-confirmed)
+
+### B-001 — Scaffold generator was deferred after being scoped (2026-11-20)
+In the owner's words: no direct quote; the plan was recorded in issue #1182 and delivered later.
+What happened: the session opened #1182 to defer item 4 instead of building it, then delivered it in the next round (PR #1183, merge 2ced1e5f).
+Effect: one extra planning and review cycle.
+Idea for Aegis: when an item is small enough to plan, plan it into the current cycle rather than opening a deferral issue.
+Status: fixed for this project (delivered). Open for Aegis.
+
+### B-002 — Plan-audit wording loops (2026-11-20)
+In the owner's words: no direct quote.
+What happened: PR #1176 needed five plan-audit rounds and PR #1180 five, mostly for wording and determinacy, not new scope. Record: PR #1176 and PR #1180 bodies (as reported by the build session).
+Effect: audit time; not measured.
+Idea for Aegis: a determinacy checklist before capture (every condition stated, every step run/skip named).
+Status: open for Aegis.
+
+### B-003 — Advisory gate blocks merges but has no machine-readable input (2026-11-20)
+In the owner's words: no direct quote; the owner supplied the exception in U-3.
+What happened: PR #1185's advisory gate returned REQUIRED_INPUT_UNAVAILABLE because its B/D/E stage declarations have no pinned machine-readable form (scripts/ci/aegis_verdict_gate_fetch.py line 116, as reported by the build session). Record: PR #1185 comments.
+Effect: an owner exception for a docs-only merge.
+Idea for Aegis: publish the stage-declaration format, or record the gate as intentionally not wired and neutral.
+Status: fixed for this project by exception; open for Aegis.
+
+### B-004 — Final reviewers could not verify checks or hashes (2026-11-20)
+In the owner's words: no direct quote.
+What happened: several Stage F reviewers reported that the sandbox blocked shell, git, grep and glob, so they read the packet files only; the coordinator recomputed hashes and check states. Record: Stage F comments on PRs #1177, #1179, #1181 and #1183 (as reported by the build session).
+Effect: extra coordinator verification; not measured.
+Idea for Aegis: put a machine-readable checks/hash export in the review packet.
+Status: open for Aegis.
+
+### B-005 — New tool self-tests are not CI-wired (2026-11-20)
+In the owner's words: no direct quote.
+What happened: the ancestry, evidence-pack and scaffold suites (13+16+19 = 48 tests, as reported by the build session) run only by hand; wiring them needs a protected .github change and an owner grant. Record: docs/offline-ci.md and the three test files.
+Effect: the tests can be skipped without a red check.
+Idea for Aegis: a small workflow step for these suites.
+Status: open for Aegis (needs a grant).
+
+### B-006 — Docs claimed no repository script executes while one is imported (2026-11-20)
+In the owner's words: no direct quote.
+What happened: the evidence-pack docs said the tool runs no repository script, but it imports scripts/check-manifest-ancestry.py in-process. D3 caught it on PR #1181; the wording was corrected.
+Effect: one review round; the false claim would have misled reviewers.
+Idea for Aegis: describe in-process imports explicitly in tool docs.
+Status: fixed for this project.
+
+## Worked well
+
+### W-001 — Independent audits caught real defects before merge (2026-11-20)
+What happened: D1/D3/Stage F caught the #1179 closure-order failure, the #1181 false docs claim, and the #1183 error-contract bugs. Record: D3/Stage F comments on PR #1181 and #1183 (as reported by the build session).
+Effect: defects were fixed before merge.
+Idea for Aegis: keep the separate-agent audit chain.
+Status: working.
+
+### W-002 — Head-bound verdicts and fresh merger receipts made merges auditable (2026-11-20)
+What happened: each merged PR carries a Stage F verdict naming the exact head and a fresh merger receipt naming the check states and the authority. Record: receipts on the merged PRs in this batch, e.g. PR #1185 receipt 7056134282.
+Effect: each of these merges carries a receipt that can be re-checked; example called out above.
+Idea for Aegis: keep this as the default.
+Status: working.
