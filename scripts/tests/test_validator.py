@@ -10229,6 +10229,147 @@ def test_consumer_install_record_package_overlap():
         finally:
             _starter_guard_cleanup(source)
 
+# --- skill reachability (EVG-05) -------------------------------------------
+
+
+def _reachability_fixture(root, door=(), skills=(), allow=None, heading=True):
+    """Build a throwaway library tree: README, skills and the reviewed list."""
+    root = Path(root)
+    lines = ["# Fixture", ""]
+    if heading:
+        lines += ["### Start here: pick your path", ""] + list(door)
+        lines += ["", "## Later", "", "prose"]
+    else:
+        lines += ["## Not the door", "", "prose"]
+    (root / "README.md").write_text("\n".join(lines) + "\n",
+                                    encoding="utf-8", newline="\n")
+    for name in skills:
+        folder = root / ".claude" / "skills" / name
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "SKILL.md").write_text(
+            f"---\nname: {name}\ndescription: fixture skill {name}\n---\n\n"
+            f"# {name}\n", encoding="utf-8", newline="\n")
+    allow_path = root / "tools" / "skill_reachability" / "allow-list.json"
+    allow_path.parent.mkdir(parents=True, exist_ok=True)
+    names = list(validator.REACHABILITY_ALLOWED if allow is None else allow)
+    rows = [{"name": n, "tier_at_triage": "none", "triage_row": 1,
+             "reason": "fixture"} for n in names]
+    allow_path.write_text(json.dumps({
+        "schema": "aegis.skill-reachability-allow-list/1",
+        "expected_count": len(rows), "skills": rows}, indent=2) + "\n",
+        encoding="utf-8", newline="\n")
+    return root
+
+
+def test_skill_reachability():
+    """EVG-05: a skill is routed from a door or reviewed, never invisible."""
+    allowed = sorted(validator.REACHABILITY_ALLOWED)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(tmp, skills=allowed + ["orphan-skill"])
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "orphan-skill is not routed from a front door",
+                     "reachability: an unrouted, unlisted skill (tier none) fails")
+        assert len(rep.errors) == 1, rep.errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(
+            tmp, door=['- **"x"** -> orphan-skill'],
+            skills=allowed + ["orphan-skill"])
+        rep = validator.Report()
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            validator.check_skill_reachability(rep, root=root)
+        expect_clean(rep, "reachability: a skill the door section names is routed")
+        assert rep.warnings == [], rep.warnings
+        assert out.getvalue() == "", out.getvalue()
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(
+            tmp, door=['- **"x"** -> door-skill'],
+            skills=allowed + ["door-skill", "relay-skill"])
+        (root / ".claude" / "skills" / "door-skill" / "SKILL.md").write_text(
+            "---\nname: door-skill\n---\n\n## Later\n\n- route to relay-skill\n",
+            encoding="utf-8", newline="\n")
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "relay-skill is not routed from a front door",
+                     "reachability: handoff tier is unrouted, so an unlisted "
+                     "relay fails")
+        assert len(rep.errors) == 1, rep.errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(tmp, skills=allowed + ["tenth-skill"],
+                                     allow=allowed + ["tenth-skill"])
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "unexpected: tenth-skill",
+                     "reachability: an allow-list with a tenth name fails (R1)")
+        assert len(rep.errors) == 1, rep.errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(tmp, skills=allowed,
+                                     allow=allowed + ["ghost-skill"])
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "ghost-skill is on the allow-list but is not a skill",
+                     "reachability: an allow-listed ghost with no SKILL.md fails "
+                     "(R2 dead row)")
+        expect_error(rep, "unexpected: ghost-skill",
+                     "reachability: the ghost row also leaves the pinned name set")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(tmp, skills=allowed)
+        (root / "tools" / "skill_reachability" / "allow-list.json").unlink()
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "cannot read the allow-list",
+                     "reachability: a missing allow-list fails closed (R1)")
+        assert len(rep.errors) == 1, rep.errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(
+            tmp, door=['- **"x"** -> eval-runner-designer'], skills=allowed)
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "eval-runner-designer is door but the allow-list",
+                     "reachability: an allow-listed skill that is now routed "
+                     "fails (R3)")
+        assert len(rep.errors) == 1, rep.errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(tmp, skills=allowed, heading=False)
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "README.md has no 'Start here' section",
+                     "reachability: a missing door heading is a plain error")
+        assert len(rep.errors) == 1, rep.errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(tmp, skills=allowed)
+        (root / "README.md").unlink()
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "README.md has no 'Start here' section",
+                     "reachability: a missing README.md is a plain error, not a "
+                     "traceback")
+        assert len(rep.errors) == 1, rep.errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _reachability_fixture(
+            tmp, door=['- **"x"** -> broken-skill'],
+            skills=allowed + ["broken-skill"])
+        (root / ".claude" / "skills" / "broken-skill"
+         / "SKILL.md").write_bytes(b"\xff\xfe not utf-8")
+        rep = validator.Report()
+        validator.check_skill_reachability(rep, root=root)
+        expect_error(rep, "cannot read",
+                     "reachability: an unreadable SKILL.md is an error, not a "
+                     "traceback")
+        assert len(rep.errors) == 1, rep.errors
+
+
 TESTS = [
     test_dsr1b_identity_gate_fallback_justification,
     test_dsr1b_identity_gate_owner_semantics,
@@ -10351,6 +10492,7 @@ TESTS = [
     test_consumer_install_record_write_failure,
     test_consumer_install_record_nonfile_switch,
     test_consumer_install_record_package_overlap,
+    test_skill_reachability,
 ]
 
 
