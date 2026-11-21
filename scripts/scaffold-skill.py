@@ -268,10 +268,20 @@ def _validate_config(config: dict, repo_root: Path, validator) -> None:
         _require_list(config, key, allow_empty=key in EMPTY_LIST_ALLOWED)
 
     trigger_note = config.get("trigger_note")
-    if trigger_note is not None and not isinstance(trigger_note, str):
-        raise ScaffoldError("config key 'trigger_note' must be a string")
+    if trigger_note is not None:
+        if not isinstance(trigger_note, str):
+            raise ScaffoldError(
+                "config key 'trigger_note' must be a string")
+        if "\n" in trigger_note or "\r" in trigger_note:
+            raise ScaffoldError(
+                "config key 'trigger_note' must be a one-line string")
 
     overlaps = config["overlaps_with"]
+    for overlap in overlaps:
+        if not NAME_RE.fullmatch(overlap):
+            raise ScaffoldError(
+                f"overlap '{overlap}' must match the skill name pattern "
+                "^[a-z][a-z0-9-]{2,63}$")
     if len(set(overlaps)) != len(overlaps):
         raise ScaffoldError(
             "config key 'overlaps_with' must not repeat a skill name")
