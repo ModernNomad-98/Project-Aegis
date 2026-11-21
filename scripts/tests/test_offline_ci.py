@@ -823,7 +823,13 @@ class VerdictGateWorkflowTests(_GateIsolationMixin, unittest.TestCase):
     def test_trigger_contract_is_default_branch_executed(self):
         self.assertEqual([], verdict_trigger_violations(self.workflow))
         self.assertEqual({"pull_request_target", "issue_comment"}, set(self.workflow["on"]))
-        self.assertNotIn("if", self.job)
+        # One neutral skip is permitted: this advisory job is not run until
+        # the repository variable is exactly 'on'.  A skipped job is neutral
+        # in the UI, publishes no commit status and produces no evidence, and
+        # GitHub may treat a skipped required check as satisfied -- so this
+        # job must never be registered as a required context.  No other
+        # condition is permitted.
+        self.assertEqual("vars.AEGIS_VERDICT_GATE == 'on'", self.job.get("if"))
         self.assertNotIn("needs", self.job)
 
     def test_one_job_and_one_unique_context_name(self):

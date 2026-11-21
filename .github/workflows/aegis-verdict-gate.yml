@@ -21,10 +21,18 @@
 #     step-scoped, so the single job holds statuses: write and only the
 #     publish-status step invokes the only status writer; every other step is
 #     read-only.  The isolation tests assert both facts.
-#   * There is no push, workflow_dispatch or workflow_run trigger, no skip
-#     variable, no continue-on-error and no retry.  The job runs on every
-#     declared event; a disabled or absent run leaves the required context
-#     missing (blocked), never green.
+#   * There is no push, workflow_dispatch or workflow_run trigger, no
+#     continue-on-error and no retry.  The job is neutral/skip by default: it
+#     is skipped unless the repository variable AEGIS_VERDICT_GATE is exactly
+#     'on'.  A skipped job is neutral in the UI, publishes no commit status
+#     and produces no evidence.  GitHub may treat a skipped REQUIRED check as
+#     satisfied, so this job must never be registered as a required context.
+#     AEGIS_VERDICT_GATE is an operator switch, not automatic record
+#     detection: it defaults off, and enabling it is the operator's claim
+#     that B/D/E records actually exist and the T6/T24 authority is present.
+#     The switch is for a later C shadow only.  When enabled, the job runs on
+#     every declared event, and a run that never happens leaves no status at
+#     all: never green.
 #   * Readiness is not merge authority.  This job reports post-F readiness
 #     evidence only.  Stage 3 registration of the context is an owner action
 #     and is not performed here.
@@ -56,6 +64,7 @@ env:
 
 jobs:
   aegis-verdict-gate:
+    if: vars.AEGIS_VERDICT_GATE == 'on'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
