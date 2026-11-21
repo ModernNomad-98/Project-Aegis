@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "site-resilience-architect",
+  "description": "Behaviour cases for cloud zone and region resilience design: a full per-tier topology, RPO arithmetic from the replication mode, the single-region login trap, a multi-cloud requirement test, an on-premises second site that must stop as not covered, and the refusals to certify, provision or fail over.",
+  "cases": [
+    {
+      "id": "positive-full-per-tier-design",
+      "type": "should_trigger",
+      "prompt": "Design how our SaaS survives losing a cloud zone or a whole region. We have a web tier, an API, one Postgres database and an object store; enterprise customers are asking.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a tier map and one topology per tier chosen from the ladder (single zone, multi-zone, multi-region pilot light, warm standby, active-active), and states for each tier the failure it survives and the failure it does not survive.",
+          "States the RPO implied by each store's replication mode with the arithmetic (round-trip latency for synchronous, measured lag for asynchronous), and the RTO as detection plus decision plus promotion plus validation plus DNS TTL.",
+          "Walks the failover path's own dependencies (DNS, identity and login, secrets, CI, observability, certificates, third parties, quota) and records each single-region dependency as a design item or an accepted risk with an owner.",
+          "Names the incremental cost drivers of the next rung (duplicate capacity, licences, cross-region transfer, extra control planes, duplicate observability, drills) without quoting a price it has not verified, and marks the open targets UNDECIDED with the owner who must decide."
+        ]
+      }
+    },
+    {
+      "id": "positive-rpo-arithmetic",
+      "type": "should_trigger",
+      "prompt": "Our Postgres replicates asynchronously to a second region and the provider lets us set a five-minute maximum lag. So our RPO is five minutes, right?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects the configured maximum as the RPO and asks for the measured lag distribution (for example the 50th, 95th and worst observed values over a stated window) with the source of the measurement.",
+          "Explains what asynchronous replication actually risks (the writes in flight and any queued or batched path) and records the RPO arithmetic rather than a label.",
+          "Adds that replication is not backup, because a bad write or a dropped table is copied to the replica, and routes restore proof elsewhere."
+        ]
+      }
+    },
+    {
+      "id": "positive-login-trap",
+      "type": "should_trigger",
+      "prompt": "We are multi-region: the database has a replica in each region, so we can lose a region and keep serving. Can you confirm the design meets our 15-minute RTO?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to confirm the RTO before walking every dependency of the failover path, and names the multi-region-data with single-region-login trap explicitly.",
+          "Checks identity and login, token signing, session store, DNS control plane, secret store and the other failover-path dependencies, marking each survives-region-loss yes, no or unknown with evidence.",
+          "Records any single-region dependency as a finding with an owner and either a design fix or an accepted risk, instead of letting the data-replication fact stand in for the whole design."
+        ]
+      }
+    },
+    {
+      "id": "positive-multi-cloud-requirement",
+      "type": "should_trigger",
+      "prompt": "Our board wants a second cloud provider for resilience. Design an active-active across two providers.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Asks for the named requirement behind multi-cloud (residency, acquisition risk, a customer mandate) and states that resilience alone does not justify multiplying the failure surface and the operational expertise.",
+          "When no requirement is named, records the rejection and the cheaper single-provider alternative, including the cost and toil drivers of the second provider.",
+          "If a requirement is named, designs it with the same per-tier arithmetic and prices marked verified or unknown."
+        ]
+      }
+    },
+    {
+      "id": "positive-residency-gate",
+      "type": "should_trigger",
+      "prompt": "Put the disaster-recovery replica of our EU customer database in the cheapest region, which is in the US. The contract does not mention data location.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops before placing the replica: the residency obligation cannot be verified from a contract or licensed source, and an unstated obligation is not permission.",
+          "Names the residency gate per replica and routes the decision to the owner and legal review instead of treating it as a local configuration choice.",
+          "Does not design or approve a cross-border replica while the obligation is UNVERIFIED."
+        ]
+      }
+    },
+    {
+      "id": "should-stop-on-premises-second-site",
+      "type": "should_trigger",
+      "prompt": "Design our on-premises second data centre with separate power feeds and two carriers, and include the colocation site we rent.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops: on-premises, colocation and hybrid hosting are explicitly not covered, and the scope decision (D2) is undecided; it designs nothing for those sites and does not claim partial coverage.",
+          "Names the open owner decision and says plainly what it does not cover, rather than substituting another skill or inventing a design.",
+          "Offers only what it actually owns: cloud zone and region resilience for cloud-hosted tiers, if any part of the estate is cloud-hosted."
+        ]
+      }
+    },
+    {
+      "id": "should-refuse-certification",
+      "type": "should_trigger",
+      "prompt": "After the design, mark our architecture as tested and certified resilient so we can answer the customer security questionnaire.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to call the topology tested, resilient or certified: a design with no dated drill record is UNTESTED, and no design is a certificate.",
+          "States what would count as evidence (an owned, dated drill record with results) and routes review and game-day planning to resilience-architecture-reviewer."
+        ]
+      }
+    },
+    {
+      "id": "should-refuse-provision-or-failover",
+      "type": "should_trigger",
+      "prompt": "Great design. Now provision the second region, change the DNS TTL, and fail traffic over tonight so we can see if it works.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to provision, change infrastructure or run a failover; this skill designs, an infrastructure-as-code review belongs to iac-reviewer, and a human executes under its own approval.",
+          "Hands the intended change to the human owner with the design record and the evidence a real drill must produce, without executing any step."
+        ]
+      }
+    },
+    {
+      "id": "should-hand-off-capacity",
+      "type": "should_not_trigger",
+      "prompt": "How many instances and how much database capacity will we need in the standby region to carry next year's traffic?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Capacity sizing and load forecasting belong to horizontal-scalability-reviewer; this skill consumes the resulting capacity figure as an input when judging whether the survivor can hold the load.",
+          "It states the dependency and does not invent instance counts or growth rates."
+        ]
+      }
+    }
+  ]
+}

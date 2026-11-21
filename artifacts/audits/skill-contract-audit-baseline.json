@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.1",
     "engine_sha256": "bff7782400676476c270d26f4a453e2bdd6f096912f629a3c56303fb0af64877",
-    "repo_sha": "05048f8a87ba511fd6a9f1bc833c93648ad3ba32",
-    "branch": "p0/t-evg10-dr-plan-2026-11-21",
+    "repo_sha": "9bae3f06fa39ff8d01f9b0cd74b0cdede3071d6a",
+    "branch": "",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 1014,
-    "audited_byte_count": 7150657,
-    "corpus_content_hash": "268a22d512c6afb692fa21dcea9bff883f4cd00ed583290dfa081c95b59a9fcf",
+    "audited_file_count": 1018,
+    "audited_byte_count": 7189815,
+    "corpus_content_hash": "00fa276635ea19e99eae707e2cecd72883d63b4b6a2dba4a81f1a20d293ed5f2",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "e3a7ebb16f7b4609fc9bc26178aa559e6af18c7a8540f8ede1cb97447eb427cb"
+        "sha256": "9837115fd53af170b76e6a888d06b493b48bfcbff865df4750c0b747127c4b9e"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -43,14 +43,14 @@
         ]
       }
     },
-    "skill_count": 261,
+    "skill_count": 262,
     "rule_count": 28,
-    "finding_count": 485,
+    "finding_count": 489,
     "by_severity": {
       "P0": 3,
-      "P1": 100,
+      "P1": 101,
       "P2": 41,
-      "info": 341
+      "info": 344
     },
     "by_rule": {
       "ARTF-001": 10,
@@ -58,13 +58,13 @@
       "EVAL-003": 3,
       "PARITY-001": 38,
       "REF-003": 1,
-      "ROUTE-002": 341,
-      "SIDE-004": 86,
+      "ROUTE-002": 344,
+      "SIDE-004": 87,
       "STATE-001": 2,
       "STATE-002": 1
     },
-    "mechanical_count": 384,
-    "semantic_review_candidates": 101
+    "mechanical_count": 387,
+    "semantic_review_candidates": 102
   },
   "rule_inventory": [
     {
@@ -137,7 +137,7 @@
         "AEGIS-057"
       ],
       "limits": "covers the \u00a75 classes (source/test/config writes, VCS mutation, install, network, deploy/provision, data-store/live-state writes, spend, unbound doc/state writes) as lexical verb+noun patterns, at most ONE candidate per class per skill; fenced snippets INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; the approved-write exception applies ONLY to the doc-state-write class and ONLY when exact-path + content-preview + approval markers sit within a few lines of the write \u2014 approval language elsewhere never suppresses anything (extra negative fixture: approved-doc-writer)",
-      "hit_count": 86
+      "hit_count": 87
     },
     {
       "id": "SIDE-005",
@@ -359,7 +359,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 341
+      "hit_count": 344
     },
     {
       "id": "ROUTE-003",
@@ -6943,6 +6943,71 @@
     {
       "rule": "ROUTE-002",
       "severity": "info",
+      "file": ".claude/skills/site-resilience-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "site-resilience-architect",
+      "related_skills": [
+        "business-continuity-planner"
+      ],
+      "evidence": "exclusion toward `business-continuity-planner` is not reciprocated (business-continuity-planner's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "site-resilience-architect",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/site-resilience-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "site-resilience-architect",
+      "related_skills": [
+        "cloud-architecture-decider"
+      ],
+      "evidence": "exclusion toward `cloud-architecture-decider` is not reciprocated (cloud-architecture-decider's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "site-resilience-architect",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/site-resilience-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "site-resilience-architect",
+      "related_skills": [
+        "resilience-architecture-reviewer"
+      ],
+      "evidence": "exclusion toward `resilience-architecture-reviewer` is not reciprocated (resilience-architecture-reviewer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "site-resilience-architect",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/site-resilience-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "site-resilience-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "site-resilience-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
       "file": ".claude/skills/skill-deprecation-planner/SKILL.md",
       "line": 0,
       "owning_skill": "skill-deprecation-planner",
@@ -9304,6 +9369,14 @@
     "share-link-access-architect": {
       "complete": 1,
       "verified": 2
+    },
+    "site-resilience-architect": {
+      "accepted": 6,
+      "committed": 1,
+      "complete": 2,
+      "deployed": 1,
+      "proposed": 1,
+      "verified": 8
     },
     "skill-deprecation-planner": {
       "planned": 3,

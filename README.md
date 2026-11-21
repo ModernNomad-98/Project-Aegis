@@ -901,7 +901,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->261<!-- /SKILL-COUNT --> skills comprise **260 in <!-- FAMILY-COUNT -->25<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->262<!-- /SKILL-COUNT --> skills comprise **261 in <!-- FAMILY-COUNT -->25<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -1029,14 +1029,17 @@ keeps a human as the approval gate on anything irreversible. See
 24. **Layer 2 addition (2026-11-13)** *(Layer 2, 1)* — the capability-based,
     model-agnostic routing policy registered as its own model-invocable skill,
     matching the catalog family of the same name. *e.g.* `model-routing-policy`.
-25. **Operational continuity** *(EVG-1, 2)* — the business side of resilience:
+25. **Operational continuity** *(EVG-1, 3)* — the business side of resilience:
     a business impact analysis that ranks what must survive and what losing it costs
     over time, continuity strategies for people, workplace, suppliers/SaaS vendors
     and manual workarounds, crisis communications, and the ownership, review cadence
-    and exercises that keep the plan alive; plus the technical disaster-recovery plan
-    with traceable RTO/RPO targets, declaration authority, scenario runbooks,
-    recovery order and gates, failback and a dated test-and-update loop.
-    *e.g.* `business-continuity-planner`, `disaster-recovery-plan-author`.
+    and exercises that keep the plan alive; the cloud zone/region topology that
+    survives a zone or region loss with the RTO/RPO its replication actually
+    delivers; plus the technical disaster-recovery plan with traceable RTO/RPO
+    targets, declaration authority, scenario runbooks, recovery order and gates,
+    failback and a dated test-and-update loop.
+    *e.g.* `business-continuity-planner`, `site-resilience-architect`,
+    `disaster-recovery-plan-author`.
 
 ## Maintainer reading routes
 
@@ -1792,15 +1795,19 @@ choices, but nothing is saved until a person invokes `aegis-setup` by name:
 |---|---|---|
 | `aegis-setup` | The four-choice setup conversation (Aegis only, a local helper, an online helper, help choosing) and an Aegis-only saved selection for one user and one checkout, tested on single-user Windows PowerShell. Local and online helpers remain unavailable; it connects no provider, measures no token saving, and does not replace `project-orchestrator`. | **manual only** |
 
-Operational continuity (EVG-1, EVG-10, family 25): the business side of resilience —
-what must survive an outage, what losing it costs over time, who decides, and the
-technical plan that recovers it. The family exists with two skills; the continuity
-conductor is not built at this base. Design/author only → model-invocable:
+Operational continuity (EVG-1, EVG-10, EVG-11, family 25): the business side of
+resilience — what must survive an outage, what losing it costs over time, who
+decides, the cloud topology that survives a zone or region loss, and the technical
+plan that recovers it. The family exists with three skills; the continuity
+conductor is not built at this base. The site design is cloud zones and regions
+only: on-premises, colocation and hybrid hosting are not covered (owner scope
+decision D2, undecided). Design/author only → model-invocable:
 
 | Skill | What it does | Invocation |
 |---|---|---|
 | `business-continuity-planner` | Designs the business continuity plan and its business impact analysis (BIA): critical processes ranked by impact over time (1h/4h/1d/3d/1w) and maximum tolerable downtime, dependency traces (people, systems, workplace, suppliers), a recovery-target table in which every RTO/RPO states its source record, date and owner or is marked UNDECIDED, continuity strategies for people/workplace/suppliers and SaaS vendors/manual workarounds (weakened control and reconciliation named), crisis communications (audiences, named speaker and deputy, approval authority, status page, licensed source for regulator obligations), and per-process ownership, review cadence and an exercise programme. Refuses to invent RTO/RPO, to declare the plan compliant or certified, and to design without a named business owner. ≠ `incident-response-runbook` (the live response), `slo-reliability-architect` (reliability targets and paging), `resilience-architecture-reviewer` (per-dependency cloud failure review), `disaster-recovery-plan-author` (technical recovery plan), and the compliance family (standard conformance from a licensed copy). | auto + manual |
-| `disaster-recovery-plan-author` | Authors the technical disaster-recovery (DR) plan a team executes: service tiers whose RTO/RPO each carry a source record, date and owner or are UNDECIDED; observable declaration criteria with a named declarer, deputy, out-of-hours path, stand-down and record; the recovery strategy per tier from the site-resilience design (backup-and-restore, pilot light, warm standby, active-active, site switch) with the design gap recorded where none exists; recovery order with identity and DNS before applications and data before services; six scenario runbooks with one action per step, exact path, expected result, verification, approval gate and abort; failback with reconciliation and split-brain handling; and a test schedule whose dated evidence updates the plan. It also owns the plan's failover playbooks; reviewer seam recorded: `resilience-architecture-reviewer` currently routes that authoring to `incident-response-runbook`/`rollback-runbook-author`, not yet to this skill. Refuses to invent RTO/RPO, to claim a tier tested without dated evidence, and to execute any recovery. ≠ `business-continuity-planner` (the BIA and business tolerance), `resilience-architecture-reviewer` (design review), `database-backup-verifier` (manual-only restore drill), `incident-response-runbook` (live response), `rollback-runbook-author` (release backout), site-resilience-architect (site design, not built at this base), and the compliance family. | auto + manual |
+| `disaster-recovery-plan-author` | Authors the technical disaster-recovery (DR) plan a team executes: service tiers whose RTO/RPO each carry a source record, date and owner or are UNDECIDED; observable declaration criteria with a named declarer, deputy, out-of-hours path, stand-down and record; the recovery strategy per tier from the site-resilience design (backup-and-restore, pilot light, warm standby, active-active, site switch) with the design gap recorded where none exists; recovery order with identity and DNS before applications and data before services; six scenario runbooks with one action per step, exact path, expected result, verification, approval gate and abort; failback with reconciliation and split-brain handling; and a test schedule whose dated evidence updates the plan. It also owns the plan's failover playbooks; reviewer seam recorded: `resilience-architecture-reviewer` currently routes that authoring to `incident-response-runbook`/`rollback-runbook-author`, not yet to this skill. Refuses to invent RTO/RPO, to claim a tier tested without dated evidence, and to execute any recovery. ≠ `business-continuity-planner` (the BIA and business tolerance), `resilience-architecture-reviewer` (design review), `database-backup-verifier` (manual-only restore drill), `incident-response-runbook` (live response), `rollback-runbook-author` (release backout), site-resilience-architect (site design), and the compliance family. | auto + manual |
+| `site-resilience-architect` | Designs how a cloud-hosted product survives the loss of a zone or a region: one topology per tier from the single-zone, multi-zone, pilot-light, warm-standby and active-active ladder, with the failure each survives and the one it does not; the replication mode and the RPO its measured lag actually delivers (synchronous latency, asynchronous lag distribution), the DNS failover path and its trigger, and the RTO as detection + decision + promotion + validation + DNS TTL. Audits every dependency of the failover path itself (identity and login, token signing, session store, secrets, CI and deploy, observability, certificates, third parties, quota) so a multi-region claim is not data replication behind a single-region front door; gates every replica on a named residency obligation and its source; and admits multi-cloud only against a named requirement. Cloud zones and regions only: on-premises, colocation and hybrid hosting are explicitly not covered (owner scope decision D2, undecided), and it writes no DR plan, runbook or backup-restore proof. ≠ `disaster-recovery-plan-author` (the technical plan), `resilience-architecture-reviewer` (design review and drills), `cloud-architecture-decider` (provider choice), `business-continuity-planner` (BIA and business targets), `horizontal-scalability-reviewer` (capacity), `iac-reviewer` (infrastructure-as-code), `slo-reliability-architect` (SLOs and paging). | auto + manual |
 
 ## Authoring a new skill
 

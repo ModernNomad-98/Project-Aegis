@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "3d3880f1ffbeaa83d5846034b8bd5c59057e8733",
+  "source_revision": "d395c5641d383d48904384c2f41100b915303a0f",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -1092,6 +1092,11 @@
       "name": "share-link-access-architect",
       "path": ".claude/skills/share-link-access-architect/SKILL.md",
       "sha256": "cc3f16da24772799a09fba984f80969ad8723cce93ec8c345b26db95b1e189f2"
+    },
+    {
+      "name": "site-resilience-architect",
+      "path": ".claude/skills/site-resilience-architect/SKILL.md",
+      "sha256": "099cd24113ecb91a38c2270264b4c58da61edeea93bfd9b8b48224f43b7d9d00"
     },
     {
       "name": "skill-deprecation-planner",

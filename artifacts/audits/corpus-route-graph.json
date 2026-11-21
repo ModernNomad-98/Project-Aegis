@@ -1091,6 +1091,11 @@
       "declares_read_only": false
     },
     {
+      "name": "site-resilience-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "skill-deprecation-planner",
       "manual_only": false,
       "declares_read_only": false
@@ -3505,6 +3510,11 @@
     {
       "from": "disaster-recovery-plan-author",
       "to": "rollback-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "disaster-recovery-plan-author",
+      "to": "site-resilience-architect",
       "type": "description-mention"
     },
     {
@@ -7060,6 +7070,26 @@
     {
       "from": "share-link-access-architect",
       "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "site-resilience-architect",
+      "to": "business-continuity-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "site-resilience-architect",
+      "to": "cloud-architecture-decider",
+      "type": "description-mention"
+    },
+    {
+      "from": "site-resilience-architect",
+      "to": "disaster-recovery-plan-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "site-resilience-architect",
+      "to": "resilience-architecture-reviewer",
       "type": "description-mention"
     },
     {
