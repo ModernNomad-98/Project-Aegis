@@ -281,7 +281,7 @@ here.
   → `rollback-runbook-author` →
   `incident-response-runbook`. *If merge == deploy on the platform:*
   `merge-is-deploy-governance`. Route FROM the decider's result; never
-  re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md).
+  re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md). When hosting applies, backups are verified by `database-backup-verifier` *(manual-only — name it explicitly, and only when a recovery target — recovery point objective (RPO) and recovery time objective (RTO) — is recorded)* and disaster recovery (DR) design is reviewed by `resilience-architecture-reviewer`; the [After launch](../../../docs/paths/after-launch.md) guide's backup rows are the route.
 - **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` *(only when the release-with-agents route applies: a multi-reviewer release is in scope)* → `sharded-validation-with-resume` *(same condition; only when the full validation tier is needed)* → `release-readiness-reviewer`
   (and the read-only reviewer subagents in `.claude/agents/` when available and relevant); the reviewer advises and the owner authorizes; Aegis's control plane is synthetic only.
   *At release, unless the owner has already answered it, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist`, preceded by `feature-flag-architect` when no flag system exists yet.
