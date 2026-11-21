@@ -3,7 +3,7 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.1",
     "engine_sha256": "bff7782400676476c270d26f4a453e2bdd6f096912f629a3c56303fb0af64877",
-    "repo_sha": "972d80636d6af49fabc8826d3d207783c7a42e80",
+    "repo_sha": "3a4b0515b18e5b0f9d20259c4e81387f0c41b481",
     "branch": "p0/t-evg09-business-continuity-2026-11-20",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
