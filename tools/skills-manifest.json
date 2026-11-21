@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "8ddc3edeefbb0fd915499c7be1324d6d24b8510f",
+  "source_revision": "14c53e1295ce57349d32aa42fa9476583e6b8b13",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -242,6 +242,11 @@
       "name": "browser-boundary-reviewer",
       "path": ".claude/skills/browser-boundary-reviewer/SKILL.md",
       "sha256": "e72ee91da1aca6016ecdfa1f85f381e0a1e8edf9be68173a0c922f70f2314cb5"
+    },
+    {
+      "name": "business-continuity-planner",
+      "path": ".claude/skills/business-continuity-planner/SKILL.md",
+      "sha256": "fd12890bec33ac5dfe71ba183bf54af92793fcbd36cd331ae34a33301df0abea"
     },
     {
       "name": "caching-strategy-designer",

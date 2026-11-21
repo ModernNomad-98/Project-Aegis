@@ -4294,10 +4294,10 @@
   "schema_version": 2,
   "scope_note": "The roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap. The generated summary carries the derived count. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization. Convention (D114, 2026-10-24): a roadmap row closed by shipping a skill is always SHIPPED/explicit-id; an owner authorization is not evidence grade.",
   "snapshot": {
-    "d_entry": "D124",
-    "rows_sha256": "6a7d2cbc5f331374f4a19a78082cd766429dd6178b218a0d243c2e89619a9427",
+    "d_entry": "D125",
+    "rows_sha256": "53d96a82f291afd4311b103f0b638097b29c844627b4cc8a083a90d55c4594f4",
     "totals": {
-      "beyond_roadmap_skills": 90,
+      "beyond_roadmap_skills": 91,
       "by_area": {
         "01": 55,
         "02": 35,
@@ -4331,7 +4331,7 @@
         "P1": 0,
         "P2": 0
       },
-      "manifest_skills": 259,
+      "manifest_skills": 260,
       "review_pending": 114
     }
   }
