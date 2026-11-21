@@ -74,7 +74,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Technical recovery steps, failover design and restore procedures are declined and handed to the future disaster-recovery-plan-author skill (not built at this base); this skill keeps only the business requirement and the origin of the targets, and says so when that skill is unavailable."
+          "Technical recovery steps, failover design and restore procedures are declined and handed to disaster-recovery-plan-author; this skill keeps only the business requirement and the origin of the targets, and says so when that skill is unavailable."
         ]
       }
     },

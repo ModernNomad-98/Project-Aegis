@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.1",
     "engine_sha256": "bff7782400676476c270d26f4a453e2bdd6f096912f629a3c56303fb0af64877",
-    "repo_sha": "cbe3ddae9c9579b2b3ac528f7d86f46ee7452f6b",
-    "branch": "p0/t-evg09-business-continuity-2026-11-20",
+    "repo_sha": "05048f8a87ba511fd6a9f1bc833c93648ad3ba32",
+    "branch": "p0/t-evg10-dr-plan-2026-11-21",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 1010,
-    "audited_byte_count": 7103296,
-    "corpus_content_hash": "1395ec05bc9c751edd82e5016a79eb5488e8c2c759faab16ba117f3f4e0f6fcc",
+    "audited_file_count": 1014,
+    "audited_byte_count": 7150657,
+    "corpus_content_hash": "268a22d512c6afb692fa21dcea9bff883f4cd00ed583290dfa081c95b59a9fcf",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "3c747f332314f727a6ac515434ac9575909832b18082782908e04c0a28f3a8b0"
+        "sha256": "e3a7ebb16f7b4609fc9bc26178aa559e6af18c7a8540f8ede1cb97447eb427cb"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -43,14 +43,14 @@
         ]
       }
     },
-    "skill_count": 260,
+    "skill_count": 261,
     "rule_count": 28,
-    "finding_count": 481,
+    "finding_count": 485,
     "by_severity": {
       "P0": 3,
       "P1": 100,
       "P2": 41,
-      "info": 337
+      "info": 341
     },
     "by_rule": {
       "ARTF-001": 10,
@@ -58,12 +58,12 @@
       "EVAL-003": 3,
       "PARITY-001": 38,
       "REF-003": 1,
-      "ROUTE-002": 337,
+      "ROUTE-002": 341,
       "SIDE-004": 86,
       "STATE-001": 2,
       "STATE-002": 1
     },
-    "mechanical_count": 380,
+    "mechanical_count": 384,
     "semantic_review_candidates": 101
   },
   "rule_inventory": [
@@ -359,7 +359,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 337
+      "hit_count": 341
     },
     {
       "id": "ROUTE-003",
@@ -2896,6 +2896,70 @@
       ],
       "remediation_owner": "design-system-token-governor",
       "confidence": "high",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
+      "line": 0,
+      "owning_skill": "disaster-recovery-plan-author",
+      "related_skills": [
+        "database-backup-verifier"
+      ],
+      "evidence": "exclusion toward `database-backup-verifier` is not reciprocated (database-backup-verifier's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "disaster-recovery-plan-author",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
+      "line": 0,
+      "owning_skill": "disaster-recovery-plan-author",
+      "related_skills": [
+        "incident-response-runbook"
+      ],
+      "evidence": "exclusion toward `incident-response-runbook` is not reciprocated (incident-response-runbook's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "disaster-recovery-plan-author",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
+      "line": 0,
+      "owning_skill": "disaster-recovery-plan-author",
+      "related_skills": [
+        "resilience-architecture-reviewer"
+      ],
+      "evidence": "exclusion toward `resilience-architecture-reviewer` is not reciprocated (resilience-architecture-reviewer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "disaster-recovery-plan-author",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
+      "line": 0,
+      "owning_skill": "disaster-recovery-plan-author",
+      "related_skills": [
+        "rollback-runbook-author"
+      ],
+      "evidence": "exclusion toward `rollback-runbook-author` is not reciprocated (rollback-runbook-author's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "disaster-recovery-plan-author",
+      "confidence": "low",
       "mechanical": true
     },
     {
@@ -8777,6 +8841,12 @@
     },
     "diataxis-doc-organizer": {
       "complete": 2
+    },
+    "disaster-recovery-plan-author": {
+      "accepted": 1,
+      "planned": 1,
+      "ready": 1,
+      "verified": 10
     },
     "docs-as-code-architect": {
       "verified": 1

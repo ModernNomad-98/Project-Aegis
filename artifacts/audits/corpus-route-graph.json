@@ -431,6 +431,11 @@
       "declares_read_only": false
     },
     {
+      "name": "disaster-recovery-plan-author",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "docs-as-code-architect",
       "manual_only": false,
       "declares_read_only": false
@@ -2439,6 +2444,11 @@
     },
     {
       "from": "business-continuity-planner",
+      "to": "disaster-recovery-plan-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "business-continuity-planner",
       "to": "incident-response-runbook",
       "type": "description-mention"
     },
@@ -3470,6 +3480,31 @@
     {
       "from": "diataxis-doc-organizer",
       "to": "readme-craftsman",
+      "type": "description-mention"
+    },
+    {
+      "from": "disaster-recovery-plan-author",
+      "to": "business-continuity-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "disaster-recovery-plan-author",
+      "to": "database-backup-verifier",
+      "type": "description-mention"
+    },
+    {
+      "from": "disaster-recovery-plan-author",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "disaster-recovery-plan-author",
+      "to": "resilience-architecture-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "disaster-recovery-plan-author",
+      "to": "rollback-runbook-author",
       "type": "description-mention"
     },
     {
@@ -8162,7 +8197,6 @@
     "background-job-orchestration-architect",
     "branching-strategy-designer",
     "browser-boundary-reviewer",
-    "business-continuity-planner",
     "cell-based-architecture-designer",
     "complete-project-checkpoint",
     "configuration-architect",
