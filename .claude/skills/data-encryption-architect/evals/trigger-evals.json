@@ -1,0 +1,87 @@
+{
+  "skill": "data-encryption-architect",
+  "description": "Trigger discrimination for data-encryption-architect against the nearest shipped owners.",
+  "overlaps_with": [
+    "secrets-identity-hardener",
+    "cloud-security-baseline-reviewer",
+    "database-backup-verifier",
+    "iac-reviewer",
+    "pii-lifecycle-designer",
+    "appsec-implementer",
+    "compliance-control-foundation"
+  ],
+  "cases": [
+    {
+      "id": "data-encryption-architect-positive-1",
+      "prompt": "Design encryption in transit and at rest for our multi-store SaaS: Postgres, object storage, Redis, search, queue, logs, backups and analytics, across browser, edge, service-to-service and third-party boundaries.",
+      "expected_skill": "data-encryption-architect",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "The request needs this skill's design method; cloud-security-baseline-reviewer reviews configured controls, which is a different task."
+    },
+    {
+      "id": "data-encryption-architect-negative-1",
+      "prompt": "Rotate the leaked AWS access key now and update the production credentials.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "data-encryption-architect"
+      ],
+      "reason": "This is secrets-identity-hardener's manual-only execution deliverable; data-encryption-architect must not rotate, revoke or touch credentials."
+    },
+    {
+      "id": "data-encryption-architect-negative-2",
+      "prompt": "Review our configured cloud accounts against the named security baseline and report failed controls.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": [
+        "data-encryption-architect"
+      ],
+      "reason": "This is cloud-security-baseline-reviewer's configured-account review; the encryption architect designs and does not inspect live accounts."
+    },
+    {
+      "id": "data-encryption-architect-negative-3",
+      "prompt": "Verify that our backups are actually encrypted and that a restore works.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "data-encryption-architect"
+      ],
+      "reason": "Backup-encryption and restore verification are database-backup-verifier's deliverable; this skill only designs what backups must inherit."
+    },
+    {
+      "id": "data-encryption-architect-negative-4",
+      "prompt": "Review this Terraform change for encryption settings, public exposure and blast radius before we apply it.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": [
+        "data-encryption-architect"
+      ],
+      "reason": "This is iac-reviewer's infrastructure-as-code review; the encryption architect produces the design baseline, not the diff review."
+    },
+    {
+      "id": "data-encryption-architect-negative-5",
+      "prompt": "Design PII retention schedules and the data-subject deletion process across our systems.",
+      "expected_skill": "pii-lifecycle-designer",
+      "should_not_trigger": [
+        "data-encryption-architect"
+      ],
+      "reason": "PII lifecycle design is pii-lifecycle-designer's deliverable; this skill consumes that record and designs supporting encryption."
+    },
+    {
+      "id": "data-encryption-architect-negative-6",
+      "prompt": "Implement the field-level encryption control test-first and make the failing negative test pass.",
+      "expected_skill": "appsec-implementer",
+      "should_not_trigger": [
+        "data-encryption-architect"
+      ],
+      "reason": "This is appsec-implementer's manual-only implementation work; the encryption architect stops at the design."
+    },
+    {
+      "id": "data-encryption-architect-negative-7",
+      "prompt": "Are we ISO 27001 compliant? Give us a certification answer for the audit.",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": [
+        "data-encryption-architect"
+      ],
+      "reason": "Compliance certification and control mapping belong to the compliance family; this skill records encryption decisions and makes no compliance claim."
+    }
+  ]
+}

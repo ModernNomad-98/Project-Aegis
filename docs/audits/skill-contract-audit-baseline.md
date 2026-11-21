@@ -1,9 +1,9 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.14.1 (engine sha256 `bff7782400676476…`)
-- Repo SHA: `9bae3f06fa39ff8d01f9b0cd74b0cdede3071d6a` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `00fa276635ea19e99eae707e2cecd72883d63b4b6a2dba4a81f1a20d293ed5f2` (1018 files, 7189815 bytes)
-- Skills scanned: **262**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
+- Repo SHA: `7ebe96c4291c2e8cad929345873b9b399532f230` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `934b74187fbfca5efb60dd606e6d8a8fe17fcbcf2786b749502ff60c6deba0d1` (1022 files, 7218920 bytes)
+- Skills scanned: **263**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **489** (387 mechanical, 102 semantic-review candidates)
 
 Findings are EXPECTED here: this report records the corpus as it is
@@ -63,7 +63,7 @@ mechanically proven defects.
 
 ## Coverage (what was and was not reviewed)
 
-- **Mechanically scanned:** all 262 shipped skills' SKILL.md + references + eval JSONs (this report).
+- **Mechanically scanned:** all 263 shipped skills' SKILL.md + references + eval JSONs (this report).
 - **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is left to `scripts/validate-skills.py`, which checks agent frontmatter and guided-path links.
 - **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read: a link or path that leads outside the repository stops the run.
 - **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
@@ -273,6 +273,7 @@ mechanically proven defects.
 - `cqrs-read-model-designer`: verified×1
 - `cross-team-dependency-negotiator`: proposed×1
 - `dast-safety-harness-designer`: complete×1
+- `data-encryption-architect`: accepted×3, complete×2, verified×2
 - `data-flow-diagrammer`: verified×3
 - `data-migration-runbook-author`: accepted×2, verified×4
 - `data-partitioning-sharding-strategist`: complete×1, verified×1

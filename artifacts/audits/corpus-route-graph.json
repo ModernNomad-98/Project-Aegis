@@ -371,6 +371,11 @@
       "declares_read_only": false
     },
     {
+      "name": "data-encryption-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "data-flow-diagrammer",
       "manual_only": false,
       "declares_read_only": false
@@ -3061,6 +3066,71 @@
       "from": "dast-safety-harness-designer",
       "to": "threat-modeler",
       "type": "description-mention"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "appsec-implementer",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "cloud-security-baseline-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "cloud-security-baseline-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "compliance-control-foundation",
+      "type": "body-route"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "database-backup-verifier",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "iac-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "iac-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "iso-27001-isms-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "pii-lifecycle-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "pii-lifecycle-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "secrets-identity-hardener",
+      "type": "body-route"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-encryption-architect",
+      "to": "soc2-trust-criteria-mapper",
+      "type": "body-route"
     },
     {
       "from": "data-flow-diagrammer",
@@ -8232,6 +8302,7 @@
     "configuration-architect",
     "context-co-update-ci-gate",
     "cqrs-read-model-designer",
+    "data-encryption-architect",
     "data-quality-monitor-designer",
     "demo-tenant-safety-designer",
     "docs-first-implementer",

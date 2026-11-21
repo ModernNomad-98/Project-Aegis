@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "d395c5641d383d48904384c2f41100b915303a0f",
+  "source_revision": "f2762630d76477e858f3916dfe6bda6ffa9c6140",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -372,6 +372,11 @@
       "name": "dast-safety-harness-designer",
       "path": ".claude/skills/dast-safety-harness-designer/SKILL.md",
       "sha256": "101a3aa592bc0e1b1331ca92cecc07b5a5b404d0a37b04e2a9d70d4674098741"
+    },
+    {
+      "name": "data-encryption-architect",
+      "path": ".claude/skills/data-encryption-architect/SKILL.md",
+      "sha256": "ba94622ca4907a27cc1857be22d79d08844a56fd5ee9b348aa633931cda02610"
     },
     {
       "name": "data-flow-diagrammer",

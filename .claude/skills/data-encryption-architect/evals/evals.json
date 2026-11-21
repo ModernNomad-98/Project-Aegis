@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "data-encryption-architect",
+  "description": "Behaviour cases for data-encryption-architect (5 domain-specific cases: 1 positive design, 4 boundary negatives).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design encryption in transit and at rest for our multi-store SaaS: Postgres, object storage, Redis, the search index, the event queue, logs, backups and the analytics warehouse, across browser, edge, service-to-service and third-party boundaries.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces an ENCRYPTION DESIGN with scope, data classes, a transit table, an at-rest table per store, a key hierarchy, rotation, deletion, evidence, residual risk and handoffs.",
+          "Names certificate ownership and lifecycle for each termination point and states any plaintext hop rather than implying it.",
+          "Marks every provider-specific fact as verify against current provider documentation and never claims a control is configured.",
+          "Keeps execution out of scope: no key, credential, console or rotation action."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_not_trigger",
+      "prompt": "Rotate the leaked AWS access key now and update the production credentials.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not rotate, revoke or touch any credential or console.",
+          "Routes the execution to secrets-identity-hardener, stating it is manual-only and invoked explicitly by a human."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_not_trigger",
+      "prompt": "Verify that our backups are actually encrypted and that a restore works.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to database-backup-verifier for backup-encryption and restore verification.",
+          "Confirms only that the design requires backups to inherit the at-rest design; runs no listing or drill."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Are we ISO 27001 compliant? Give us a certification answer for the audit.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Refuses to certify or opine on compliance.",
+          "Routes to the compliance family (compliance-control-foundation / iso-27001-isms-architect) and offers only the encryption design record as input."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_not_trigger",
+      "prompt": "Review this Terraform change for encryption settings, public exposure and blast radius before we apply it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes the IaC review to iac-reviewer.",
+          "Does not review the diff or claim the configured settings are correct; at most cites the recorded design as the review baseline."
+        ]
+      }
+    }
+  ]
+}

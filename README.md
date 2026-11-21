@@ -901,7 +901,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->262<!-- /SKILL-COUNT --> skills comprise **261 in <!-- FAMILY-COUNT -->25<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->263<!-- /SKILL-COUNT --> skills comprise **262 in <!-- FAMILY-COUNT -->26<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -1040,6 +1040,17 @@ keeps a human as the approval gate on anything irreversible. See
     failback and a dated test-and-update loop.
     *e.g.* `business-continuity-planner`, `site-resilience-architect`,
     `disaster-recovery-plan-author`.
+26. **Data protection** *(EVG-1, 1)* — design-only encryption across data classes,
+    stores and trust boundaries: what is encrypted in transit and at rest and who
+    holds the keys; TLS/mTLS termination, certificate ownership and lifecycle; the
+    per-store choice of provider-default or customer-managed key with envelope
+    encryption; the KMS key hierarchy with custody, separation of duties, rotation
+    and revocation; crypto-shredding versus record deletion; inherited protection
+    for backups, replicas and disaster-recovery copies; and the evidence each claim
+    rests on. Stored-credential hashing, secret envelopes and rotation stay with
+    `secrets-identity-hardener` (manual-only); execution and provider work stay with
+    the named owners.
+    *e.g.* `data-encryption-architect`.
 
 ## Maintainer reading routes
 
@@ -1808,6 +1819,18 @@ decision D2, undecided). Design/author only → model-invocable:
 | `business-continuity-planner` | Designs the business continuity plan and its business impact analysis (BIA): critical processes ranked by impact over time (1h/4h/1d/3d/1w) and maximum tolerable downtime, dependency traces (people, systems, workplace, suppliers), a recovery-target table in which every RTO/RPO states its source record, date and owner or is marked UNDECIDED, continuity strategies for people/workplace/suppliers and SaaS vendors/manual workarounds (weakened control and reconciliation named), crisis communications (audiences, named speaker and deputy, approval authority, status page, licensed source for regulator obligations), and per-process ownership, review cadence and an exercise programme. Refuses to invent RTO/RPO, to declare the plan compliant or certified, and to design without a named business owner. ≠ `incident-response-runbook` (the live response), `slo-reliability-architect` (reliability targets and paging), `resilience-architecture-reviewer` (per-dependency cloud failure review), `disaster-recovery-plan-author` (technical recovery plan), and the compliance family (standard conformance from a licensed copy). | auto + manual |
 | `disaster-recovery-plan-author` | Authors the technical disaster-recovery (DR) plan a team executes: service tiers whose RTO/RPO each carry a source record, date and owner or are UNDECIDED; observable declaration criteria with a named declarer, deputy, out-of-hours path, stand-down and record; the recovery strategy per tier from the site-resilience design (backup-and-restore, pilot light, warm standby, active-active, site switch) with the design gap recorded where none exists; recovery order with identity and DNS before applications and data before services; six scenario runbooks with one action per step, exact path, expected result, verification, approval gate and abort; failback with reconciliation and split-brain handling; and a test schedule whose dated evidence updates the plan. It also owns the plan's failover playbooks; reviewer seam recorded: `resilience-architecture-reviewer` currently routes that authoring to `incident-response-runbook`/`rollback-runbook-author`, not yet to this skill. Refuses to invent RTO/RPO, to claim a tier tested without dated evidence, and to execute any recovery. ≠ `business-continuity-planner` (the BIA and business tolerance), `resilience-architecture-reviewer` (design review), `database-backup-verifier` (manual-only restore drill), `incident-response-runbook` (live response), `rollback-runbook-author` (release backout), site-resilience-architect (site design), and the compliance family. | auto + manual |
 | `site-resilience-architect` | Designs how a cloud-hosted product survives the loss of a zone or a region: one topology per tier from the single-zone, multi-zone, pilot-light, warm-standby and active-active ladder, with the failure each survives and the one it does not; the replication mode and the RPO its measured lag actually delivers (synchronous latency, asynchronous lag distribution), the DNS failover path and its trigger, and the RTO as detection + decision + promotion + validation + DNS TTL. Audits every dependency of the failover path itself (identity and login, token signing, session store, secrets, CI and deploy, observability, certificates, third parties, quota) so a multi-region claim is not data replication behind a single-region front door; gates every replica on a named residency obligation and its source; and admits multi-cloud only against a named requirement. Cloud zones and regions only: on-premises, colocation and hybrid hosting are explicitly not covered (owner scope decision D2, undecided), and it writes no DR plan, runbook or backup-restore proof. ≠ `disaster-recovery-plan-author` (the technical plan), `resilience-architecture-reviewer` (design review and drills), `cloud-architecture-decider` (provider choice), `business-continuity-planner` (BIA and business targets), `horizontal-scalability-reviewer` (capacity), `iac-reviewer` (infrastructure-as-code), `slo-reliability-architect` (SLOs and paging). | auto + manual |
+
+Data protection (EVG-12, family 26): design-only encryption across data classes,
+stores and trust boundaries — what is encrypted in transit and at rest, and who
+holds the keys. The family exists with one skill; it decides encryption as
+architecture and hands execution to the named owners. Stored-credential hashing,
+secret envelopes and rotation stay with `secrets-identity-hardener` (manual-only);
+backup-encryption verification stays with `database-backup-verifier` (manual-only).
+Design only → model-invocable:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `data-encryption-architect` | Design-only encryption across data classes, stores and trust boundaries: a transit table (TLS or mTLS per hop, every termination point, certificate ownership, issuance, renewal, revocation and trust-anchor lifecycle, and stated plaintext hops); a per-store at-rest table (provider-default versus customer-managed key, envelope encryption, key reference, custody, rejected alternative) covering databases, object stores, caches, search indexes, queues, logs, backups, analytics and third-party processors; the KMS key hierarchy with per-store and per-tenant scoping, separation of use/administer/delete duties, rotation triggers, revocation and compromise response; crypto-shredding versus record deletion and what remains readable in backups, replicas, caches and logs; inherited protection for backups, replicas and DR copies or a named exception; and the evidence each claim needs, with uncollected evidence marked UNVERIFIED. Never claims a control is configured, rotated or compliant, and touches no key, credential, console or rotation. ≠ `secrets-identity-hardener` (stored-credential hashing, secret envelopes and rotation versions; manual-only), `database-backup-verifier` (backup-encryption and restore verification; manual-only), `cloud-security-baseline-reviewer` (configured accounts), `iac-reviewer` (infrastructure-as-code review), `pii-lifecycle-designer` (PII lifecycle and data-subject deletion mechanics), `appsec-implementer` (implementation; manual-only) and the compliance family (certification). | auto + manual |
 
 ## Authoring a new skill
 
