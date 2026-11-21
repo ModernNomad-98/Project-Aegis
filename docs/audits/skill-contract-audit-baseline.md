@@ -1,9 +1,9 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `a865e22a498afbc67b46c99f0aad59751b9db3e2` (branch `p0/card4-mobile-2026-11-19`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `5a49c0948926f6fa566a4476a659cac3e8c7677a5856e9f2a2c5e03381979536` (1006 files, 7056307 bytes)
-- Skills scanned: **259**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
+- Tool: `audit-skill-contracts` v1.14.1 (engine sha256 `bff7782400676476…`)
+- Repo SHA: `730f37f09a5f33e7fb1a09018845e9909985d5dd` (branch `p0/t-evg09-business-continuity-2026-11-20`; working tree dirty: true; dirty scanned surfaces: none)
+- Corpus content hash: `1395ec05bc9c751edd82e5016a79eb5488e8c2c759faab16ba117f3f4e0f6fcc` (1010 files, 7103296 bytes)
+- Skills scanned: **260**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **481** (380 mechanical, 101 semantic-review candidates)
 
 Findings are EXPECTED here: this report records the corpus as it is
@@ -46,8 +46,8 @@ mechanically proven defects.
 | STATE-004 | P0 | semantic-candidate | exact-operation claim with unbound placeholders in command fences | 0 |
 | STATE-005 | P1 | semantic-candidate | narrative approved-state section inside an append-only contract | 0 |
 | ARTF-001 | P1 | semantic-candidate | durability claim without a durability level | 10 |
-| ROUTE-001 | P1 | mechanical | routing reference to a name that is not on disk | 1 |
-| ROUTE-002 | info | mechanical | exclusion toward a neighbor that never reciprocates (CENSUS) | 336 |
+| ROUTE-001 | P1 | mechanical | routing reference to a name that is not on disk | 0 |
+| ROUTE-002 | info | mechanical | exclusion toward a neighbor that never reciprocates (CENSUS) | 337 |
 | ROUTE-003 | P1 | mechanical | a Stage-2 route reaches the commitments skill without a readiness/NOT-COMMIT-ABLE guard ON THAT ROUTE, or the roadmap owner is not independently classified | 0 |
 | VOCAB-002 | P1 | semantic-candidate | committed used as a roadmap horizon label | 0 |
 | VOCAB-003 | P0 | semantic-candidate | approved scope described as a commitment | 0 |
@@ -63,7 +63,7 @@ mechanically proven defects.
 
 ## Coverage (what was and was not reviewed)
 
-- **Mechanically scanned:** all 259 shipped skills' SKILL.md + references + eval JSONs (this report).
+- **Mechanically scanned:** all 260 shipped skills' SKILL.md + references + eval JSONs (this report).
 - **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is left to `scripts/validate-skills.py`, which checks agent frontmatter and guided-path links.
 - **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read: a link or path that leads outside the repository stops the run.
 - **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
@@ -73,9 +73,9 @@ mechanically proven defects.
 | Severity | Count |
 |---|---:|
 | P0 | 3 |
-| P1 | 101 |
+| P1 | 100 |
 | P2 | 41 |
-| info | 336 |
+| info | 337 |
 
 | Rule | Count |
 |---|---:|
@@ -84,8 +84,7 @@ mechanically proven defects.
 | EVAL-003 | 3 |
 | PARITY-001 | 38 |
 | REF-003 | 1 |
-| ROUTE-001 | 1 |
-| ROUTE-002 | 336 |
+| ROUTE-002 | 337 |
 | SIDE-004 | 86 |
 | STATE-001 | 2 |
 | STATE-002 | 1 |
@@ -155,7 +154,6 @@ mechanically proven defects.
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:187` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:199` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-automation-architect/SKILL.md` (owner: qa-automation-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **ROUTE-001** [P1/medium/mechanical] `.claude/skills/qa-orchestrator/SKILL.md` (owner: qa-orchestrator; maps: AEGIS-053) — routing line references `written-walkthrough`, which is not a skill on disk: '**5. Run the play once.** Execute the in-scope steps; for manual-only steps, hand off to the human with exact instructio'
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-orchestrator/SKILL.md` (owner: qa-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record entry' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-strategy-architect/SKILL.md` (owner: qa-strategy-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeded database' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-strategy-architect/SKILL.md` (owner: qa-strategy-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
@@ -201,7 +199,7 @@ mechanically proven defects.
 
 - **EVAL-002** × 3 — e.g. `.claude/skills/complete-project-checkpoint/evals/trigger-evals.json`: trigger-evals case 'authoring-skill' names no expected_skill — unjudgeable as written
 - **PARITY-001** × 38 — e.g. `.claude/skills/application-layer-pattern-advisor/SKILL.md`: Validation Checklist contains no checkbox items — nothing verifiable
-- **ROUTE-002** × 336 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
+- **ROUTE-002** × 337 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
 
 ## Vocabulary census (non-zero skills)
 
@@ -250,6 +248,7 @@ mechanically proven defects.
 - `background-job-orchestration-architect`: complete×1
 - `branching-strategy-designer`: accepted×2, complete×2
 - `browser-boundary-reviewer`: complete×2, verified×2
+- `business-continuity-planner`: accepted×2, estimated×1
 - `caching-strategy-designer`: accepted×1, proposed×1, targeted×1, verified×1
 - `cell-based-architecture-designer`: complete×1
 - `chat-backlog-reconciliation`: proposed×1, verified×2
@@ -280,7 +279,7 @@ mechanically proven defects.
 - `database-backup-verifier`: committed×3, estimated×11, proposed×1, verified×7
 - `defect-triage-facilitator`: complete×6
 - `demo-tenant-safety-designer`: verified×1
-- `design-orchestrator`: accepted×3, prioritized×2, proposed×4, ready×1, sequenced×1, verified×10
+- `design-orchestrator`: accepted×3, committed×1, prioritized×2, proposed×4, ready×1, sequenced×1, verified×10
 - `design-review-facilitator`: complete×1, targeted×1
 - `design-system-token-governor`: verified×1
 - `diataxis-doc-organizer`: complete×2
@@ -354,7 +353,7 @@ mechanically proven defects.
 - `product-spec-writer`: verified×1
 - `production-safe-smoke-tester`: deployed×1, proposed×2, verified×3
 - `profiling-methodology-designer`: complete×1, proposed×1, targeted×1
-- `project-orchestrator`: accepted×22, approved scope×4, commit-able×9, committed×2, complete×42, deployed×1, proposed×11, ready×3, verified×4
+- `project-orchestrator`: accepted×22, approved scope×4, commit-able×9, committed×2, complete×42, deployed×1, proposed×11, ready×3, verified×5
 - `promotion-packet-writer`: ready×3
 - `prompt-injection-defender`: accepted×2
 - `pwa-boundary-reviewer`: verified×1

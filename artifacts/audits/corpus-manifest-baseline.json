@@ -1,19 +1,19 @@
 {
   "tool": "audit-skill-contracts",
-  "version": "1.14.0",
-  "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-  "repo_sha": "a865e22a498afbc67b46c99f0aad59751b9db3e2",
-  "branch": "p0/card4-mobile-2026-11-19",
-  "working_tree_dirty": false,
+  "version": "1.14.1",
+  "engine_sha256": "bff7782400676476c270d26f4a453e2bdd6f096912f629a3c56303fb0af64877",
+  "repo_sha": "730f37f09a5f33e7fb1a09018845e9909985d5dd",
+  "branch": "p0/t-evg09-business-continuity-2026-11-20",
+  "working_tree_dirty": true,
   "dirty_paths_in_scanned_surfaces": [],
-  "audited_file_count": 1006,
-  "audited_byte_count": 7056307,
-  "corpus_content_hash": "5a49c0948926f6fa566a4476a659cac3e8c7677a5856e9f2a2c5e03381979536",
+  "audited_file_count": 1010,
+  "audited_byte_count": 7103296,
+  "corpus_content_hash": "1395ec05bc9c751edd82e5016a79eb5488e8c2c759faab16ba117f3f4e0f6fcc",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {
       "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-      "sha256": "e74c9b65a03fac2c2678d0d8001b9afb9ec9a51b2f25f2c41a87b4c6a78f24d8"
+      "sha256": "3c747f332314f727a6ac515434ac9575909832b18082782908e04c0a28f3a8b0"
     },
     "agent_names_enumerated": {
       "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -42,7 +42,7 @@
       ]
     }
   },
-  "skill_count": 259,
+  "skill_count": 260,
   "skills": [
     {
       "name": "ab-test-designer",
@@ -896,6 +896,24 @@
       "writes_artifacts": false
     },
     {
+      "name": "business-continuity-planner",
+      "skill_md": ".claude/skills/business-continuity-planner/SKILL.md",
+      "family": "Skills (Operational continuity \u2014 family 25, EVG-1)",
+      "description_chars": 1005,
+      "references": [
+        ".claude/skills/business-continuity-planner/references/bia-worksheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 11,
+      "trigger_cases": 10,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
       "name": "caching-strategy-designer",
       "skill_md": ".claude/skills/caching-strategy-designer/SKILL.md",
       "family": "Skills (D12.3 \u2014 performance engineering pack)",
@@ -1496,8 +1514,8 @@
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 7,
-      "trigger_cases": 8,
+      "eval_cases": 9,
+      "trigger_cases": 9,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -4341,14 +4359,14 @@
       "name": "tenant-modeler",
       "skill_md": ".claude/skills/tenant-modeler/SKILL.md",
       "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
-      "description_chars": 974,
+      "description_chars": 1014,
       "references": [
         ".claude/skills/tenant-modeler/references/tenant-lifecycle-catalog.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 11,
-      "trigger_cases": 4,
+      "trigger_cases": 10,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": true,

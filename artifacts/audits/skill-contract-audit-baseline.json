@@ -1,20 +1,20 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.14.0",
-    "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-    "repo_sha": "a865e22a498afbc67b46c99f0aad59751b9db3e2",
-    "branch": "p0/card4-mobile-2026-11-19",
-    "working_tree_dirty": false,
+    "version": "1.14.1",
+    "engine_sha256": "bff7782400676476c270d26f4a453e2bdd6f096912f629a3c56303fb0af64877",
+    "repo_sha": "730f37f09a5f33e7fb1a09018845e9909985d5dd",
+    "branch": "p0/t-evg09-business-continuity-2026-11-20",
+    "working_tree_dirty": true,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 1006,
-    "audited_byte_count": 7056307,
-    "corpus_content_hash": "5a49c0948926f6fa566a4476a659cac3e8c7677a5856e9f2a2c5e03381979536",
+    "audited_file_count": 1010,
+    "audited_byte_count": 7103296,
+    "corpus_content_hash": "1395ec05bc9c751edd82e5016a79eb5488e8c2c759faab16ba117f3f4e0f6fcc",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "e74c9b65a03fac2c2678d0d8001b9afb9ec9a51b2f25f2c41a87b4c6a78f24d8"
+        "sha256": "3c747f332314f727a6ac515434ac9575909832b18082782908e04c0a28f3a8b0"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -43,14 +43,14 @@
         ]
       }
     },
-    "skill_count": 259,
+    "skill_count": 260,
     "rule_count": 28,
     "finding_count": 481,
     "by_severity": {
       "P0": 3,
-      "P1": 101,
+      "P1": 100,
       "P2": 41,
-      "info": 336
+      "info": 337
     },
     "by_rule": {
       "ARTF-001": 10,
@@ -58,8 +58,7 @@
       "EVAL-003": 3,
       "PARITY-001": 38,
       "REF-003": 1,
-      "ROUTE-001": 1,
-      "ROUTE-002": 336,
+      "ROUTE-002": 337,
       "SIDE-004": 86,
       "STATE-001": 2,
       "STATE-002": 1
@@ -345,7 +344,7 @@
         "AEGIS-053"
       ],
       "limits": "curated non-skill allowlist; reviewer agents count as known; unbackticked stale names missed",
-      "hit_count": 1
+      "hit_count": 0
     },
     {
       "id": "ROUTE-002",
@@ -360,7 +359,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 336
+      "hit_count": 337
     },
     {
       "id": "ROUTE-003",
@@ -1790,6 +1789,38 @@
       "family": "route",
       "aegis_map": [],
       "remediation_owner": "browser-boundary-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/business-continuity-planner/SKILL.md",
+      "line": 0,
+      "owning_skill": "business-continuity-planner",
+      "related_skills": [
+        "incident-response-runbook"
+      ],
+      "evidence": "exclusion toward `incident-response-runbook` is not reciprocated (incident-response-runbook's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "business-continuity-planner",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/business-continuity-planner/SKILL.md",
+      "line": 0,
+      "owning_skill": "business-continuity-planner",
+      "related_skills": [
+        "slo-reliability-architect"
+      ],
+      "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "business-continuity-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -4315,22 +4346,6 @@
     {
       "rule": "ROUTE-002",
       "severity": "info",
-      "file": ".claude/skills/membership-invitation-designer/SKILL.md",
-      "line": 0,
-      "owning_skill": "membership-invitation-designer",
-      "related_skills": [
-        "tenant-modeler"
-      ],
-      "evidence": "exclusion toward `tenant-modeler` is not reciprocated (tenant-modeler's description never mentions this skill) \u2014 census evidence, no AEGIS id",
-      "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "membership-invitation-designer",
-      "confidence": "low",
-      "mechanical": true
-    },
-    {
-      "rule": "ROUTE-002",
-      "severity": "info",
       "file": ".claude/skills/memory-context-poisoning-reviewer/SKILL.md",
       "line": 0,
       "owning_skill": "memory-context-poisoning-reviewer",
@@ -5486,22 +5501,6 @@
       "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": false
-    },
-    {
-      "rule": "ROUTE-001",
-      "severity": "P1",
-      "file": ".claude/skills/qa-orchestrator/SKILL.md",
-      "line": 0,
-      "owning_skill": "qa-orchestrator",
-      "related_skills": [],
-      "evidence": "routing line references `written-walkthrough`, which is not a skill on disk: '**5. Run the play once.** Execute the in-scope steps; for manual-only steps, hand off to the human with exact instructio'",
-      "family": "route",
-      "aegis_map": [
-        "AEGIS-053"
-      ],
-      "remediation_owner": "qa-orchestrator",
-      "confidence": "medium",
-      "mechanical": true
     },
     {
       "rule": "ROUTE-002",
@@ -8624,6 +8623,10 @@
       "complete": 2,
       "verified": 2
     },
+    "business-continuity-planner": {
+      "accepted": 2,
+      "estimated": 1
+    },
     "caching-strategy-designer": {
       "accepted": 1,
       "proposed": 1,
@@ -8758,6 +8761,7 @@
     },
     "design-orchestrator": {
       "accepted": 3,
+      "committed": 1,
       "prioritized": 2,
       "proposed": 4,
       "ready": 1,
@@ -9060,7 +9064,7 @@
       "deployed": 1,
       "proposed": 11,
       "ready": 3,
-      "verified": 4
+      "verified": 5
     },
     "promotion-packet-writer": {
       "ready": 3
