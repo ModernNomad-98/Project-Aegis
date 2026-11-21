@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "14c53e1295ce57349d32aa42fa9476583e6b8b13",
+  "source_revision": "0d94b0abdb2030a652cff2f7fd5e06d9944b7147",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -246,7 +246,7 @@
     {
       "name": "business-continuity-planner",
       "path": ".claude/skills/business-continuity-planner/SKILL.md",
-      "sha256": "fd12890bec33ac5dfe71ba183bf54af92793fcbd36cd331ae34a33301df0abea"
+      "sha256": "36924bfc04efd02eca1a3d9362cf1e403f591a962b14aa826495433820d84176"
     },
     {
       "name": "caching-strategy-designer",
@@ -432,6 +432,11 @@
       "name": "diataxis-doc-organizer",
       "path": ".claude/skills/diataxis-doc-organizer/SKILL.md",
       "sha256": "a38cc95779d1821843055f326305c798cab8a025a2498053fb731c129fea08cd"
+    },
+    {
+      "name": "disaster-recovery-plan-author",
+      "path": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
+      "sha256": "6d2c5c0722233c5382ed5692f8fc7d14a2dc900834a8283384e35a6353170b89"
     },
     {
       "name": "docs-as-code-architect",
