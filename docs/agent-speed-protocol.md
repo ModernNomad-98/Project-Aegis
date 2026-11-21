@@ -37,6 +37,17 @@ When a minor or nit finding is fixed after the plan audit, the same auditor chec
 
 A blocking or major finding still requires a new capture and a full re-audit.
 
+### Capture determinacy checklist
+Before capturing a plan, confirm:
+- every acceptance criterion has an executable check (a command, a file, or a named review);
+- every conditional step says whether it runs or is skipped for the conditions the plan states;
+- every required input or authority is either supplied or its absence stops the work;
+- every count is measured at the stated head, not carried forward from an earlier one;
+- the scope names exact files, with no "and related";
+- every claim that will appear in the PR body can be re-derived from the final diff.
+
+If any answer is no, revise the capture before the audit. This checklist is the response to the tracker entry B-002 (repeated plan-audit wording loops).
+
 ## Scope freeze
 
 The captured plan is the scope. Anything requested after capture becomes (a) a
