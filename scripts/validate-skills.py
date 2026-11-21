@@ -87,6 +87,15 @@ Repo-level checks:
     FAMILY-COUNT marker — both HARD errors. Curated surfaces (roster flagship
     names, the roles table) are checked at WARNING level only, since they are
     human-curated and deliberately not 1:1 with the skill set.
+  * skill reachability (EVG-05 -- check_skill_reachability, HARD): every skill on
+    disk must be routed from a front door -- named by the README "Start here"
+    slice, CLAUDE.md, AGENTS.md, a docs/paths page linked from that slice, or
+    project-orchestrator (door), or named by a conductor those doors name (play).
+    A skill named only on a routing line of a routed skill (handoff) is still
+    UNROUTED: the user reaches it only if an earlier skill sends them on. Any
+    unrouted skill (handoff or none) must be recorded on the reviewed allow-list
+    at tools/skill_reachability/allow-list.json, whose exact nine names are
+    pinned here in protected code (REACHABILITY_ALLOWED).
 
 The `_template` directory is exempt from the per-skill structure checks (it is a
 template, not a shipped skill), but Claude Code still loads it and consumers copy
@@ -3692,6 +3701,226 @@ def write_readme_counts(print_only: bool = False) -> int:
     return 0
 
 
+# --- skill reachability (EVG-05) -------------------------------------------
+#
+# A shipped skill nobody routes to is invisible: the user has to guess its name.
+# This scan is a behaviour copy of tools/skill_reachability/measure_routed.py.
+# It is copied, not imported, because the required `validate-skills` job must
+# never execute code from `tools/`: `tools/` is outside gate_pattern, so a pull
+# request could rewrite it unnoticed. Parity with the tool is checked from the
+# unprotected side, in tools/skill_reachability/tests/.
+
+REACHABILITY_DOOR_HEADING = "### Start here: pick your path"
+REACHABILITY_DOOR_END = "**How Aegis chooses models"
+# The reviewed name-only-by-design set, pinned in protected code on purpose: a
+# new skill must not be able to add itself to a `tools/` data file, so widening
+# this policy takes a protected-path change.
+REACHABILITY_ALLOWED = frozenset({
+    "eval-runner-designer", "framework-edition-tracker",
+    "framework-mapping-refresher", "library-diff-reviewer",
+    "skill-deprecation-planner", "skill-quality-reviewer",
+    "skill-usage-instrumenter", "skill-usage-ledger",
+    "source-currency-auditor",
+})
+_REACHABILITY_EXCLUSION = re.compile(r"(?i)do not use")
+# The audit engine's routing grammar, character for character the tool's.
+_REACHABILITY_ROUTING_LINE = re.compile(
+    r"(?i)(→|\broutes? to\b|\binvoke[sd]?\b|\bhand(?:s|ed)? (?:off|over|to)\b|"
+    r"\bdelegate[sd]? to\b|\bbelongs to\b|\bowned by\b|\bgoes to\b)")
+_REACHABILITY_GUIDE_LINK = re.compile(
+    r"\((docs/paths/[A-Za-z0-9._-]+\.md)(?:#[^)\s]*)?\)")
+
+
+def _reachability_names(root: Path, rep: Report | None = None) -> list[str]:
+    """Shipped skills: directories under `.claude/skills/` that hold SKILL.md."""
+    skills_dir = root / ".claude" / "skills"
+    if not skills_dir.is_dir():
+        return []
+    try:
+        children = sorted(skills_dir.iterdir())
+    except OSError as exc:
+        if rep is not None:
+            rep.error(f"reachability: cannot list {_rel(skills_dir)}: {exc}")
+        return []
+    return [p.name for p in children
+            if p.is_dir() and p.name != "_template" and (p / "SKILL.md").is_file()]
+
+
+def _reachability_tier_map(root: Path,
+                           rep: Report | None = None) -> dict[str, str] | None:
+    """Tier every shipped skill as door, play, handoff or none.
+
+    Door = named by a front door (README "Start here" slice, CLAUDE.md,
+    AGENTS.md, a docs/paths page linked from that slice, project-orchestrator).
+    Play = named in a door-named conductor's text. Handoff = named on a routing
+    line of a routed skill's SKILL.md. Handoff and none are both unrouted.
+
+    Returns None when the README door section is missing or unreadable: that one
+    condition is reported on `rep` as a plain error, because one edited heading
+    must not look like a crashed gate. Unreadable source files are reported the
+    same way and read as empty text; nothing here raises past `rep`.
+    """
+    def report(msg: str) -> None:
+        if rep is not None:
+            rep.error(msg)
+
+    def read_text(path: Path) -> str:
+        try:
+            return path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            report(f"reachability: cannot read {_rel(path)}: {exc}")
+            return ""
+
+    skills_dir = root / ".claude" / "skills"
+    names = _reachability_names(root, rep)
+    pattern = {n: re.compile(r"(?<![A-Za-z0-9-])" + re.escape(n)
+                             + r"(?![A-Za-z0-9-])") for n in names}
+
+    def named_in(text: str, skip: str | None = None,
+                 routing_only: bool = False) -> set[str]:
+        found: set[str] = set()
+        for line in text.splitlines():
+            if _REACHABILITY_EXCLUSION.search(line):
+                continue
+            if routing_only and not _REACHABILITY_ROUTING_LINE.search(line):
+                continue
+            for name, rx in pattern.items():
+                if name != skip and name not in found and rx.search(line):
+                    found.add(name)
+        return found
+
+    def skill_md(name: str) -> str:
+        return read_text(skills_dir / name / "SKILL.md")
+
+    def skill_text(name: str) -> str:
+        parts = [skill_md(name)]
+        refs = skills_dir / name / "references"
+        if refs.is_dir():
+            for path in sorted(refs.rglob("*.md")):
+                parts.append(read_text(path))
+        return "\n".join(parts)
+
+    try:
+        readme = (root / "README.md").read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        readme = []
+    start = next((i for i, line in enumerate(readme)
+                  if line.startswith(REACHABILITY_DOOR_HEADING)), None)
+    if start is None:
+        report("reachability: README.md has no 'Start here' section")
+        return None
+    end = next((i for i in range(start + 1, len(readme))
+                if readme[i].startswith("#")
+                or readme[i].startswith(REACHABILITY_DOOR_END)), len(readme))
+    door_text = "\n".join(readme[start:end])
+
+    sources = {"README doors": door_text}
+    for filename in ("CLAUDE.md", "AGENTS.md"):
+        if (root / filename).is_file():
+            sources[filename] = read_text(root / filename)
+    for guide in sorted(set(_REACHABILITY_GUIDE_LINK.findall(door_text))):
+        if (root / guide).is_file():
+            sources[guide] = read_text(root / guide)
+    if (skills_dir / "project-orchestrator" / "SKILL.md").is_file():
+        sources["project-orchestrator"] = skill_text("project-orchestrator")
+
+    named_by: dict[str, list[str]] = {}
+    for label, text in sources.items():
+        skip = "project-orchestrator" if label == "project-orchestrator" else None
+        for name in named_in(text, skip=skip):
+            named_by.setdefault(name, []).append(label)
+    tier = {name: "door" for name in named_by}
+    if "project-orchestrator" in names:
+        tier["project-orchestrator"] = "door"
+
+    conductors = sorted(n for n in tier if n.endswith("-orchestrator")
+                        and n != "project-orchestrator")
+    for conductor in conductors:
+        for name in named_in(skill_text(conductor), skip=conductor):
+            named_by.setdefault(name, []).append("play:" + conductor)
+            tier.setdefault(name, "play")
+
+    for source in sorted(tier):
+        for name in named_in(skill_md(source), skip=source, routing_only=True):
+            if name not in tier:
+                named_by.setdefault(name, []).append("handoff:" + source)
+    for name in names:
+        if name not in tier:
+            tier[name] = "handoff" if name in named_by else "none"
+    return tier
+
+
+def _reachability_allow_list(root: Path, rep: Report) -> set[str] | None:
+    """Read the reviewed allow-list as DATA; fail closed if it is not readable.
+
+    A missing, unparseable or duplicated list is one error and no checks run:
+    the gate must not guess what policy a broken file meant.
+    """
+    path = root / "tools" / "skill_reachability" / "allow-list.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, ValueError) as exc:
+        rep.error(f"reachability: cannot read the allow-list {_rel(path)}: {exc}")
+        return None
+    rows = payload.get("skills") if isinstance(payload, dict) else None
+    listed = [row.get("name") for row in rows or []
+              if isinstance(row, dict) and isinstance(row.get("name"), str)]
+    if len(listed) != len(set(listed)):
+        rep.error("reachability: the allow-list repeats a name; it must record "
+                  "each reviewed skill once")
+        return None
+    return set(listed)
+
+
+def _reachability_allow_set_matches(listed: set[str], rep: Report) -> bool:
+    """Require exactly the pinned nine names: a new skill cannot self-allow-list."""
+    unexpected = sorted(listed - REACHABILITY_ALLOWED)
+    missing = sorted(REACHABILITY_ALLOWED - listed)
+    if not unexpected and not missing:
+        return True
+    rep.error(
+        "reachability: the allow-list names disagree with the reviewed set"
+        + (f"; unexpected: {', '.join(unexpected)}" if unexpected else "")
+        + (f"; missing: {', '.join(missing)}" if missing else ""))
+    return False
+
+
+def check_skill_reachability(rep: Report, root: Path | None = None) -> None:
+    """A skill must be routed from a front door, or reviewed as name-only.
+
+    `root` defaults to the repository; the fixture self-test passes a temporary
+    tree, so the scan is a pure function of its root. Nothing is printed: on a
+    clean tree this check changes neither stdout nor the warning list (T9).
+    """
+    root = REPO_ROOT if root is None else Path(root)
+    allowed = _reachability_allow_list(root, rep)
+    tier = _reachability_tier_map(root, rep)
+    if allowed is None or tier is None:
+        return
+    names = _reachability_names(root)
+    on_disk = set(names)
+    for name in sorted(allowed):
+        if name not in on_disk:
+            rep.error(f"reachability: {name} is on the allow-list but is not a "
+                      "skill on disk; drop the dead row")
+    for name in sorted(allowed & set(tier)):
+        if tier[name] in ("door", "play"):
+            rep.error(f"reachability: {name} is {tier[name]} but the allow-list "
+                      "requires an unrouted skill; drop its row or its route")
+    if not _reachability_allow_set_matches(allowed, rep):
+        return
+    for name in names:
+        if name in allowed or tier.get(name) not in ("handoff", "none"):
+            continue
+        rep.error(
+            f"reachability: {name} is not routed from a front door and is not "
+            f"on the allow-list (tier: {tier[name]}); route it from the README "
+            "'Start here' section, CLAUDE.md, AGENTS.md or a docs/paths page, "
+            "or add a row to tools/skill_reachability/allow-list.json AND the "
+            "matching name to this file's REACHABILITY_ALLOWED (the pinned "
+            "set), with a reviewed reason")
+
+
 def _run_repo_checks(rep: Report, skills: list[Path], *,
                      skip_readme_markers: bool = False,
                      refresh_manifest: bool = False,
@@ -3718,6 +3947,7 @@ def _run_repo_checks(rep: Report, skills: list[Path], *,
     check_agents_schema(rep)                       # HARD
     check_config_surfaces(rep)                     # HARD
     check_docs_paths_links(rep)                    # HARD
+    check_skill_reachability(rep)                  # HARD  (EVG-05)
     check_no_cross_skill_file_dependencies(rep)    # HARD  (standard section 1)
     check_workflows_sha_pinned(rep)                # HARD
     check_claude_bridge(rep)                       # HARD  (decision D61)
