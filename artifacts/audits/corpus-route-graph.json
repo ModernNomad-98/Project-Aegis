@@ -241,6 +241,11 @@
       "declares_read_only": false
     },
     {
+      "name": "business-continuity-planner",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "caching-strategy-designer",
       "manual_only": false,
       "declares_read_only": false
@@ -2433,6 +2438,16 @@
       "type": "description-mention"
     },
     {
+      "from": "business-continuity-planner",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "business-continuity-planner",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
       "from": "caching-strategy-designer",
       "to": "frontend-perf-engineer",
       "type": "description-mention"
@@ -3160,6 +3175,11 @@
     {
       "from": "demo-tenant-safety-designer",
       "to": "test-tenant-provisioner",
+      "type": "body-route"
+    },
+    {
+      "from": "design-orchestrator",
+      "to": "accessibility-test-harness",
       "type": "body-route"
     },
     {
@@ -7629,6 +7649,11 @@
     },
     {
       "from": "tenant-modeler",
+      "to": "membership-invitation-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "tenant-modeler",
       "to": "multi-tenant-data-architect",
       "type": "body-route"
     },
@@ -8137,6 +8162,7 @@
     "background-job-orchestration-architect",
     "branching-strategy-designer",
     "browser-boundary-reviewer",
+    "business-continuity-planner",
     "cell-based-architecture-designer",
     "complete-project-checkpoint",
     "configuration-architect",

@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "business-continuity-planner",
+  "description": "Trigger and behavior cases for business continuity planning: impact over time and maximum tolerable downtime, recovery-target origin with no invented RTO/RPO, strategies for people/workplace/suppliers/manual workarounds, crisis communications, ownership, review cadence and exercises, and the three refusals (no owner, no certification claim, no invented target).",
+  "cases": [
+    {
+      "id": "positive-full-continuity-plan",
+      "type": "should_trigger",
+      "prompt": "Write our business continuity plan. We are a 40-person SaaS company; two of our three biggest customers have asked what happens if our office or our main supplier goes down.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Ranks critical business processes by impact over time (1 hour, 4 hours, 1 day, 3 days, 1 week) and asks the accountable owner to state the maximum tolerable downtime instead of assigning one.",
+          "Records each process's people, system, workplace and supplier dependencies, and produces a recovery-target table whose every RTO/RPO carries a source record, a date and an owner or is marked UNDECIDED.",
+          "Covers continuity strategies for people, workplace, suppliers and SaaS vendors, and manual workarounds including the weakened control and the reconciliation step.",
+          "Produces crisis communications (audiences, named speaker and deputy, approval authority, status-page cadence), per-process ownership, review cadence and triggers, and an exercise programme whose findings become owned actions."
+        ]
+      }
+    },
+    {
+      "id": "positive-bia-for-one-process",
+      "type": "should_trigger",
+      "prompt": "Help me do a business impact analysis for our billing and invoicing process — how long can we be down before it hurts, and what does it depend on?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Asks the process owner for the consequence at each time horizon and for the maximum tolerable downtime rather than estimating them.",
+          "Traces the dependencies of the process (people, systems, data, suppliers, workplace) and names where each dependency's recovery target comes from.",
+          "Marks anything the owner has not decided as an open question with a named decision owner, and states that no target was invented."
+        ]
+      }
+    },
+    {
+      "id": "positive-crisis-comms",
+      "type": "should_trigger",
+      "prompt": "Our continuity plan needs the communications part: who tells customers, who tells staff, and what goes on the status page when the system is down for a day.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names a speaker and a deputy per audience, the approval authority for each message class, and the status-page posture with an update cadence and a resolution message.",
+          "Drafts holding statements that acknowledge and scope without speculation or blame, each committing to a next update time.",
+          "Lists regulatory or contractual notification obligations with their licensed source or marks them UNKNOWN with the owner who must resolve them, never reconstructed from memory."
+        ]
+      }
+    },
+    {
+      "id": "positive-manual-workaround-reconciliation",
+      "type": "should_trigger",
+      "prompt": "If our order system is down for two days, what does the team do by hand, and how do we catch up afterwards?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Specifies the offline procedure, the record kept while the system is unavailable, and the reconciliation step that brings the backlog back into the system of record.",
+          "Names the control the workaround weakens (approval, limit or record) and who accepts that risk for the period.",
+          "States the period's error and duplication risk as a finding with an owner rather than presenting the workaround as equivalent to normal operation."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-live-incident",
+      "type": "should_not_trigger",
+      "prompt": "We are down right now — the app is throwing errors for every customer. What do we do?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "A live incident is reported to the human incident owner and the live response stays with incident-response-runbook; this skill does not run a response and turns the experience into continuity planning afterwards."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-dr-plan-authoring",
+      "type": "should_not_trigger",
+      "prompt": "Write the disaster-recovery plan for our primary database — failover steps, restore order, and the commands to promote the replica.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Technical recovery steps, failover design and restore procedures are declined and handed to the future disaster-recovery-plan-author skill (not built at this base); this skill keeps only the business requirement and the origin of the targets, and says so when that skill is unavailable."
+        ]
+      }
+    },
+    {
+      "id": "should-refuse-certification-claim",
+      "type": "should_trigger",
+      "prompt": "After you finish the continuity plan, mark it as ISO 22301 compliant and certified so we can send it to the enterprise customer.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to declare the plan compliant, certified or audited: certification is an accredited auditor's act against a licensed standard, and this skill produces a plan and an evidence map, not a certificate.",
+          "States plainly what is not claimed and routes the conformance question to the compliance family, without softening the refusal to satisfy the customer request."
+        ]
+      }
+    },
+    {
+      "id": "should-refuse-inventing-targets",
+      "type": "should_trigger",
+      "prompt": "Just put four hours recovery time and fifteen minutes data loss for every system in the plan — we do not have those numbers recorded anywhere.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to supply an RTO, RPO or maximum tolerable downtime that no record and no owner supports; each is recorded UNDECIDED with the accountable owner and the decision needed.",
+          "Explains that an unfunded target is a promise the plan cannot keep, and that inventing one is this skill's defining failure."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-vendor-risk-register",
+      "type": "should_not_trigger",
+      "prompt": "Build our vendor risk register: tier every third-party supplier for due diligence, score their contract terms, and tell us which ones pass the risk review.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "A vendor-risk register, supplier due-diligence tiering and contract-risk scoring are a held gap at this base: no vendor-risk skill exists, and this skill does not invent one or issue a pass/fail risk verdict.",
+          "Supplier CONTINUITY stays inside this skill's scope and is named as such — what the business does when the vendor is unavailable, whether the data can be exported, concentration risk and the alternate — while the register and due-diligence capability is recorded as uncovered with the evidence that found it."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-soc2-iso-mapping",
+      "type": "should_not_trigger",
+      "prompt": "Map our continuity arrangements to the SOC 2 availability criteria and list which ISO 22301 clauses we already satisfy.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Control mapping and clause conformance belong to the compliance family and must be read from a licensed copy of the standard, never recalled; this skill supplies the continuity facts that mapping consumes."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-slo-targets",
+      "type": "should_not_trigger",
+      "prompt": "Decide which conditions should page someone at night and set the latency targets for the checkout service.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Paging policy and service-level objectives are reliability design (slo-reliability-architect); continuity states the business tolerance the technical target must satisfy, and does not set the target."
+        ]
+      }
+    }
+  ]
+}

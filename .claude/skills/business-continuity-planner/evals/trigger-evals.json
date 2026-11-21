@@ -1,0 +1,103 @@
+{
+  "skill": "business-continuity-planner",
+  "description": "Trigger discrimination for the new Operational continuity family: business continuity planning vs the future disaster-recovery author, live incident response, reliability targets, resilience review and the compliance family.",
+  "overlaps_with": [
+    "incident-response-runbook",
+    "slo-reliability-architect",
+    "resilience-architecture-reviewer",
+    "compliance-control-foundation"
+  ],
+  "cases": [
+    {
+      "id": "continuity-planning-wins-here",
+      "prompt": "Which business functions must survive an outage, what does losing them cost per day, and who owns the continuity plan?",
+      "expected_skill": "business-continuity-planner",
+      "should_not_trigger": [
+        "incident-response-runbook",
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "Process criticality, impact over time, maximum tolerable downtime and plan ownership are this skill's exact scope; the resilience reviewer reviews a cloud design and the incident runbook is the live response."
+    },
+    {
+      "id": "bia-belongs-here",
+      "prompt": "Run a business impact analysis on our order fulfilment process and record where its recovery targets come from.",
+      "expected_skill": "business-continuity-planner",
+      "should_not_trigger": [
+        "slo-reliability-architect"
+      ],
+      "reason": "A BIA with target origin is continuity work; the SLO architect sets reliability targets, which are an input to the plan, not the analysis."
+    },
+    {
+      "id": "crisis-comms-wins-here",
+      "prompt": "Who speaks to customers, staff and regulators during a continuity event, and what goes on the status page?",
+      "expected_skill": "business-continuity-planner",
+      "should_not_trigger": [
+        "incident-response-runbook"
+      ],
+      "reason": "Continuity crisis communications planning (audiences, speakers, deputies, regulator obligations) is planning work; the incident runbook holds the in-incident templates and cadence that this plan composes with."
+    },
+    {
+      "id": "supplier-continuity-stays-here",
+      "prompt": "Our payroll provider is a single point of failure — decide how we plan around that vendor, its contract and a possible exit.",
+      "expected_skill": "business-continuity-planner",
+      "should_not_trigger": [
+        "compliance-control-foundation"
+      ],
+      "reason": "Supplier continuity planning is held inside this skill because no vendor-risk skill exists; the compliance foundation's vendor-management domain lists vendors and controls, and maps no continuity strategy."
+    },
+    {
+      "id": "live-incident-goes-to-runbook",
+      "prompt": "The payment gateway is failing right now and customers cannot check out — what is the response?",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "A live event is the human incident owner's, running the approved response procedure the incident runbook authored; continuity planning happens before and after, never during."
+    },
+    {
+      "id": "dr-plan-goes-to-the-future-author",
+      "prompt": "Write the technical disaster-recovery plan: failover sequence, replica promotion, and the restore runbook for the primary database.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "The technical DR plan belongs to the future disaster-recovery-plan-author skill, which is not built at this base — so the live fallback is the resilience reviewer's DR-design review, and this skill is declined because it plans the business, not the recovery steps."
+    },
+    {
+      "id": "paging-goes-to-slo-architect",
+      "prompt": "Set the service-level objectives and decide which symptoms should wake someone at 3am.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "Reliability targets and paging policy are SLO design; continuity states the business tolerance those targets must satisfy."
+    },
+    {
+      "id": "iso-audit-goes-to-compliance",
+      "prompt": "Audit us against ISO 22301 and tell us which clauses we fail.",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "Clause-level conformance comes from a licensed copy of the standard through the compliance family; this skill never reconstructs standard text from memory and never declares conformance."
+    },
+    {
+      "id": "soc2-evidence-goes-to-compliance",
+      "prompt": "Which SOC 2 availability criteria do our continuity arrangements already satisfy?",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "Mapping controls to SOC 2 trust criteria is the compliance family's projection work; the continuity plan supplies facts, not a conformance verdict."
+    },
+    {
+      "id": "backup-restore-goes-to-verifier",
+      "prompt": "Prove our database backups actually restore before we make the change.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "Executing and verifying a restore is the backup verifier's manual-only evidence procedure; this skill designs exercises and names the evidence they should produce."
+    }
+  ]
+}

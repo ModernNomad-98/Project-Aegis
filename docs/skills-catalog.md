@@ -1722,3 +1722,36 @@ measured calibration, live execution or WP-2B-7's behavioral advisory lane.
 | Skill | Source | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
 | `model-routing-policy` | Layer 2 (2026-11-13) | yes | Capability-based, model-agnostic routing policy: four capability roles, runtime host model inventory with no hardcoded model or provider names, least-cost sufficient role, and independent verification that records or stops when a distinct model is unavailable. |
+
+### Skills (Operational continuity — family 25, EVG-1)
+
+The 1-skill Operational continuity family (build item EVG-09, 2026-11-20) — the
+business side of resilience, which the library previously left to nobody. The
+discovery's finding: `resilience-architecture-reviewer` is cloud-zone-centric and
+authors no plan, `incident-response-runbook` is the live response, and
+`slo-reliability-architect` sets reliability targets — no skill asked which
+business functions must survive, what losing one costs over time, or who decides.
+The family exists with one skill; the continuity conductor (D3) and the technical
+disaster-recovery author (EVG-10) are not built at this base. The skill owns: the
+business impact analysis (critical processes, impact over time, maximum tolerable
+downtime, dependency traces, and a recovery-target table in which every RTO/RPO
+states its source record, date and owner or is marked UNDECIDED), continuity
+strategies for people, workplace, suppliers/SaaS vendors and manual workarounds
+(weakened control and reconciliation named), crisis communications (audiences,
+named speaker and deputy, approval authority, status page, regulator obligations
+from a licensed source), and per-process ownership, review cadence and exercises.
+The hard seam: **compose, never restate** — the live response stays with
+`incident-response-runbook`, reliability targets and paging with
+`slo-reliability-architect`, the per-dependency cloud failure review with
+`resilience-architecture-reviewer`, the technical recovery plan with the future
+disaster-recovery-plan-author (not built), and standard conformance with the
+compliance family, read from a licensed copy and never from memory. Stop
+conditions: no named business owner; asked to declare the plan compliant,
+resilient or ISO 22301 certified; asked for an RTO/RPO/MTD no record supports.
+Design/author only, edits nothing → **model-invocable**; ships both eval files, no
+revised version.
+
+| Skill | Source (EVG-09) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `business-continuity-planner` | EVG-09 (Operational continuity family 25; GAP-21 brief) | yes | Design the business continuity plan and its business impact analysis: critical processes ranked by impact over time (1h/4h/1d/3d/1w) and owner-stated maximum tolerable downtime; dependency traces across people, systems, workplace and suppliers; a recovery-target table whose RTO/RPO each carry a source record, date and owner or are UNDECIDED; strategies for people, workplace, suppliers and SaaS vendors, and manual workarounds with the weakened control and reconciliation; crisis communications with a named speaker and deputy per audience, approval authority, status-page cadence and licensed-source regulator obligations; and ownership, review cadence and an exercise programme. Refuses to invent RTO/RPO, to declare compliance or certification, and to design without a named business owner. ≠ `incident-response-runbook` (live response), `slo-reliability-architect` (targets/paging), `resilience-architecture-reviewer` (per-dependency DR review), the future `disaster-recovery-plan-author` (technical recovery plan; not built), the compliance family (licensed-standard conformance). |
+
