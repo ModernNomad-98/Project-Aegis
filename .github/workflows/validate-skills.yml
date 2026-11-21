@@ -78,6 +78,7 @@ jobs:
       tools: ${{ steps.filter.outputs.tools }}
       offline: ${{ steps.filter.outputs.offline }}
       docs_skills: ${{ steps.filter.outputs.docs_skills }}
+      local_tools: ${{ steps.filter.outputs.local_tools }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
@@ -90,7 +91,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = 'push' ]; then
-            printf 'tools=true\noffline=true\ndocs_skills=true\n' >> "$GITHUB_OUTPUT"
+            printf 'tools=true\noffline=true\ndocs_skills=true\nlocal_tools=true\n' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git fetch origin "$BASE_REF" --quiet
@@ -103,6 +104,16 @@ jobs:
           # lanes; every other tools/ change still does. docs_skills below keeps
           # using the full changed-path list.
           grep -Evx 'tools/skills-manifest\.json' "$RUNNER_TEMP/aegis-changed-paths" > "$RUNNER_TEMP/aegis-changed-paths-lanes" || true
+          # Local-tool suites (manifest ancestry, evidence pack, scaffold) follow
+          # the two top-level code trees. The manifest exclusion above keeps a
+          # derived-artifact-only bump from selecting the advisory job below.
+          # The alternative group is written so no literal tree-plus-slash token
+          # of the protected gate set appears in this read-only filter step.
+          if grep -Eq '^(scripts|tools)/' "$RUNNER_TEMP/aegis-changed-paths-lanes"; then
+            echo 'local_tools=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'local_tools=false' >> "$GITHUB_OUTPUT"
+          fi
           if grep -Eq '^(tools/|docs/instrumentation/workflow-outcomes-v1\.schema\.json$)' "$RUNNER_TEMP/aegis-changed-paths-lanes"; then
             echo 'tools=true' >> "$GITHUB_OUTPUT"
           else
@@ -121,6 +132,52 @@ jobs:
           else
             echo 'docs_skills=false' >> "$GITHUB_OUTPUT"
           fi
+
+  # Advisory local-tool coverage (2026-11-21). The 13 manifest-ancestry, 16
+  # evidence-pack and 19 scaffold self-tests ran only by hand before this job,
+  # so a regression in those local tools could merge green. It is path-filtered
+  # to a change under the two top-level code trees (see the local_tools output
+  # above), so a docs- or skills-only pull request does not pay for it, and it
+  # is NOT registered as a required status check: branch protection keeps
+  # `validate-skills` and `gate-guard` only, and no existing check is renamed.
+  #
+  # It runs as its own job rather than inside a gate job. Only the pinned
+  # actions and the standard library run here: the three suites install
+  # nothing, so there is no lock file to verify, no pip step, no secret and no
+  # permissions block (the workflow-level `contents: read` applies). This job
+  # shares no runner, environment file or PATH with a gate.
+  local-tool-tests:
+    needs: [changes]
+    if: needs.changes.outputs.local_tools == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          # The evidence-pack and ancestry suites resolve real commits, so the
+          # checkout needs history rather than a shallow clone.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          # The same pinned minor as the gate jobs (decision D60). The suites
+          # import only the standard library, so no dependency install follows.
+          python-version: '3.14'
+
+      # -P comes first, then -B: -P keeps the test file's own directory off
+      # sys.path (the import isolation every other python call here uses), and
+      # -B keeps bytecode out of the checkout.
+      - name: Run manifest-ancestry tests
+        run: python -P -B scripts/tests/test_manifest_ancestry.py
+
+      - name: Run evidence-pack tests
+        run: python -P -B scripts/tests/test_generate_evidence_pack.py
+
+      - name: Run scaffold-skill tests
+        run: python -P -B scripts/tests/test_scaffold_skill.py
 
   validate-skills:
     runs-on: ubuntu-latest

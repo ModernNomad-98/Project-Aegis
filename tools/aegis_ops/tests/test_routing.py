@@ -155,6 +155,7 @@ class WorkflowTests(unittest.TestCase):
             [
                 "changes",
                 "gate-guard",
+                "local-tool-tests",
                 "tools-tests-linux",
                 "tools-tests-windows",
                 "validate-skills",
@@ -249,6 +250,47 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn(
             "E1_ACTION_UNPINNED", [issue["code"] for issue in result["issues"]]
         )
+
+    # The local-tool advisory job (added 2026-11-21) is guarded by its own E1
+    # checks, because the routing matrix does not model it. Each mutation
+    # removes or widens one part of that shape and must be refused.
+    def _local_tool_mutation(self, old: str, new: str) -> list:
+        text = self._workflow_text()
+        self.assertEqual(1, text.count(old), old)
+        result = routing.check_workflow_text(text.replace(old, new))
+        self.assertFalse(result["valid"])
+        return [issue["code"] for issue in result["issues"]]
+
+    def test_local_tool_route_removed_is_refused(self) -> None:
+        codes = self._local_tool_mutation(
+            "    if: needs.changes.outputs.local_tools == 'true'\n", ""
+        )
+        self.assertIn("E1_LOCAL_TOOL_ROUTE", codes)
+
+    def test_local_tool_needs_removed_is_refused(self) -> None:
+        codes = self._local_tool_mutation(
+            "  local-tool-tests:\n    needs: [changes]\n", "  local-tool-tests:\n"
+        )
+        self.assertIn("E1_LOCAL_TOOL_NEEDS", codes)
+
+    def test_local_tools_output_removed_is_refused(self) -> None:
+        codes = self._local_tool_mutation(
+            "      local_tools: $" + "{{ steps.filter.outputs.local_tools }}\n", ""
+        )
+        self.assertIn("E1_LOCAL_TOOLS_OUTPUT", codes)
+
+    def test_local_tools_push_forcing_removed_is_refused(self) -> None:
+        codes = self._local_tool_mutation(
+            "docs_skills=true\\nlocal_tools=true\\n", "docs_skills=true\\n"
+        )
+        self.assertIn("E1_LOCAL_TOOLS_PUSH", codes)
+
+    def test_local_tool_permissions_added_is_refused(self) -> None:
+        codes = self._local_tool_mutation(
+            "  local-tool-tests:\n    needs: [changes]\n",
+            "  local-tool-tests:\n    permissions: write-all\n    needs: [changes]\n",
+        )
+        self.assertIn("E1_LOCAL_TOOL_PERMISSIONS", codes)
 
 
 if __name__ == "__main__":

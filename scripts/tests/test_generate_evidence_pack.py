@@ -2,8 +2,8 @@
 """Tests for scripts/generate-evidence-pack.py.
 
 These tests build throwaway Git repositories in the system temporary directory.
-They are not wired into CI: the pack is a local/PR aid, and this file runs
-manually as well.
+They run in the advisory path-filtered local-tool-tests job when scripts/ or
+tools/ changes; the pack stays a local/PR aid, and this file also runs by hand.
 
 Run:
     python -B -P scripts/tests/test_generate_evidence_pack.py

@@ -15,8 +15,10 @@ inputs; they do not run a live model evaluation.
    `validate-skills` and `gate-guard` run on every pull request to `main`;
    `windows-offline-checks` runs only when the change touches `tools/`,
    `requirements-ci.in` or `requirements-ci.txt`, and `tools-tests-linux` and
-   `tools-tests-windows` only when it touches `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`. A later push starts
-   new checks; older green results do not cover the new head.
+   `tools-tests-windows` only when it touches `tools/` or
+   `docs/instrumentation/workflow-outcomes-v1.schema.json`, and
+   `local-tool-tests` only when it touches `scripts/` or `tools/`. A later
+   push starts new checks; older green results do not cover the new head.
 3. Read the job logs and retained evidence if a check fails. Fix a test or
    environment failure and rerun the new candidate. A documented protected
    path guard failure needs an owner disposition under the
@@ -28,7 +30,7 @@ inputs; they do not run a live model evaluation.
    have passed. A skipped capability remains unproven.
 
 The `validate-skills` workflow runs on every pull request targeting `main` and
-every push to `main`. Inside it, a path filter decides whether three advisory
+every push to `main`. Inside it, a path filter decides whether four advisory
 jobs run. On a pull request, the `changes` job lists the paths the pull
 request changes against `main` (a three-dot `git diff --name-only` against
 the base branch) and selects:
@@ -36,17 +38,19 @@ the base branch) and selects:
 - `windows-offline-checks` only when the change touches `tools/`,
   `requirements-ci.in` or `requirements-ci.txt`;
 - `tools-tests-linux` and `tools-tests-windows` only when it touches
-  `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`.
+  `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`;
+- `local-tool-tests` only when it touches `scripts/` or `tools/`.
 
 A job the filter does not select is skipped. A pull request that touches
-none of those inputs skips all three, whatever else it changes — with one
+none of those inputs skips all four, whatever else it changes — with one
 exception: `docs/instrumentation/workflow-outcomes-v1.schema.json` is a tools
 input, so a change touching only that file runs `tools-tests-linux` and
 `tools-tests-windows` while `windows-offline-checks` stays skipped. Skills,
-other documentation, `scripts/` or `.github/` alone run neither the Windows
+other documentation or `.github/` alone run none of the advisory jobs; a
+change touching `scripts/` runs `local-tool-tests` but neither the Windows
 verification job nor the tools-test jobs. On a push to
-`main` the `changes` job selects all three, so the post-merge run is the
-full suite. `validate-skills` and `gate-guard` have no path filter. The three
+`main` the `changes` job selects all four, so the post-merge run is the
+full suite. `validate-skills` and `gate-guard` have no path filter. The four
 selected jobs need `changes`, so they are also skipped when `changes` itself
 does not succeed; [Reading a failure](#reading-a-failure) says how to tell
 the two apart. Record a skipped job as skipped, not as passed. The existing
@@ -55,12 +59,13 @@ protection is unchanged.
 
 | Job | Coverage | Merge role | Timeout |
 | --- | --- | --- | --- |
-| `changes` on Ubuntu | Lists the pull request's changed paths and selects the Windows verification and tools-test jobs (on a push to `main`, all three); those jobs need it, so they are skipped if it does not succeed | Not registered as required; runs on every pull request and push | 5 minutes |
+| `changes` on Ubuntu | Lists the pull request's changed paths and selects the Windows verification, tools-test and local-tool-test jobs (on a push to `main`, all four); those jobs need it, so they are skipped if it does not succeed | Not registered as required; runs on every pull request and push | 5 minutes |
 | `validate-skills` on Ubuntu | CI recorder/guard regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check, the Markdown link checker over the repository's own tracked pages (the corpus step, with its 600-path floor), and the pull-request body bound-field check (`Run PR-body bound-field checker self-tests` plus `pr-body-skills-check`) | Existing required check | 15 minutes |
 | `windows-offline-checks` on Windows | Recorder regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
 | `tools-tests-linux` on Ubuntu | Host-bridge Node callback tests, setup routing-contract suite, delivery-control suite | Isolated from the gates; not registered as required | 15 minutes |
 | `tools-tests-windows` on Windows | The same three suites, plus a read-only ownership diagnostic (token user, default owner, elevation, temp-root owners) recorded before the delivery-control suite | Isolated from the gates; not registered as required | 20 minutes |
+| `local-tool-tests` on Ubuntu | The three local-tool self-test suites — manifest ancestry (13 tests), evidence pack (16) and scaffold (19), 48 in total — run directly with `python -P -B`, with no dependency install | Advisory: path-filtered to a change under `scripts/` or `tools/`; not registered as required | 10 minutes |
 
 **Update (2026-10-15):** the two `tools-tests-*` rows above now additionally run the readability-acceptance suite (`tools/readability_acceptance/tests`), matching the workflow's `readability-tests` record-check step.
 
@@ -76,6 +81,14 @@ skill-preservation (`tools/skill_preservation/tests`) and plan-preservation
 record-check steps. Each suite is offline and cross-platform; one
 skill-preservation case needs symlink-creation privilege and skips on a host
 that lacks it (an explicit UNRUN, never a pass).
+
+**Update (2026-11-21):** the table above gains `local-tool-tests`, which runs
+the three local-tool self-test suites described under
+[Local tool self-tests](#local-tool-self-tests) — 48 tests in total — when a
+pull request touches `scripts/` or `tools/`, and on every push to `main`.
+It installs nothing (the suites import only the standard library), has no
+secret and no `permissions` block, and is not a required check: it is
+advisory, so a skipped run is recorded as skipped, never as passed.
 
 The two verification jobs run independently, without cross-platform fail-fast,
 automatic retries, quarantine or `continue-on-error`. A delivery closeout waits
@@ -101,6 +114,12 @@ The readability-acceptance suite (`tools/readability_acceptance/tests`) also run
 The issue-#1145 suites (`tools/skill_reachability/tests`,
 `tools/skill_preservation/tests` and `tools/plan_preservation/tests`) also run
 in those two jobs (added 2026-11-20).
+The local-tool self-test suites (`scripts/tests/test_manifest_ancestry.py`,
+`scripts/tests/test_generate_evidence_pack.py` and
+`scripts/tests/test_scaffold_skill.py`) run in the separate
+`local-tool-tests` job (added 2026-11-21) for the same reason, although their
+paths are inside the `gate-guard` set: that job is advisory, shares no runner
+with a gate, and the suites are test code, not gate code.
 
 The tools jobs use a read-only token, reference no secrets and do not persist
 checkout credentials. `scripts/tests/test_offline_ci.py` checks this layout. The
@@ -551,13 +570,13 @@ pack was written, even when the recorded ancestry result is `FAIL` or
 
 ## Local tool self-tests
 
-Three self-test suites cover the local tools added for the process-overhead work. They are **not wired into a workflow** (a CI step would need a protected `.github/` change and an owner grant), so run them by hand before changing those tools or their docs:
+Three self-test suites cover the local tools added for the process-overhead work. They run in the advisory `local-tool-tests` job when a change touches `scripts/` or `tools/`, and that job is path-filtered and not a required check, so also run them by hand before changing those tools or their docs:
 
 - `python -B -P scripts/tests/test_manifest_ancestry.py` — 13 tests for `scripts/check-manifest-ancestry.py`.
 - `python -B -P scripts/tests/test_generate_evidence_pack.py` — 16 tests for `scripts/generate-evidence-pack.py`.
 - `python -B -P scripts/tests/test_scaffold_skill.py` — 19 tests for `scripts/scaffold-skill.py`.
 
-All 48 passed locally on `main` at `1a871a48` (2026-11-20). These are local aids, not a substitute for the hosted checks that do run. The scaffold generator itself is documented under "Scaffolding" in [agent-speed-protocol.md](agent-speed-protocol.md#scaffolding); this page covers the ancestry checker and the evidence pack.
+All 48 passed locally on `main` at `1a871a48` (2026-11-20). The job is advisory coverage, not a substitute for a required check. The scaffold generator itself is documented under "Scaffolding" in [agent-speed-protocol.md](agent-speed-protocol.md#scaffolding); this page covers the ancestry checker and the evidence pack.
 
 ## Review packet (machine-readable)
 
