@@ -403,6 +403,46 @@ class ScaffoldSkillTests(unittest.TestCase):
             self.assertNotEqual(position, -1, marker)
         self.assertEqual(positions, sorted(positions))
 
+    def _assert_bad_overlap(self, overlap):
+        """A bad overlap name is refused before the path or existence check."""
+        config_path = self._write_config(
+            valid_config(overlaps_with=[overlap]))
+        before = _files_under(self.root)
+        code, out, err = self._apply(config_path)
+        self.assertEqual(code, 2, err)
+        self.assertEqual(out, "")
+        self.assertEqual(len(err.strip().splitlines()), 1, err)
+        self.assertIn("name pattern", err)
+        self.assertEqual(before, _files_under(self.root))
+        self.assertFalse((self.root / SKILL_REL).exists())
+
+    def test_overlap_with_colon_is_rejected_by_name_pattern(self):
+        self._assert_bad_overlap("C:x")
+
+    def test_overlap_with_parent_traversal_is_rejected_by_name_pattern(self):
+        self._assert_bad_overlap("../evil")
+
+    def test_overlap_with_slash_is_rejected_by_name_pattern(self):
+        self._assert_bad_overlap("a/b")
+
+    def test_overlap_with_uppercase_is_rejected_by_name_pattern(self):
+        self._assert_bad_overlap("UPPER")
+
+    def test_trigger_note_with_newline_is_rejected(self):
+        for note in ("line one\nline two", "line one\rline two"):
+            with self.subTest(note=repr(note)):
+                config_path = self._write_config(
+                    valid_config(trigger_note=note))
+                before = _files_under(self.root)
+                code, out, err = self._apply(config_path)
+                self.assertEqual(code, 2, err)
+                self.assertEqual(out, "")
+                self.assertEqual(len(err.strip().splitlines()), 1, err)
+                self.assertIn("trigger_note", err)
+                self.assertIn("one-line", err)
+                self.assertEqual(before, _files_under(self.root))
+                self.assertFalse((self.root / SKILL_REL).exists())
+
 
 def tearDownModule():
     try:
