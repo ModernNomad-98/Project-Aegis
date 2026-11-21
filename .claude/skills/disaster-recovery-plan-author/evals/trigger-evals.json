@@ -1,0 +1,124 @@
+{
+  "skill": "disaster-recovery-plan-author",
+  "description": "Trigger discrimination for the Operational continuity DR author: the technical DR plan vs the BIA/BCP, design review, restore proof, live incident response, release rollback, the future site-resilience design and the compliance family.",
+  "overlaps_with": [
+    "business-continuity-planner",
+    "resilience-architecture-reviewer",
+    "database-backup-verifier",
+    "incident-response-runbook",
+    "rollback-runbook-author",
+    "compliance-control-foundation"
+  ],
+  "cases": [
+    {
+      "id": "dr-plan-wins-here",
+      "prompt": "Write the technical DR plan: service tiers with RTO and RPO, who can declare a disaster, the recovery order, scenario runbooks and the test schedule.",
+      "expected_skill": "disaster-recovery-plan-author",
+      "should_not_trigger": [
+        "business-continuity-planner",
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "The executable technical plan, its declaration authority, order and test loop are this skill's scope; the continuity planner owns the BIA and business targets, and the reviewer reviews a design and authors no plan."
+    },
+    {
+      "id": "tier-targets-win-here",
+      "prompt": "Turn our BIA recovery targets into DR tiers with each RTO and RPO's source record, date and owner, and mark what is still undecided.",
+      "expected_skill": "disaster-recovery-plan-author",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "Consuming the BIA's targets into the technical tier table is DR-plan work; the continuity planner produces the BIA and target origin, not the recovery plan."
+    },
+    {
+      "id": "declaration-criteria-win-here",
+      "prompt": "Write the disaster declaration criteria and name who may declare, the deputy, the out-of-hours path and who may stand it down.",
+      "expected_skill": "disaster-recovery-plan-author",
+      "should_not_trigger": [
+        "incident-response-runbook"
+      ],
+      "reason": "Declaration criteria, authority and the declaration record are part of the DR plan; the incident runbook is the live response procedure the plan plugs into."
+    },
+    {
+      "id": "scenario-runbook-wins-here",
+      "prompt": "Write the DR recovery steps for a ransomware event on our primary database, including which backup to restore and how to verify it.",
+      "expected_skill": "disaster-recovery-plan-author",
+      "should_not_trigger": [
+        "incident-response-runbook",
+        "database-backup-verifier"
+      ],
+      "reason": "Authoring the DR scenario runbook is this skill's work; the incident runbook is the live response and the backup verifier proves a restore (manual-only), neither authors the plan."
+    },
+    {
+      "id": "failback-wins-here",
+      "prompt": "We are running in the secondary region and want to return — write the failback order, data reconciliation and split-brain handling.",
+      "expected_skill": "disaster-recovery-plan-author",
+      "should_not_trigger": [
+        "rollback-runbook-author"
+      ],
+      "reason": "Failback after disaster failover belongs to the DR plan; rollback-runbook-author owns release and migration backout, not a region return."
+    },
+    {
+      "id": "bia-goes-to-continuity-planner",
+      "prompt": "Build our business impact analysis: rank critical processes by impact over time, set maximum tolerable downtime and write the continuity strategies and crisis communications.",
+      "expected_skill": "business-continuity-planner",
+      "should_not_trigger": [
+        "disaster-recovery-plan-author"
+      ],
+      "reason": "The BIA, MTD, continuity strategies and crisis communications are the continuity planner's scope; the DR author consumes the resulting targets."
+    },
+    {
+      "id": "design-review-goes-to-reviewer",
+      "prompt": "Review our multi-region design: will it survive a zone failure, are the RTO and RPO achievable, and where are the single points of failure?",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "disaster-recovery-plan-author"
+      ],
+      "reason": "Reviewing the design's failure containment and target fit is the resilience reviewer's work; the DR author writes the plan the review informs."
+    },
+    {
+      "id": "restore-proof-goes-to-verifier",
+      "prompt": "Explicitly invoke database-backup-verifier. Prove the primary database backup restores to a scratch instance before we sign off the DR plan.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "disaster-recovery-plan-author"
+      ],
+      "reason": "Executing and evidence-checking a restore is the manual-only backup verifier's procedure; the DR author cites the dated evidence and designs the test, but runs no restore."
+    },
+    {
+      "id": "live-incident-goes-to-runbook",
+      "prompt": "Production is down right now and customers cannot check out — what is the live response?",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "disaster-recovery-plan-author"
+      ],
+      "reason": "A live incident is the human incident owner's and the approved response procedure's; the DR author writes the plan before and after, never during."
+    },
+    {
+      "id": "release-rollback-goes-to-author",
+      "prompt": "Write the rollback runbook for Friday's release, including the previous artifact and the bad-window data repair.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": [
+        "disaster-recovery-plan-author"
+      ],
+      "reason": "Release backout is rollback-runbook-author's scope; a DR failover or failback is a different event and authority."
+    },
+    {
+      "id": "site-topology-goes-to-design-gap",
+      "prompt": "Design our second site: region topology, network and carrier diversity, and what runs active-active versus warm standby.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "disaster-recovery-plan-author"
+      ],
+      "reason": "Topology and site design belong to the future site-resilience design (site-resilience-architect, not built at this base); the reviewer is the nearest review route and reviews, never designs. The DR author records the missing design as an owned gap and does not invent it."
+    },
+    {
+      "id": "certification-goes-to-compliance",
+      "prompt": "Audit the DR plan against ISO 22301 and tell us which clauses we fail so we can call it certified.",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": [
+        "disaster-recovery-plan-author"
+      ],
+      "reason": "Clause-level conformance comes from a licensed copy through the compliance family; the DR author claims no certification or compliance."
+    }
+  ]
+}

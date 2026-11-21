@@ -1,6 +1,6 @@
 ---
 name: business-continuity-planner
-description: 'Design a business continuity plan and its business impact analysis (BIA): rank critical processes by impact over time, trace the people, system, workplace and supplier dependencies behind each, state maximum tolerable downtime, and record where every recovery target (RTO and RPO) comes from and who owns it. Covers continuity strategies for people, workplace, suppliers and SaaS vendors, manual workarounds, crisis communications (customers, staff, regulators, status page, who speaks when), and plan ownership, review cadence and exercises. Produces and reviews the plan; runs no exercise, never invents RTO or RPO, never declares certification. Use when asked to write or review a BCP, BIA, continuity strategy, crisis plan or exercise programme. Do NOT use for the DR plan itself (disaster-recovery-plan-author, a future skill not built yet), a live incident (incident-response-runbook), paging and SLO targets (slo-reliability-architect), or ISO 22301 / SOC 2 mapping from memory (compliance family).'
+description: 'Design a business continuity plan and its business impact analysis (BIA): rank critical processes by impact over time, trace the people, system, workplace and supplier dependencies behind each, state maximum tolerable downtime, and record where every recovery target (RTO and RPO) comes from and who owns it. Covers continuity strategies for people, workplace, suppliers and SaaS vendors, manual workarounds, crisis communications (customers, staff, regulators, status page, who speaks when), and plan ownership, review cadence and exercises. Produces and reviews the plan; runs no exercise, never invents RTO or RPO, never declares certification. Use when asked to write or review a BCP, BIA, continuity strategy, crisis plan or exercise programme. Do NOT use for the DR plan itself (disaster-recovery-plan-author), a live incident (incident-response-runbook), paging and SLO targets (slo-reliability-architect), or ISO 22301 / SOC 2 mapping from memory (compliance family).'
 ---
 
 # Business Continuity Planner
@@ -45,9 +45,9 @@ nothing.
 - Use when: the plan needs an owner per process, a review cadence, review
   triggers, and an exercise programme with findings that land as owned actions.
 - Do NOT use when: the ask is the technical disaster-recovery plan itself —
-  recovery steps, failover design, restore runs — that belongs to the future
-  disaster-recovery-plan-author skill (not built at this base); this skill
-  states the business requirement that plan must meet and hands the gap over.
+  recovery steps, failover design, restore runs — that belongs to
+  disaster-recovery-plan-author; this skill states the business requirement
+  that plan must meet and hands the plan over.
 - Do NOT use when: an incident is live right now — report it to the human
   incident owner; the response procedure is incident-response-runbook's
   artifact, and this skill never runs a response.
@@ -125,7 +125,7 @@ nothing.
    an owned action with a date or an explicitly accepted risk.
 7. **Reconcile with the neighboring owners.** The live response stays with
    incident-response-runbook; reliability targets with slo-reliability-architect;
-   the technical recovery plan with the future disaster-recovery-plan-author;
+   the technical recovery plan with disaster-recovery-plan-author;
    control mapping and certification evidence with the compliance family.
    Compose — cite their artifacts, never restate their procedures.
 8. **Produce the plan and the gap list.** Render the plan and the BIA worksheet
@@ -223,10 +223,9 @@ Not claimed: <no certification claim; no RTO or RPO invented; no exercise run>
   report to the human incident owner, and route the live response to
   incident-response-runbook. This skill designs afterwards.
 - Asked to author the technical disaster-recovery plan, restore steps or
-  failover design → hand off to the future disaster-recovery-plan-author skill
-  (not built at this base) and keep only the business requirement and target
-  origin in this plan; if that skill is unavailable, name it, say it is not
-  installed, and stop that hop.
+  failover design → hand off to disaster-recovery-plan-author and keep only the
+  business requirement and target origin in this plan; if that skill is
+  unavailable, name it, say it is not installed, and stop that hop.
 - Asked to run an exercise, verify backups or test a restore → stop; those are
   executed by people under their own authority and evidence rules, and this
   skill only designs them.
@@ -241,6 +240,7 @@ Not claimed: <no certification claim; no RTO or RPO invented; no exercise run>
   checklist. No standard text is reproduced there.
 - `evals/evals.json` — trigger and behavior cases, including the three stop
   conditions that define this skill.
-- `evals/trigger-evals.json` — discrimination against the future DR author,
-  incident-response-runbook, slo-reliability-architect, resilience-architecture-
-  reviewer and the compliance family.
+- `evals/trigger-evals.json` — discrimination against
+  disaster-recovery-plan-author, incident-response-runbook,
+  slo-reliability-architect, resilience-architecture-reviewer and the
+  compliance family.

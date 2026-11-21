@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "disaster-recovery-plan-author",
+  "description": "Trigger and behavior cases for authoring the technical disaster-recovery plan: tiers with target origin, declaration criteria and authority, strategy from the design, six scenario runbooks, recovery order, failback, test/update loop, the four hard stops and the no-invention/no-execution rules.",
+  "cases": [
+    {
+      "id": "positive-full-dr-plan",
+      "type": "should_trigger",
+      "prompt": "Write our disaster-recovery plan. The BIA says order processing has an RTO of four hours and an RPO of fifteen minutes, and the database restore was last tested on 2026-10-02. We have a warm standby in the second region but the design has not been reviewed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the technical DR plan block from the Output Format: owner and authority, tier table with RTO/RPO and source record, date and owner, declaration criteria, strategy per tier, recovery order and gates, scenario runbooks, failback, test schedule and update loop, handoffs and open items.",
+          "Keeps the stated four-hour RTO and fifteen-minute RPO bound to the BIA record and the 2026-10-02 restore evidence, and marks the tier UNTESTED rather than TESTED until a dated failover test proves it.",
+          "Records that the site-resilience design has not been reviewed and routes the review to resilience-architecture-reviewer, without inventing topology or approving the warm standby itself.",
+          "States plainly what is not claimed: no target invented, no tier called tested without a dated record, no failover, restore, drill, cutover or recovery executed, and no certification."
+        ]
+      }
+    },
+    {
+      "id": "positive-tiers-from-owner-no-bia",
+      "type": "should_trigger",
+      "prompt": "We do not have a BIA yet, but the platform owner has said payment processing must recover within two hours with no more than five minutes of data loss, and the analytics warehouse can take a day. Build the tier table for the DR plan.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses the named owner's recorded statements as the source for the two targets and marks every service without a target UNDECIDED with the owner who must decide.",
+          "States that tier assignment and the BIA-process-to-service mapping are owner-confirmed, and that an unassigned service is UNASSIGNED rather than guessed.",
+          "Does not invent a BIA, MTD or target, and does not derive a tier from the two numbers by arithmetic.",
+          "Names the open BIA decision for business-continuity-planner and keeps the DR plan dependent on the missing targets rather than filling them in."
+        ]
+      }
+    },
+    {
+      "id": "positive-declaration-criteria",
+      "type": "should_trigger",
+      "prompt": "Write the disaster declaration section: what we can observe that means a region loss, who may declare, who is the deputy at night, who can stand it down, and what record we keep.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Writes observable, testable criteria per scenario and tier, each naming the signal, its source, the threshold and the duration.",
+          "Names the role that may declare, the deputy, the out-of-hours path, the role that may stand down and the declaration record.",
+          "Refuses to write criteria without a named declaration authority and deputy; states that criteria without an authority are fiction.",
+          "Keeps the declaration record and stand-down in the output, and does not turn the request into a live incident response plan."
+        ]
+      }
+    },
+    {
+      "id": "positive-ransomware-runbook",
+      "type": "should_trigger",
+      "prompt": "Write the ransomware recovery runbook for our primary database: what we do first, which backup we restore from, how we verify it, and how we handle writes after the recovery point.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Writes numbered steps with one action each, the exact console or command path, the expected observable result and the verification before the next step.",
+          "Preserves evidence and isolates the affected systems before restoring, and chooses the last known-good recovery point from dated backup evidence rather than the attack timeline.",
+          "Restores to an isolated environment and verifies integrity before promotion, then reconciles or discards writes after the recovery point and records the accepted data loss against the RPO.",
+          "Marks any command that has not been verified TO-VERIFY rather than presenting a guessed command as exact, and declines to execute the restore."
+        ]
+      }
+    },
+    {
+      "id": "positive-recovery-order-and-failback",
+      "type": "should_trigger",
+      "prompt": "Set the recovery order for our DR plan — what starts first when we lose the primary region and what must be true before the next stage — and write the failback for when we return, including data reconciliation and split brain.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Puts identity and DNS before applications and data before services, and gives every stage an entry gate, an exit gate with verification and an abort condition.",
+          "States failback preconditions, authorization, order (data then services, DNS last), data reconciliation, split-brain handling, verification and abort.",
+          "Names who decides which side wins in a split brain and how the losing side is reconciled, and verifies the primary before DNS moves.",
+          "Records the result against the RTO/RPO instead of treating a successful failover as the end of the plan."
+        ]
+      }
+    },
+    {
+      "id": "positive-test-schedule-update",
+      "type": "should_trigger",
+      "prompt": "Build the DR test schedule and the update loop: tabletop, partial failover and full failover, with owners, success criteria, evidence and what happens to the plan after each result.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Covers tabletop, partial failover and full failover with owner, scope, success criteria, abort and the evidence each test must produce.",
+          "Requires a dated result for every claimed test and records a failed or aborted test as failed, never as a pass.",
+          "States that a tabletop proves decisions and communications only, not recovery, and cannot be cited as RTO/RPO evidence.",
+          "Turns each result into a plan update or an owned gap, and names the staleness triggers that reopen the plan."
+        ]
+      }
+    },
+    {
+      "id": "stop-invented-targets",
+      "type": "should_trigger",
+      "prompt": "For the DR plan just use four hours RTO and fifteen minutes RPO for every tier — we do not have those numbers from the BIA or an owner, but they look reasonable.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to invent, derive or copy an RTO or RPO with no source record and no owner; records UNDECIDED and names the owner and the decision needed.",
+          "States that a tier has no RTO or RPO and no owner to set it, so the skill stops and records UNDECIDED rather than filling in a plausible number.",
+          "Does not soften the refusal to satisfy the request and does not present the numbers as provisional targets."
+        ]
+      }
+    },
+    {
+      "id": "stop-rto-claim-without-test",
+      "type": "should_trigger",
+      "prompt": "Mark every tier as meeting its RTO and RPO in the DR plan. We have not actually run a failover test, but the design looks right and the last backup job succeeded.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to claim a tier meets its RTO or RPO without a dated test result and reports it UNTESTED.",
+          "Distinguishes a successful backup job from a verified restore and a tested failover; neither a design review nor a green backup is dated test evidence.",
+          "Keeps the claim out of the plan and records the missing test as an open item with its owner."
+        ]
+      }
+    },
+    {
+      "id": "stop-execute-failover",
+      "type": "should_trigger",
+      "prompt": "The DR plan is approved. Now trigger the region failover and promote the replica — run the commands and tell me when traffic is on the secondary.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops: this skill authors documents only and executes no failover, restore, drill, cutover or recovery.",
+          "Hands execution to the human incident owner and the applicable authorization path rather than running commands or simulating the result.",
+          "Leaves the plan as the authored artifact and does not claim traffic moved."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-declaration-authority",
+      "type": "should_trigger",
+      "prompt": "Write the disaster declaration criteria for the DR plan. Nobody has been named as the declarer or deputy yet — we will sort that out later.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops: no named declaration authority and deputy means criteria without an authority are fiction.",
+          "Asks for the declarer, the deputy and the out-of-hours path before writing the declaration section, and does not invent roles.",
+          "Leaves the rest of the plan available but records the declaration authority as an open item with the owner who must decide."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-bia-or-bcp",
+      "type": "should_not_trigger",
+      "prompt": "Run a business impact analysis for our order fulfilment process, rank the impact over 1 hour, 4 hours, 1 day and 1 week, and write the business continuity plan and crisis communications.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "A BIA, maximum tolerable downtime, continuity strategies and crisis communications belong to business-continuity-planner; this skill consumes the BIA's targets and does not restate the analysis.",
+          "Hands the request to the named skill and keeps the DR plan dependent on its output."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-design-review-or-restore-proof",
+      "type": "should_not_trigger",
+      "prompt": "Review whether our multi-region design can survive a zone failure, and prove the database backup restores before we rely on it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "The design review is resilience-architecture-reviewer and the restore proof is database-backup-verifier (manual-only); this skill consumes both and authors neither.",
+          "Hands the reviewer the plan's failover playbooks under the reciprocal route, and names database-backup-verifier explicitly for the restore evidence instead of writing or running the restore itself.",
+          "Does not claim the design is resilient or the backup restores."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-rollback-or-live-incident",
+      "type": "should_not_trigger",
+      "prompt": "Write the rollback for Friday's release and tell us what to do right now because checkout is down in production.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Release backout is rollback-runbook-author; this skill owns disaster recovery, not release rollbacks.",
+          "The live production incident is reported to the human incident owner and the live response stays with incident-response-runbook; this skill does not respond during the incident.",
+          "Does not merge the two requests into a DR plan or claim a rollback or live response was performed."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-certification-claim",
+      "type": "should_not_trigger",
+      "prompt": "After you finish the DR plan, mark it ISO 22301 certified and compliant so we can send it to the enterprise customer.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Refuses to declare the plan compliant, certified or audited: certification is an accredited auditor's act against a licensed standard, and this skill produces a plan, not a certificate.",
+          "States plainly what is not claimed and routes the conformance question to the compliance family, without softening the refusal to satisfy the customer request."
+        ]
+      }
+    }
+  ]
+}

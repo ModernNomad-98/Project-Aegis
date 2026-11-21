@@ -1,10 +1,11 @@
 {
   "skill": "business-continuity-planner",
-  "description": "Trigger discrimination for the new Operational continuity family: business continuity planning vs the future disaster-recovery author, live incident response, reliability targets, resilience review and the compliance family.",
+  "description": "Trigger discrimination for the Operational continuity family: business continuity planning vs the disaster-recovery plan author, live incident response, reliability targets, resilience review and the compliance family.",
   "overlaps_with": [
     "incident-response-runbook",
     "slo-reliability-architect",
     "resilience-architecture-reviewer",
+    "disaster-recovery-plan-author",
     "compliance-control-foundation"
   ],
   "cases": [
@@ -55,13 +56,13 @@
       "reason": "A live event is the human incident owner's, running the approved response procedure the incident runbook authored; continuity planning happens before and after, never during."
     },
     {
-      "id": "dr-plan-goes-to-the-future-author",
+      "id": "dr-plan-goes-to-the-author",
       "prompt": "Write the technical disaster-recovery plan: failover sequence, replica promotion, and the restore runbook for the primary database.",
-      "expected_skill": "resilience-architecture-reviewer",
+      "expected_skill": "disaster-recovery-plan-author",
       "should_not_trigger": [
         "business-continuity-planner"
       ],
-      "reason": "The technical DR plan belongs to the future disaster-recovery-plan-author skill, which is not built at this base — so the live fallback is the resilience reviewer's DR-design review, and this skill is declined because it plans the business, not the recovery steps."
+      "reason": "The technical DR plan belongs to disaster-recovery-plan-author; the continuity planner keeps only the business requirement and target origin, and the resilience reviewer reviews the plan's design rather than authoring it."
     },
     {
       "id": "paging-goes-to-slo-architect",
