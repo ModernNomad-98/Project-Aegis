@@ -2,18 +2,18 @@
   "tool": "audit-skill-contracts",
   "version": "1.14.1",
   "engine_sha256": "bff7782400676476c270d26f4a453e2bdd6f096912f629a3c56303fb0af64877",
-  "repo_sha": "cbe3ddae9c9579b2b3ac528f7d86f46ee7452f6b",
-  "branch": "p0/t-evg09-business-continuity-2026-11-20",
+  "repo_sha": "82f9e7ced0d639a250dae819d39a89c6d616ac93",
+  "branch": "p0/t-evg10-dr-plan-2026-11-21",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
-  "audited_file_count": 1010,
-  "audited_byte_count": 7103296,
-  "corpus_content_hash": "1395ec05bc9c751edd82e5016a79eb5488e8c2c759faab16ba117f3f4e0f6fcc",
+  "audited_file_count": 1014,
+  "audited_byte_count": 7150289,
+  "corpus_content_hash": "a7af914121eff6b8bdd71007b0ed46b67b8c9e4eda81aacd4abb0e23904daf1f",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {
       "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-      "sha256": "3c747f332314f727a6ac515434ac9575909832b18082782908e04c0a28f3a8b0"
+      "sha256": "466058749742ea313c31d8258707909deef38fd1b8577dcef54c2a97203fea74"
     },
     "agent_names_enumerated": {
       "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -42,7 +42,7 @@
       ]
     }
   },
-  "skill_count": 260,
+  "skill_count": 261,
   "skills": [
     {
       "name": "ab-test-designer",
@@ -898,8 +898,8 @@
     {
       "name": "business-continuity-planner",
       "skill_md": ".claude/skills/business-continuity-planner/SKILL.md",
-      "family": "Skills (Operational continuity \u2014 family 25, EVG-1)",
-      "description_chars": 1005,
+      "family": "Skills (Operational continuity \u2014 family 25, EVG-1, EVG-10)",
+      "description_chars": 975,
       "references": [
         ".claude/skills/business-continuity-planner/references/bia-worksheet.md"
       ],
@@ -1570,6 +1570,24 @@
       "has_trigger_evals": true,
       "eval_cases": 5,
       "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "disaster-recovery-plan-author",
+      "skill_md": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
+      "family": "Skills (Operational continuity \u2014 family 25, EVG-1, EVG-10)",
+      "description_chars": 996,
+      "references": [
+        ".claude/skills/disaster-recovery-plan-author/references/dr-plan-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 14,
+      "trigger_cases": 12,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
