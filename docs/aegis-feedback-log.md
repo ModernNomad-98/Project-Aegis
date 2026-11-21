@@ -65,7 +65,7 @@ In the owner's words: no direct quote; the owner supplied the exception in U-3.
 What happened: PR #1185's advisory gate returned REQUIRED_INPUT_UNAVAILABLE because its B/D/E stage declarations have no pinned machine-readable form (scripts/ci/aegis_verdict_gate_fetch.py line 116, as reported by the build session). Record: PR #1185 comments.
 Effect: an owner exception for a docs-only merge.
 Idea for Aegis: publish the stage-declaration format, or record the gate as intentionally not wired and neutral.
-Status: fixed for this project by exception; open for Aegis.
+Status: fixed for Aegis by PR #1199 (merge 47cc2f9e, 2026-11-21). The advisory gate is skipped by default unless the repository variable AEGIS_VERDICT_GATE is exactly on; it publishes no status or evidence and must never be required. Option C remains deferred pending T6/T24/T23/T4.
 
 ### B-004 — Final reviewers could not verify checks or hashes (2026-11-20)
 In the owner's words: no direct quote.
