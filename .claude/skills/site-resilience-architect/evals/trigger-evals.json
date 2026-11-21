@@ -1,0 +1,96 @@
+{
+  "skill": "site-resilience-architect",
+  "description": "Trigger discrimination for cloud zone and region resilience design: the site designer versus provider choice, design review, business continuity targets, scale-out, infrastructure-as-code review and SLO/paging design.",
+  "overlaps_with": [
+    "cloud-architecture-decider",
+    "resilience-architecture-reviewer",
+    "business-continuity-planner",
+    "horizontal-scalability-reviewer",
+    "iac-reviewer",
+    "slo-reliability-architect"
+  ],
+  "cases": [
+    {
+      "id": "site-design-wins-here",
+      "prompt": "Choose the topology and replication mode for each tier of our cloud product so it survives a zone or a region loss, and tell us the RTO and RPO each can really meet.",
+      "expected_skill": "site-resilience-architect",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer",
+        "cloud-architecture-decider"
+      ],
+      "reason": "Choosing a per-tier failure topology, replication mode and failover path is this skill's exact scope; the reviewer reviews an existing design and the cloud decider chooses the platform, not the survival topology."
+    },
+    {
+      "id": "rpo-arithmetic-wins-here",
+      "prompt": "What RPO does our asynchronous cross-region replication actually give us, and how does that change if we move to synchronous?",
+      "expected_skill": "site-resilience-architect",
+      "should_not_trigger": [
+        "business-continuity-planner"
+      ],
+      "reason": "The RPO implied by a replication mode is design arithmetic; the continuity planner records the business requirement and target origin, which is the input to this calculation."
+    },
+    {
+      "id": "failover-path-trap-wins-here",
+      "prompt": "Our data is replicated to two regions but login runs in one. What breaks when that region is lost?",
+      "expected_skill": "site-resilience-architect",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "Auditing the failover path's own dependencies and designing the fix is design work; the reviewer would review the resulting design and plan the drill."
+    },
+    {
+      "id": "provider-choice-goes-to-cloud-decider",
+      "prompt": "Should we use provider A or provider B for the new platform, and which managed database should we pick?",
+      "expected_skill": "cloud-architecture-decider",
+      "should_not_trigger": [
+        "site-resilience-architect"
+      ],
+      "reason": "Provider and managed-service choice is the cloud architecture decision; this skill designs survival on the platform once chosen and only judges multi-cloud against a named requirement."
+    },
+    {
+      "id": "design-review-goes-to-reviewer",
+      "prompt": "Review our existing disaster-recovery design and run a game day to prove the failover works.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "site-resilience-architect"
+      ],
+      "reason": "Reviewing a design and planning a supervised drill is the reviewer's work; this skill authors the topology and cannot certify or test it."
+    },
+    {
+      "id": "business-target-goes-to-continuity",
+      "prompt": "Which business processes must survive an outage, and what is the maximum tolerable downtime the owner will accept?",
+      "expected_skill": "business-continuity-planner",
+      "should_not_trigger": [
+        "site-resilience-architect"
+      ],
+      "reason": "Business impact, maximum tolerable downtime and target ownership are continuity planning; this skill consumes those targets and never invents them."
+    },
+    {
+      "id": "scale-out-goes-to-scalability",
+      "prompt": "Will the standby region have enough capacity for peak traffic next quarter, and how should we scale it?",
+      "expected_skill": "horizontal-scalability-reviewer",
+      "should_not_trigger": [
+        "site-resilience-architect"
+      ],
+      "reason": "Capacity forecasting and scale-out review belong to the scalability reviewer; this skill consumes the capacity figure when judging whether the survivor can hold the load."
+    },
+    {
+      "id": "iac-diff-goes-to-iac-reviewer",
+      "prompt": "Review this Terraform diff that adds the second-region replica and the failover record.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": [
+        "site-resilience-architect"
+      ],
+      "reason": "Reviewing an infrastructure-as-code diff is the IaC reviewer's work; this skill designs the topology the diff should implement and never edits or approves infrastructure."
+    },
+    {
+      "id": "slo-paging-goes-to-slo-architect",
+      "prompt": "Set the availability SLO for the multi-region service and decide which failures should page at 3am.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "site-resilience-architect"
+      ],
+      "reason": "SLOs, error budgets and paging policy are reliability design; this skill states the failure a topology survives and the RTO/RPO it meets, which the SLO target must respect."
+    }
+  ]
+}
