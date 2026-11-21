@@ -548,3 +548,13 @@ and its output is evidence for a reviewer. Wiring it into CI would need a
 protected `.github/` change and a separate owner grant. Exit `0` means the
 pack was written, even when the recorded ancestry result is `FAIL` or
 `ERROR`; exit `2` means the pack could not be generated.
+
+## Local tool self-tests
+
+Three self-test suites cover the local tools added for the process-overhead work. They are **not wired into a workflow** (a CI step would need a protected `.github/` change and an owner grant), so run them by hand before changing those tools or their docs:
+
+- `python -B -P scripts/tests/test_manifest_ancestry.py` — 13 tests for `scripts/check-manifest-ancestry.py`.
+- `python -B -P scripts/tests/test_generate_evidence_pack.py` — 16 tests for `scripts/generate-evidence-pack.py`.
+- `python -B -P scripts/tests/test_scaffold_skill.py` — 19 tests for `scripts/scaffold-skill.py`.
+
+All 48 passed locally on `main` at `1a871a48` (2026-11-20). These are local aids, not a substitute for the hosted checks that do run. The scaffold generator itself is documented under "Scaffolding" in [agent-speed-protocol.md](agent-speed-protocol.md#scaffolding); this page covers the ancestry checker and the evidence pack.
