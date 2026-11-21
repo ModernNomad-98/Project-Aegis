@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "0d94b0abdb2030a652cff2f7fd5e06d9944b7147",
+  "source_revision": "3d3880f1ffbeaa83d5846034b8bd5c59057e8733",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -436,7 +436,7 @@
     {
       "name": "disaster-recovery-plan-author",
       "path": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
-      "sha256": "6d2c5c0722233c5382ed5692f8fc7d14a2dc900834a8283384e35a6353170b89"
+      "sha256": "a01fd632e3877bb7c3848a88ddfbfb982fab81b925154bd7b164f6b362a314c2"
     },
     {
       "name": "docs-as-code-architect",
