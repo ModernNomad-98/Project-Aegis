@@ -186,9 +186,13 @@ records `github.workflow_ref` and `github.workflow_sha`
 and refuses to run unless the executed file is the default-branch
 `aegis-verdict-gate.yml`.
 
-The workflow has no `push`, `workflow_dispatch` or `workflow_run` trigger,
-no repository-variable skip and no `continue-on-error`. A disabled or absent
-run leaves the context missing (blocked), never green.
+The workflow has no `push`, `workflow_dispatch` or `workflow_run` trigger and
+no `continue-on-error`; it has one deliberate job-level operator switch,
+`AEGIS_VERDICT_GATE`. When the variable is unset (the default) the job is
+skipped, publishes no commit status and produces no evidence. GitHub may treat
+a skipped required check as satisfied, so the job must never be registered as
+required. Enable the variable only when B/D/E records and T6/T24 authority
+exist; it is not automatic record detection.
 
 ### Adapter, checker and publisher
 

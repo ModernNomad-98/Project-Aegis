@@ -504,6 +504,15 @@ the pointer, never the condition's requirement text.
 | DCO | required commit check (inside `validate-skills`) | every commit carries a `Signed-off-by` line, produced with `git commit -s`, and the DCO step of `validate-skills` checks it | an unsigned commit is not a pass; no local tool, label or severity claim waives it |
 | `aegis-verdict-gate` | **NOT WIRED** (C1.1b) | none today: C1.1b under owner decision T23 owns any wiring, and registering a required context needs T4 | a checker readiness record is evidence only; it is not a gate and it creates no bypass or green result |
 
+**The `aegis-verdict-gate` job is neutral/skip by default.** The workflow job is
+skipped unless repository variable `AEGIS_VERDICT_GATE` is exactly `on`; it
+registers no required context and must never be registered as one. A skipped
+job is neutral in the UI, publishes no commit status and produces no evidence,
+and GitHub may treat a skipped required check as satisfied. `AEGIS_VERDICT_GATE`
+is an operator switch, not automatic record detection: it defaults off, and
+enabling it is the operator's claim that the B/D/E stage records actually
+exist and the T6/T24 authority is present. Enable it only on that claim.
+
 **Why the `MG` cells are links.** For an `MG` row the legitimate passing path is
 the linked condition itself. Stating that condition here would make this table
 a second rendering of the gate block and would fail [the agreement
