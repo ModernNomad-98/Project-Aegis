@@ -1,10 +1,10 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.14.1 (engine sha256 `bff7782400676476…`)
-- Repo SHA: `05048f8a87ba511fd6a9f1bc833c93648ad3ba32` (branch `p0/t-evg10-dr-plan-2026-11-21`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `268a22d512c6afb692fa21dcea9bff883f4cd00ed583290dfa081c95b59a9fcf` (1014 files, 7150657 bytes)
-- Skills scanned: **261**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
-- Findings: **485** (384 mechanical, 101 semantic-review candidates)
+- Repo SHA: `9bae3f06fa39ff8d01f9b0cd74b0cdede3071d6a` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `00fa276635ea19e99eae707e2cecd72883d63b4b6a2dba4a81f1a20d293ed5f2` (1018 files, 7189815 bytes)
+- Skills scanned: **262**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
+- Findings: **489** (387 mechanical, 102 semantic-review candidates)
 
 Findings are EXPECTED here: this report records the corpus as it is
 at the Repo SHA above, after whatever remediation that commit already
@@ -35,7 +35,7 @@ mechanically proven defects.
 | SIDE-001 | P1 | mechanical | read-only-declared skill instructs artifact writes | 0 |
 | SIDE-002 | P0 | mechanical | read-only-declared skill mentions scratch/temp/memory writes | 0 |
 | SIDE-003 | P0 | mechanical | read-only-declared skill grants write-capable tools | 0 |
-| SIDE-004 | P1 | semantic-candidate | auto-invocable skill's Workflow instructs a §5 mutation class without cover | 86 |
+| SIDE-004 | P1 | semantic-candidate | auto-invocable skill's Workflow instructs a §5 mutation class without cover | 87 |
 | SIDE-005 | P1 | mechanical | MANUAL-ONLY annotation, disable-model-invocation setting and catalog expectation disagree | 0 |
 | APPR-001 | P1 | mechanical | bare generic status value with no approval class | 0 |
 | APPR-002 | P0 | semantic-candidate | scope grant authorizing BUILD from a requirements-stage approval | 0 |
@@ -47,7 +47,7 @@ mechanically proven defects.
 | STATE-005 | P1 | semantic-candidate | narrative approved-state section inside an append-only contract | 0 |
 | ARTF-001 | P1 | semantic-candidate | durability claim without a durability level | 10 |
 | ROUTE-001 | P1 | mechanical | routing reference to a name that is not on disk | 0 |
-| ROUTE-002 | info | mechanical | exclusion toward a neighbor that never reciprocates (CENSUS) | 341 |
+| ROUTE-002 | info | mechanical | exclusion toward a neighbor that never reciprocates (CENSUS) | 344 |
 | ROUTE-003 | P1 | mechanical | a Stage-2 route reaches the commitments skill without a readiness/NOT-COMMIT-ABLE guard ON THAT ROUTE, or the roadmap owner is not independently classified | 0 |
 | VOCAB-002 | P1 | semantic-candidate | committed used as a roadmap horizon label | 0 |
 | VOCAB-003 | P0 | semantic-candidate | approved scope described as a commitment | 0 |
@@ -63,7 +63,7 @@ mechanically proven defects.
 
 ## Coverage (what was and was not reviewed)
 
-- **Mechanically scanned:** all 261 shipped skills' SKILL.md + references + eval JSONs (this report).
+- **Mechanically scanned:** all 262 shipped skills' SKILL.md + references + eval JSONs (this report).
 - **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is left to `scripts/validate-skills.py`, which checks agent frontmatter and guided-path links.
 - **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read: a link or path that leads outside the repository stops the run.
 - **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
@@ -73,9 +73,9 @@ mechanically proven defects.
 | Severity | Count |
 |---|---:|
 | P0 | 3 |
-| P1 | 100 |
+| P1 | 101 |
 | P2 | 41 |
-| info | 341 |
+| info | 344 |
 
 | Rule | Count |
 |---|---:|
@@ -84,8 +84,8 @@ mechanically proven defects.
 | EVAL-003 | 3 |
 | PARITY-001 | 38 |
 | REF-003 | 1 |
-| ROUTE-002 | 341 |
-| SIDE-004 | 86 |
+| ROUTE-002 | 344 |
+| SIDE-004 | 87 |
 | STATE-001 | 2 |
 | STATE-002 | 1 |
 
@@ -177,6 +177,7 @@ mechanically proven defects.
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/secure-migration-reviewer/SKILL.md` (owner: secure-migration-reviewer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'Deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/security-logging-alerting-architect/SKILL.md` (owner: security-logging-alerting-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'implemented by `observability-operator` (manual-only); logging changes' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/sharded-validation-with-resume/SKILL.md` (owner: sharded-validation-with-resume; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'recorded and validated (docs' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
+- **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/site-resilience-architect/SKILL.md` (owner: site-resilience-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/skill-deprecation-planner/SKILL.md` (owner: skill-deprecation-planner; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record (catalog retired section + decision-log entry' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/skill-deprecation-planner/SKILL.md` (owner: skill-deprecation-planner; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'write the coverage diff' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/skill-quality-reviewer/SKILL.md` (owner: skill-quality-reviewer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
@@ -199,7 +200,7 @@ mechanically proven defects.
 
 - **EVAL-002** × 3 — e.g. `.claude/skills/complete-project-checkpoint/evals/trigger-evals.json`: trigger-evals case 'authoring-skill' names no expected_skill — unjudgeable as written
 - **PARITY-001** × 38 — e.g. `.claude/skills/application-layer-pattern-advisor/SKILL.md`: Validation Checklist contains no checkbox items — nothing verifiable
-- **ROUTE-002** × 341 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
+- **ROUTE-002** × 344 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
 
 ## Vocabulary census (non-zero skills)
 
@@ -394,6 +395,7 @@ mechanically proven defects.
 - `server-state-architect`: verified×1
 - `sharded-validation-with-resume`: complete×1, targeted×2
 - `share-link-access-architect`: complete×1, verified×2
+- `site-resilience-architect`: accepted×6, committed×1, complete×2, deployed×1, proposed×1, verified×8
 - `skill-deprecation-planner`: planned×3, ready×1, targeted×1, verified×1
 - `skill-selection-advisor`: planned×2, verified×5
 - `skill-usage-instrumenter`: estimated×4
