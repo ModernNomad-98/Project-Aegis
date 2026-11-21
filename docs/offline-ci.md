@@ -558,3 +558,66 @@ Three self-test suites cover the local tools added for the process-overhead work
 - `python -B -P scripts/tests/test_scaffold_skill.py` — 19 tests for `scripts/scaffold-skill.py`.
 
 All 48 passed locally on `main` at `1a871a48` (2026-11-20). These are local aids, not a substitute for the hosted checks that do run. The scaffold generator itself is documented under "Scaffolding" in [agent-speed-protocol.md](agent-speed-protocol.md#scaffolding); this page covers the ancestry checker and the evidence pack.
+
+## Review packet (machine-readable)
+
+`scripts/build-review-packet.py` records the mechanical facts of one pull
+request as JSON: the base and head commits, the optional PR number, the body's
+size and bound-fields hash, and every reported check run with the required
+checks resolved. It is offline and deterministic, and it is a reviewer aid,
+not a gate: nothing runs it automatically.
+
+```text
+python -P scripts/build-review-packet.py --body body.md \
+    --head 0123456789abcdef0123456789abcdef01234567 \
+    --base f37fd8f43b1a974d8700014246c0466a837f88c9 \
+    --checks checks.json --pr 123 --out ../review-packet.json
+```
+
+`--checks` is required, so a packet can never assert an assumed check state.
+`--required` names the checks that must pass; it is repeatable and defaults to
+`gate-guard` and `validate-skills` (passing it replaces the default list).
+`--pr` is optional and must be a positive integer. An existing `--out` is
+refused unless `--force` is given, and its parent directory must exist.
+
+`--checks` accepts a JSON list of check-run objects or the `gh api` shape
+`{"check_runs": [...]}`. Each object has a string `name`, and `status` and
+`conclusion` values that are strings or null.
+
+The packet uses schema `aegis.review-packet/1` and these fields:
+
+- `pr`, `head`, `base` — the pull request number (or null) and the two
+  40-character lowercase hexadecimal commit ids.
+- `body` — `bytes`, `lines`, `sha256` and `bound_fields` (`hash16`,
+  `sha256`, `method`, `tool`, `version`), the five bound-field values
+  reused from `scripts/ci/bound_fields_hash.py`'s `report(text)`.
+- `checks.entries` — every check-run entry as `name`, `status`,
+  `conclusion` and the derived booleans `is_success` and `is_failure`.
+- `checks.required` — one record per required name with `name`, `present`
+  and `success`.
+- `checks.all_required_success` — true only when every required name is
+  present and successful.
+- `checks.failures`, `checks.skipped`, `checks.cancelled` — unique, sorted
+  name lists.
+
+Only the literal conclusion `success` is a success. A null conclusion is
+recorded as `pending`; `neutral`, `stale`, `queued`, `in_progress`,
+`cancelled`, `skipped` and any unlisted conclusion are not success.
+`failure`, `timed_out`, `action_required` and `startup_failure` are the
+failure conclusions. Duplicate names are all kept, and a name counts as a
+success only when every entry for it is `success`; one non-success duplicate
+fails the name. A required name that is missing fails
+`all_required_success`.
+
+A body must be strict UTF-8 and contain the three bound-field sentinels
+(witness, skills, security); an invalid or unterminated body is an input
+error. Errors print one line and exit 2; success exits 0.
+
+Two runs with the same inputs produce byte-identical output: there are no
+timestamps, run ids or absolute paths, keys are sorted, and the file uses LF.
+The builder makes no network calls and starts no subprocesses; it imports the
+bound-fields module in-process and writes nothing except `--out`.
+
+The suite `scripts/tests/test_build_review_packet.py` covers the packet shape
+and these rules; run it with
+`python -B -P scripts/tests/test_build_review_packet.py`.
