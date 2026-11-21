@@ -1,6 +1,8 @@
 """Tests for scripts/scaffold-skill.py.
 
-Stdlib unittest only (the repo's scripts/tests convention; not CI-wired).
+Stdlib unittest only (the repo's scripts/tests convention). The advisory
+path-filtered local-tool-tests job runs it when scripts/ or tools/ changes.
+
 Run from the repository root:
 
     python -B -P scripts/tests/test_scaffold_skill.py

@@ -2,8 +2,9 @@
 """Tests for scripts/check-manifest-ancestry.py.
 
 These tests build throwaway Git repositories in the system temporary directory.
-They are not wired into CI and no git hook is installed: the checker is a manual
-pre-push check, and this file runs manually as well.
+They run in the advisory path-filtered local-tool-tests job when scripts/ or
+tools/ changes. No git hook is installed: the checker is also a manual pre-push
+check, and this file also runs by hand.
 
 Run:
     python -P scripts/tests/test_manifest_ancestry.py

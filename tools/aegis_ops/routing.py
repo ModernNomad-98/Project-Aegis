@@ -1,11 +1,16 @@
 """C3.2 dependency-aware path/check routing and the bounded E1 invariants.
 
-The matrix is closed over the six existing workflow checks.  'validate-skills'
+The matrix is closed over the six routed workflow checks.  'validate-skills'
 and 'gate-guard' are required and can never be routed away; an unmapped path
-fails closed.  The workflow analyser checks the E1 edit's bounded shape
+fails closed.  The workflow declares one more advisory job,
+'local-tool-tests' (added 2026-11-21), which the matrix does not model: its
+routing flag is the separate 'local_tools' output, not a matrix input.  The
+analyser's job-set check is therefore separate from the matrix's check enum.
+The workflow analyser checks the E1 edit's bounded shape
 (routing/path-scope only): job set, required-job unconditionality, the push
 lane forcing every output true, the closed 'docs_skills' predicate, per-job
-advisory routing and pinned
+advisory routing, the local-tool job's route (its needs, condition, declared
+output, push forcing and no permissions of its own) and pinned
 actions.  It does not write the workflow and it makes no settings or
 required-context claim.
 """
@@ -29,6 +34,14 @@ CHECKS = (
 )
 REQUIRED_CHECKS = ("gate-guard", "validate-skills")
 ADVISORY_CHECKS = ("windows-offline-checks", "tools-tests-linux", "tools-tests-windows")
+# Every job the E1 analyser must find in the workflow, in the order the
+# workflow declares them. It is wider than CHECKS: 'local-tool-tests' is an
+# advisory job the routing matrix does not enumerate (it routes on its own
+# 'local_tools' output), so adding it to CHECKS would fail every matrix
+# fixture with ROUTING_CHECK_MISSING.
+EXPECTED_WORKFLOW_JOBS = ("changes", "local-tool-tests") + tuple(
+    name for name in CHECKS if name != "changes"
+)
 ROW_FIELDS = (
     "check",
     "required",
@@ -205,12 +218,28 @@ def _job_if(lines: typing.List[str]) -> typing.Optional[str]:
     return None
 
 
+def _job_needs(lines: typing.List[str]) -> typing.List[str]:
+    """Return one job's shallow job-level needs list (not a step's)."""
+
+    for line in lines:
+        if line.startswith("    needs:") and not line.startswith("      "):
+            value = line.split("needs:", 1)[1].strip()
+            if value.startswith("[") and value.endswith("]"):
+                return [
+                    item.strip().strip("'\"")
+                    for item in value[1:-1].split(",")
+                    if item.strip()
+                ]
+            return [value.strip("'\"")] if value else []
+    return []
+
+
 def check_workflow_text(text: str) -> typing.Dict[str, object]:
     """Check the bounded E1 shape of the validate-skills workflow."""
 
     report = schema.Report()
     jobs = _jobs(text)
-    expected_jobs = set(CHECKS)
+    expected_jobs = set(EXPECTED_WORKFLOW_JOBS)
     if set(jobs) != expected_jobs:
         report.add(
             "E1_JOB_SET_CHANGED",
@@ -262,6 +291,52 @@ def check_workflow_text(text: str) -> typing.Dict[str, object]:
                 report.add("E1_ADVISORY_DOCS_SKIP", "%s must skip docs/skills-only PRs" % name)
         elif "needs.changes.outputs.tools == 'true'" not in condition:
             report.add("E1_ADVISORY_ROUTE", "%s must route on tools" % name)
+    # The local-tool advisory job (added 2026-11-21) is not a matrix row, so
+    # its E1 shape is guarded explicitly: a later edit must not drop the job,
+    # drop its dependency on `changes`, widen its condition, stop declaring
+    # the output, stop forcing it on the push lane, or give it a write token.
+    local_job = jobs.get("local-tool-tests")
+    if local_job is None:
+        report.add(
+            "E1_LOCAL_TOOL_JOB_MISSING",
+            "the local-tool-tests job must stay in the workflow",
+        )
+    else:
+        local_needs = _job_needs(local_job)
+        if local_needs != ["changes"]:
+            report.add(
+                "E1_LOCAL_TOOL_NEEDS",
+                "local-tool-tests must need exactly ['changes'], not %r"
+                % (local_needs,),
+            )
+        local_if = _job_if(local_job)
+        if local_if != "needs.changes.outputs.local_tools == 'true'":
+            report.add(
+                "E1_LOCAL_TOOL_ROUTE",
+                "local-tool-tests must run only when local_tools is true, not %r"
+                % (local_if,),
+            )
+        if re.search(r"(?m)^    permissions:", "\n".join(local_job)):
+            report.add(
+                "E1_LOCAL_TOOL_PERMISSIONS",
+                "local-tool-tests must add no permissions block of its own",
+            )
+    local_output = "local_tools: $" + "{{ steps.filter.outputs.local_tools }}"
+    if local_output not in changes_job_text:
+        report.add(
+            "E1_LOCAL_TOOLS_OUTPUT",
+            "the changes job must declare the local_tools output",
+        )
+    push_printfs = [
+        line
+        for line in changes_job_text.splitlines()
+        if "printf" in line and "GITHUB_OUTPUT" in line
+    ]
+    if not any("local_tools=true" in line for line in push_printfs):
+        report.add(
+            "E1_LOCAL_TOOLS_PUSH",
+            "the push lane must force local_tools=true",
+        )
     changes_text = "\n".join(jobs.get("changes", []))
     for token in ("tools=true", "offline=true", "docs_skills=true"):
         if token not in changes_text:
