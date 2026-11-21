@@ -38,6 +38,8 @@
 | "Bad, stale or missing data keeps reaching users or reports." | [`data-quality-monitor-designer`](../../.claude/skills/data-quality-monitor-designer/SKILL.md) — **conditional**: a production pipeline, store, warehouse or critical dataset needs quality gates; silent auto-repair is refused. Quote: "Asked to design checks that auto-repair failing data → refuse silent correction." |
 | "We have no external probes and learn about outages from customers." | [`synthetic-monitoring-architect`](../../.claude/skills/synthetic-monitoring-architect/SKILL.md) — **conditional**: no external probes exist yet; running probes against production needs human approval and a validated safety contract, and SLO targets come from [`slo-reliability-architect`](../../.claude/skills/slo-reliability-architect/SKILL.md) first. Quote: "Executing probes against production is requested (not just designing them) → STOP." |
 
+**Scope note — disaster recovery, sites and continuity.** `resilience-architecture-reviewer` is cloud-zone-centric: it reviews per-dependency failure containment, zone/region redundancy, RTO/RPO fit and failover design for cloud-hosted systems. It does not review on-premises, colocation or second-site power/network/carrier diversity, it does not author a disaster-recovery plan, and it does not cover business continuity or a business impact analysis (BIA). If any of those are in scope, treat them as uncovered and ask the owner or `project-orchestrator` for the missing owner rather than assuming this review covers them.
+
 ### Plan the next version
 
 | The situation, in plain words | Who owns it (and its rules) |
