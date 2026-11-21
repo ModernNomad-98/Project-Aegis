@@ -79,10 +79,67 @@ decide analogues from the owner approval register and prior PR receipts.
 
 ## Scaffolding
 
-Repeated skill additions use the same 11-15-file pattern. Generate
-registration, coverage, reconciliation, manifest and baselines from one
-config, with tooling outside protected paths in a planning branch or workspace
-until a grant exists, then review the generated diff.
+Skill additions use `scripts/scaffold-skill.py` (APR-140 tooling; no
+`.github/` change) with one JSON config: `name`, `description`, `purpose`,
+`use_when`, `inputs`, `workflow`, `output_format`,
+`validation_checklist`, `gotchas`, `stop_conditions`, `supporting_files`,
+`positive_prompt`, `negative_prompt`, `overlaps_with`, and optional
+`trigger_note`. Unknown keys are rejected, the name cannot shadow a reserved
+bundled skill, and every overlap must resolve to an installed
+`.claude/skills/<name>/SKILL.md`.
+
+The generator emits exactly three files under `.claude/skills/<name>/`:
+
+- `SKILL.md` — strict frontmatter (`name` plus a single-quoted `description`
+  with internal apostrophes doubled) and the nine sections in canonical order:
+  Purpose, Use When, Inputs to Inspect, Workflow (numbered), Output Format,
+  Validation Checklist (checkboxes), Gotchas, Stop Conditions, Supporting
+  Files (bullets, or "- None yet.").
+- `evals/evals.json` — `$schema`, `skill`, an eval-suite `description`,
+  and two cases: one `should_trigger` built from the config's positive prompt
+  with assertions derived from its workflow and checklist, and one
+  `should_not_trigger` built from the negative prompt that names the first
+  overlap as the owner.
+- `evals/trigger-evals.json` — `skill`, `description`, `overlaps_with`, and
+  the matching positive/negative discrimination cases; the positive expects
+  this skill and forbids the overlaps, the negative expects the first overlap
+  and forbids this skill.
+
+The default is a dry run that writes nothing and prints each file plus the
+closure list:
+
+```
+python -P scripts/scaffold-skill.py --config <config.json> --repo-root .
+python -P scripts/scaffold-skill.py --config <config.json> --repo-root . --apply
+```
+
+`--apply` refuses an existing skill directory unless `--force` is given;
+`--force` overwrites only the three generated files and leaves other files in
+the directory alone. Output is deterministic, contains no timestamp, and an
+invalid argument or config exits 2 with one line of error text.
+
+Registration, README counts, the manifest and the audit baseline keep their
+owning tools — the generator never edits them. Its printed closures are, in
+order:
+
+1. Review the generated text and replace the placeholder assertions with
+   checks specific to this skill.
+2. Add the `docs/skills-catalog.md` row and the README selected/coverage
+   entry, and hand-bump the README family-roster count by one. Do not run
+   `--write-readme-counts` yet: it fails closed until the manifest matches
+   disk.
+3. Commit the skill, then run
+   `python -P scripts/validate-skills.py --refresh-skills-manifest --manifest-ref=<content-commit>`
+   and commit the manifest. That refresh exits 1 because the README count is
+   still stale, but it writes the manifest before that check; the failure is
+   expected.
+4. Run `python -P scripts/validate-skills.py --write-readme-counts` and
+   commit the result.
+5. Run `python -P scripts/validate-skills.py`, then
+   `python -P scripts/tests/test_audit_skill_contracts.py`.
+6. Regenerate the baseline with
+   `python -P scripts/audit-skill-contracts.py --json artifacts/audits/skill-contract-audit-baseline.json`
+   and review the diff.
 
 ## Measurement
 
