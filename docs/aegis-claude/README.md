@@ -282,8 +282,7 @@ python scripts/ci/check-markdown-links.py \
 ## Provenance
 
 Drafted by DeepSeek (DeepSeek Harness; configured route
-<code>deepseek-flash</code>) on 2026-11-22. The pilot plan is
-[<code>PLAN.md</code>](../../PLAN.md). Live evidence was produced on Claude
+<code>deepseek-flash</code>) on 2026-11-22. The pilot plan is the lane brief in the authoring session (not shipped). Live evidence was produced on Claude
 Code 2.1.311 for Windows against a disposable repository; the L1 observation
 was supplied for the earlier status update. The local verification evidence is
 the adapter's test suite and the read-only repository checks listed above.
