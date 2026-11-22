@@ -93,6 +93,29 @@ missing authority. A delayed register transcription does not invalidate a direct
     projection is refreshed (from the records) before a stage is reported
     complete; the projection never overrides the evidence.
 
+**Run-record sync (after a confirmed append/refresh).** Once a project-state
+write is confirmed, probe in order and use the first candidate that works:
+(a) an executable `.aegis/bin/aegis-run` →
+`.aegis/bin/aegis-run sync --dir .aegis/run --project-state docs/project-state.md`;
+(b) `command -v aegis-run` (on Windows: `where.exe aegis-run` or `Test-Path`) →
+`aegis-run sync --dir .aegis/run --project-state docs/project-state.md`;
+(c) from the Aegis root, a succeeding `python -c "import tools.aegis_run"` (no
+`-P`) → `python -m tools.aegis_run sync --dir <ABS run dir> --project-state
+<ABS state path>`; from elsewhere,
+`PYTHONPATH=<checkout> python -P -m tools.aegis_run sync --dir <ABS run dir>
+--project-state <ABS state path>` only when `PYTHONPATH` points at that
+checkout — `-P` without `PYTHONPATH` is not a valid probe, otherwise `UNRUN`.
+The relative `--dir .aegis/run --project-state docs/project-state.md` in (a)/(b)
+belong to the product repo (the `.aegis/bin` wrapper), not the Aegis root;
+(d) else `RUN-RECORD SYNC: UNRUN (tool unavailable)`, carried into the next
+snapshot's next action.
+Report success as `RUN-RECORD SYNC: SYNCED (n new)` — `SYNCED (0 new)` when
+nothing was new, never implying new evidence; only a candidate that exists and
+exits nonzero is `RUN-RECORD SYNC: FAILED (reason)`. Sync is idempotent, never
+writes this file, creates no second run record, adds no entry type, gates
+nothing and grants no authority, and a failure never blocks or rolls back the
+confirmed state write.
+
 ## Section mutability — immutable evidence vs mutable projection
 
 Two kinds of section, governed differently. A future session must find **one

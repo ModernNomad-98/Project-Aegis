@@ -342,6 +342,10 @@ idempotency, and the mutable-projection refresh — lives in
 apply it, do not restate it here.** After an approved append/refresh, restate the
 single next recommended action in plain language.
 
+**Run-record sync (after confirmation).** After any confirmed project-state write (append, refresh, or cold-start create), run exactly one sync, probing in order: (a) an executable `.aegis/bin/aegis-run` → `.aegis/bin/aegis-run sync --dir .aegis/run --project-state docs/project-state.md`;
+(b) else `command -v aegis-run` (or the platform equivalent: `where.exe`/`Test-Path` on Windows) → `aegis-run sync --dir .aegis/run --project-state docs/project-state.md`; (c) else, from the Aegis root, a succeeding `python -c "import tools.aegis_run"` (no `-P`) → `python -m tools.aegis_run sync --dir <ABS run dir> --project-state <ABS state path>`; from elsewhere, `PYTHONPATH=<checkout> python -P -m tools.aegis_run sync --dir <ABS run dir> --project-state <ABS state path>` only when `PYTHONPATH` points at that checkout — `-P` without `PYTHONPATH` is not a valid probe, otherwise `UNRUN`; the relative paths in (a)/(b) belong to the product repo (the `.aegis/bin` wrapper), not the Aegis root;
+(d) else report `RUN-RECORD SYNC: UNRUN (tool unavailable)` and carry it into the next snapshot's next action. Report success as `RUN-RECORD SYNC: SYNCED (n new)` — `SYNCED (0 new)` when nothing was new, never implying new evidence; only a candidate that exists and exits nonzero is `RUN-RECORD SYNC: FAILED (reason)`. Sync is idempotent, writes no `docs/project-state.md` and no second record, never gates nor grants authority, and never blocks, indefinitely retries, or rolls back that write.
+
 ## Output Format
 
 Each turn produces (never a wall of jargon):
@@ -362,6 +366,7 @@ IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + e
 NEXT ACTION:     <the single next recommended action, in plain language>
 RECORDING: exactly one form (see references/recording-and-authority.md) — NONE THIS TURN (no terminal result exists to record — a pure invocation, classification, or question turn; nothing to preview or approve, and no log entry is fabricated); or SINGLE=<path + one ID + date + attribution + byte-for-byte entry>; or BATCH (low-risk only)=<path(s) + ORDERED list of every ID + each date/attribution + byte-for-byte content of EVERY entry + any exact projection refresh>, ONE approval for the complete bounded batch (high-risk actions are never batched)
 RECORDING STATUS: NONE THIS TURN | AWAITING EXPLICIT APPROVAL (only when authority is missing; nothing written) | RECORDED under applicable explicit grant: exact entry or every batch ID + every refreshed projection listed; partial failure reports exactly what did and did not land
+RUN-RECORD SYNC: <SYNCED (n new) | UNRUN (tool unavailable) | FAILED (reason)> — shown only when this turn confirmed a project-state write (append, refresh, or create); `SYNCED (0 new)` means nothing new; a missing or non-probeable candidate is UNRUN, never FAILED
 ```
 
 `docs/project-state.md` is workspace-persisted after a verified write (template in Supporting Files); Git-tracked, committed and remote-persisted require separate evidence:
@@ -410,6 +415,7 @@ scope, users, success, open questions) refreshed at approved checkpoints.
       implementation authority; previews byte-for-byte; no rejected/already-recorded
       proposal re-offered; projections refreshed, never contradicting evidence.
 - [ ] The next recommended action is stated in plain language.
+- [ ] **Run-record sync:** after a confirmed write, exactly one sync ran in probe order (`.aegis/bin/aegis-run` → `command -v aegis-run` or its Windows equivalent → `python -m tools.aegis_run` where importable, `-P` only with `PYTHONPATH`); an absent tool reported `UNRUN` carried into the next action; success reported `SYNCED (n new)` (0 new says so); a candidate that exists and exits nonzero reported `FAILED`; neither blocked, indefinitely retried, nor rolled back the confirmed state write.
 - [ ] Build choices define terms, reasons, costs, pros and cons, and give a context-based recommendation before ONE atomic question; the answer is not action or recording authority.
 
 ## Gotchas

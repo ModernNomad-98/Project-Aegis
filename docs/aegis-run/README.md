@@ -100,8 +100,9 @@ What the import means, and what it does not:
   `<repo>/.git/hooks/post-commit`; `uninstall-hook` removes only a hook that
   carries the aegis_run marker. Nothing else is written outside `D`.
 - **The hook runs the named checkout, not the repository.** It changes directory
-  to `--aegis-path` and runs `python -P`, so a repository-local `tools/`
-  package cannot shadow the Aegis `tools.aegis_run`.
+  to `--aegis-path`, sets `PYTHONPATH` to it, and runs `python -P`, so a
+  repository-local `tools/` package cannot shadow the Aegis `tools.aegis_run`
+  (without that `PYTHONPATH`, `-P` would not import it).
 
 ## Files in a run directory
 
