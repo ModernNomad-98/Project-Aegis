@@ -108,7 +108,7 @@ In the owner's words: "I just had two instance that didn't even know aegis exist
 What happened: two build sessions began in repositories that use Aegis but did not load it; the exact hosts/directories were not supplied. Aegis has no adoption marker or startup doctor; discovery relies on the host reading AGENTS.md/CLAUDE.md or .claude/skills.
 Effect: sessions miss the skills entirely; not measured.
 Idea for Aegis: one-command adopt writes .aegis/project.json, START-HERE, wrappers and startup blocks; doctor verifies them. Hosts that ignore startup files remain instruction-only, not enforced.
-Status: in progress; adopt/doctor implementation exists in a lane but is not merged. Open for Aegis.
+Status: fixed by PR #1205 (merge 21d16ce6): adopt/doctor/unadopt merged; doctor verifies the startup contract. Instruction-only: hosts that ignore startup files still miss Aegis.
 
 ### B-009 — Run Record needed a human command at every stage (2026-11-22)
 In the owner's words: "that's manual as fuck, who's going to remember that at every stage?"
@@ -126,13 +126,19 @@ Status: corrected in docs and skill text; regression test not yet wired.
 What happened: the 72 run-record tests and 50 adopt tests run only by hand; CI's local-tool-tests covers the older 48. Wiring them needs a protected .github change and an owner grant.
 Effect: regressions in the new tools can merge without a red check.
 Idea for Aegis: add one local-tool-tests step for tools/aegis_run and tools/aegis_adopt.
-Status: open for Aegis (needs a grant).
+Status: open for Aegis (needs a grant). The run-record, adopt and guard/adapter suites are also unwired (B-011).
 
 ### B-012 — Skill-first sequencing failed while building an Aegis tool (2026-11-22)
 What happened: the adopt/doctor build was dispatched before its matching safety skill was read; the PR evidence table was not assembled at plan time; the feedback log was updated only after an owner prompt. D3 then surfaced symlink escape, wrapper execution, partial-write, mode-loss and read-only-target defects one at a time.
 Effect: at least six extra D3 rounds that a tool-safety matrix would have front-loaded. Not measured.
 Idea for Aegis: require a "skills applied" table before build dispatch and fail the brief if the matching skill row is missing; keep the feedback log as a running log, not a closing artifact.
 Status: open for Aegis; the adopt PR is paused until the skill evidence is attached.
+
+### B-013 — Enforcement stopped at L2 partial (2026-11-22)
+What happened: the Claude Code 2.1.311 adapter was proven in a disposable repo: Bash, .env reads and policy writes were blocked; Read was allowed; SessionStart exit 2 did **not** block startup. Codex CLI's account rejects every tested model; Gemini is not installed; the VS Code extensions and Cursor are unqualified. There is no OS sandbox.
+Effect: one L2 tool gate, not containment. A host that ignores hooks bypasses it; allowlisted commands can still run arbitrary code.
+Idea for Aegis: require L3 external containment before any surface is called enforced; qualify each host/mode separately.
+Status: open; L1 and L3 UNRUN.
 
 ## Worked well
 

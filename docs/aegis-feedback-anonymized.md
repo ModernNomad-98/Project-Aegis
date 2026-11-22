@@ -108,6 +108,13 @@ Effect: avoidable review cycles; not measured.
 Idea: a machine-checkable "skills applied" row in every build brief; fail the brief if missing.
 Status: open.
 
+### A-9 — Enforcement stopped at L2 partial
+Stage: implement. Category: security.
+What happened: one coding-agent host was proven to block Bash, secret reads and policy writes, but its startup hook did not block and no OS sandbox exists; other hosts were unqualified or blocked.
+Effect: one tool gate, not containment.
+Idea: require external containment before calling a host enforced.
+Status: open.
+
 ## Worked well
 
 ### W-1 — Independent audits caught real defects before merge
