@@ -81,6 +81,8 @@ SHELL_ESCAPE_MARKERS = (
 DEFAULT_DENIED_PATHS = (
     "**/.env",
     "**/.env.*",
+    "**/.envrc",
+    "**/.envrc.*",
     "**/.ssh/**",
     "**/.aws/**",
     "**/.gnupg/**",
@@ -291,6 +293,17 @@ def load_policy(policy_path: str | Path) -> Policy:
     if type(data["deny_outside_repo"]) is not bool:
         raise GuardError("policy field 'deny_outside_repo' must be a boolean")
 
+    for raw_pattern in data["denied_paths"]:
+        normalized = _normalize_denied_glob(raw_pattern)
+        if not normalized:
+            raise GuardError(f"invalid denied_paths glob: {raw_pattern!r}")
+        try:
+            _glob_regex(normalized.casefold())
+        except re.error as exc:
+            raise GuardError(
+                f"invalid denied_paths glob {raw_pattern!r}: {exc}"
+            ) from None
+
     required_session_files = tuple(
         _normalize_session_path(item)
         for item in data["required_session_files"]
@@ -462,6 +475,13 @@ def _matches_denied_glob(pattern: str, candidates: list[str]) -> bool:
     return False
 
 
+def _normalize_denied_glob(raw_pattern: str) -> str:
+    pattern = raw_pattern.replace("\\", "/")
+    if pattern.startswith("./"):
+        pattern = pattern[2:]
+    return pattern.rstrip("/")
+
+
 def _denied_path_pattern(
     target: Path, repo: Path, patterns: tuple[str, ...]
 ) -> str | None:
@@ -474,10 +494,7 @@ def _denied_path_pattern(
             pass
     candidates.append(target.as_posix())
     for raw_pattern in patterns:
-        pattern = raw_pattern.replace("\\", "/")
-        if pattern.startswith("./"):
-            pattern = pattern[2:]
-        pattern = pattern.rstrip("/")
+        pattern = _normalize_denied_glob(raw_pattern)
         if not pattern:
             continue
         if _matches_denied_glob(pattern, candidates):
@@ -909,7 +926,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except GuardError as exc:
         _emit_error(str(exc))
         return EXIT_ERROR
-    except (OSError, RuntimeError, ValueError) as exc:
+    except (OSError, RuntimeError, ValueError, re.error) as exc:
         _emit_error(f"internal error: {exc}")
         return EXIT_ERROR
 

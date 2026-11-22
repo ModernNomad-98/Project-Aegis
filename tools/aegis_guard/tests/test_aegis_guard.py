@@ -69,6 +69,8 @@ class AegisGuardTests(unittest.TestCase):
         (self.repo / "src" / "main.py").write_text("print('ok')\n", encoding="utf-8")
         (self.repo / ".env").write_text("SECRET=1\n", encoding="utf-8")
         (self.repo / ".env.local").write_text("LOCAL=1\n", encoding="utf-8")
+        (self.repo / ".envrc").write_text("export A=1\n", encoding="utf-8")
+        (self.repo / ".envrc.local").write_text("export B=1\n", encoding="utf-8")
         (self.repo / ".ssh").mkdir()
         (self.repo / ".ssh" / "id_test").write_text("key\n", encoding="utf-8")
         (self.repo / ".aws").mkdir()
@@ -263,6 +265,13 @@ class AegisGuardTests(unittest.TestCase):
             with self.subTest(raw=raw):
                 self.assert_deny(self.check("Read", {"file_path": raw}), "denied by pattern")
 
+    def test_deny_envrc_paths(self) -> None:
+        for raw in (".envrc", ".envrc.local", "nested/.envrc"):
+            with self.subTest(raw=raw):
+                self.assert_deny(
+                    self.check("Read", {"path": raw}), "denied by pattern"
+                )
+
     def test_deny_ssh_paths(self) -> None:
         for raw in (".ssh/id_test", ".ssh", ".ssh/config"):
             with self.subTest(raw=raw):
@@ -297,7 +306,7 @@ class AegisGuardTests(unittest.TestCase):
                 self.assert_deny(self.check("Read", {"path": raw}), "denied by pattern")
 
     def test_deny_case_insensitive_secret_path(self) -> None:
-        for raw in (".ENV", ".SSH/ID_TEST", "CERT.PEM"):
+        for raw in (".ENV", ".ENVRC", ".ENVRC.LOCAL", ".SSH/ID_TEST", "CERT.PEM"):
             with self.subTest(raw=raw):
                 self.assert_deny(self.check("Read", {"path": raw}), "denied by pattern")
 
@@ -734,6 +743,14 @@ class AegisGuardTests(unittest.TestCase):
         self.assert_deny(
             self.check("Bash", {"command": "echo hello"}), "bash_allowlist"
         )
+
+    def test_invalid_denied_glob_is_policy_error(self) -> None:
+        self.write_policy(denied_paths=["docs/[z-a]"])
+        self.assert_error(self.check("Read", {"file_path": "docs/inside.md"}))
+
+    def test_invalid_denied_glob_blocks_session(self) -> None:
+        self.write_policy(denied_paths=["docs/[z-a]"])
+        self.assert_error(self.session())
 
     def test_malformed_policy(self) -> None:
         self.policy_path.write_text("{", encoding="utf-8")

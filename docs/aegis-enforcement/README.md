@@ -72,8 +72,9 @@ The SHA-256 covers the exact policy bytes. Errors write
 ## Policy fields (`aegis.policy/1`)
 
 The eight core fields are required; `bash_allowlist` is optional and
-defaults to `[]`. Unknown fields, missing core fields and wrong
-types exit 3. A policy is read-only input; the check never rewrites it.
+defaults to `[]`. Unknown fields, missing core fields, wrong types and
+invalid `denied_paths` globs exit 3. A policy is read-only input; the check
+never rewrites it.
 
 | Field | Type | Behavior |
 | --- | --- | --- |
@@ -81,7 +82,7 @@ types exit 3. A policy is read-only input; the check never rewrites it.
 | `allowed_tools` | string array | Exact, case-sensitive allow-list. An unlisted tool is denied; an empty list denies all tools. |
 | `denied_tools` | string array | Exact, case-sensitive deny-list. A deny wins over the allow-list. |
 | `allowed_roots` | string array | Roots for path arguments. Relative entries resolve against the repository; absolute entries are used as written. An empty list denies every path argument. |
-| `denied_paths` | string array | Additional glob deny patterns. A pattern without `/` matches any path component; a trailing `/**` also matches its directory; matching is case-insensitive. |
+| `denied_paths` | string array | Additional glob deny patterns. A pattern without `/` matches any path component; a trailing `/**` also matches its directory; matching is case-insensitive. Invalid globs exit 3. |
 | `deny_outside_repo` | boolean | Boolean declaration. v1 always requires both an allowed root and repository containment; `false` is accepted but does not disable the boundary. |
 | `network_commands` | string array | Additional tokens or token phrases. Built-in program and subcommand rules cannot be removed. |
 | `required_session_files` | string array | Repository-relative files required by `session`, in addition to `.aegis/project.json`. |
@@ -102,8 +103,8 @@ containment.**
 ### Built-in secret paths
 
 These patterns are always denied, in addition to `denied_paths`:
-`.env*`, `.ssh/**`, `.aws/**`,
-`.gnupg/**`, `.git-credentials`, `id_rsa*`,
+`.env`, `.env.*`, `.envrc`, `.envrc.*`, `.ssh/**`,
+`.aws/**`, `.gnupg/**`, `.git-credentials`, `id_rsa*`,
 `*.pem`, `*.key`, `secrets/**` and
 `credentials*`. They match at any depth and case-insensitively.
 The policy list can add patterns but cannot remove these.
@@ -265,7 +266,8 @@ python scripts/ci/check-markdown-links.py docs/aegis-enforcement/README.md tools
 
 The test suite covers allow/deny decisions, fail-closed unlisted tools, Bash
 default-deny and exact allowlist matching, missing and malformed policies,
-malformed arguments, Windows backslash paths, case-insensitive matching,
+invalid `denied_paths` globs, malformed arguments, Windows backslash paths,
+case-insensitive matching,
 UNC/device/drive-relative paths, symlink or junction escape, every built-in
 secret pattern and network rule, non-adjacent git/npm/npx/pip/pip3/uv
 subcommands, shell metacharacters, redirects, parentheses, shell wrappers,

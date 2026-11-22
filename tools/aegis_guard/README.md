@@ -57,8 +57,9 @@ SHA-256 is over the exact policy bytes. Errors print one JSON object with an
 ## Policy: `aegis.policy/1`
 
 Eight core fields are required; `bash_allowlist` is optional and
-defaults to `[]`. Types are checked and unknown fields are errors.
-The [JSON Schema](policy.schema.json) mirrors the contract.
+defaults to `[]`. Types are checked; unknown fields and invalid
+`denied_paths` globs are errors (exit 3). The
+[JSON Schema](policy.schema.json) mirrors the contract.
 
 ```json
 {
@@ -80,15 +81,15 @@ The [JSON Schema](policy.schema.json) mirrors the contract.
 | `allowed_tools` | string array | Exact, case-sensitive tool allow-list. An unlisted tool is denied. An empty list denies every tool. |
 | `denied_tools` | string array | Exact, case-sensitive deny-list. A deny wins over the allow-list. |
 | `allowed_roots` | string array | Path roots for `path`, `file_path` and `notebook_path` arguments. Relative entries resolve against the repository. An empty list denies every path argument. |
-| `denied_paths` | string array | Additional glob deny patterns. A pattern without `/` matches any path component; a trailing `/**` also matches its directory. Matching is case-insensitive. |
+| `denied_paths` | string array | Additional glob deny patterns. A pattern without `/` matches any path component; a trailing `/**` also matches its directory. Matching is case-insensitive. Invalid globs exit 3. |
 | `deny_outside_repo` | boolean | Boolean declaration. v1 always requires a path to be inside both an allowed root and the repository; `false` is accepted but does not disable containment. |
 | `network_commands` | string array | Additional tokens or token phrases to reject. Built-in program basenames and subcommand rules are always enforced. |
 | `required_session_files` | string array | Repository-relative files required by `session`, in addition to `.aegis/project.json`. Absolute paths and `..` are policy errors. |
 | `bash_allowlist` | string array | Optional exact Bash command allow-list, default `[]`. Bash is denied unless the command token list exactly equals an entry; no prefix or fnmatch matching. |
 
 Built-in secret patterns are always enforced in addition to
-`denied_paths`: `.env*`, `.ssh/**`,
-`.aws/**`, `.gnupg/**`, `.git-credentials`,
+`denied_paths`: `.env`, `.env.*`, `.envrc`, `.envrc.*`,
+`.ssh/**`, `.aws/**`, `.gnupg/**`, `.git-credentials`,
 `id_rsa*`, `*.pem`, `*.key`,
 `secrets/**` and `credentials*`. Built-in network rules are always
 enforced in addition to `network_commands`: the program basenames
@@ -138,7 +139,8 @@ python -m unittest discover -s tools/aegis_guard/tests -v
 The suite is standard library only and makes no network call. It covers Bash
 default-deny and exact allowlist matching, shell syntax and wrapper denial,
 backslash/quote/dollar escapes and concatenation, redirects and parentheses,
-non-adjacent subcommands, and the path/session rules. One Windows-only fixture
+non-adjacent subcommands, every built-in secret pattern including `.envrc`,
+invalid `denied_paths` globs, and the path/session rules. One Windows-only fixture
 creates a junction with `cmd /c mklink /J` to prove the escape is denied. The
 guard itself imports no `subprocess`, `socket` or HTTP client.
 
