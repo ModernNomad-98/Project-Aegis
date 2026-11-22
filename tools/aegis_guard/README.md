@@ -172,7 +172,8 @@ or `python script.py` can still run arbitrary or network code, and an
 allowlisted name can resolve to a different binary. Builds require an external
 OS or container sandbox. This is L2 only: a local policy check, not
 containment. It is one policy layer, useful only when an adapter invokes it and
-blocks on 10, 3, 2 and every other non-zero result. Policy-file protection is
-path-based after symlink resolution and case-folding; a pre-existing hard link
-at a different path is not recognized as the same file. Host status and evidence
+blocks on 10, 3, 2 and every other non-zero result. Policy-file protection uses
+the resolved case-folded path and the file's st_dev/st_ino identity; a
+pre-existing hard link at a different path is denied. Residual short-name/path
+alias risks require the external sandbox. Host status and evidence
 are in the [user guide](../../docs/aegis-enforcement/README.md).
