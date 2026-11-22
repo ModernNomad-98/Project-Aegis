@@ -1,0 +1,2 @@
+Synthetic example artifact for Aegis Run Record v1.
+Not evidence about any application.
