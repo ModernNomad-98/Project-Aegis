@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aegis.invalid/schemas/aegis.policy/1.json",
+  "title": "Aegis policy v1",
+  "description": "Policy for Aegis Guard v1 (schema aegis.policy/1). All core fields are required; bash_allowlist is optional and defaults to [] and unknown fields are rejected. Aegis Guard reads this policy but does not install a host hook or enforce it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "allowed_tools",
+    "denied_tools",
+    "allowed_roots",
+    "denied_paths",
+    "deny_outside_repo",
+    "network_commands",
+    "required_session_files"
+  ],
+  "properties": {
+    "schema": {
+      "description": "Policy format identifier. Must be exactly aegis.policy/1.",
+      "const": "aegis.policy/1"
+    },
+    "allowed_tools": {
+      "description": "Exact, case-sensitive tool allow-list. A tool not named here is denied. An empty list denies every tool.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "denied_tools": {
+      "description": "Exact, case-sensitive tool deny-list. A deny here wins over allowed_tools.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "allowed_roots": {
+      "description": "Path roots that may contain a path, file_path or notebook_path argument. Relative entries resolve against the repository; absolute entries are used as written. An empty list denies every path argument. Repository containment is always required in addition to an allowed root.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "denied_paths": {
+      "description": "Additional glob patterns for denied paths. A pattern without a slash matches any path component; a pattern ending in /** also matches its directory; matching is case-insensitive. Built-in secret patterns are always enforced in addition to this list.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "deny_outside_repo": {
+      "description": "Boolean policy declaration. v1 always requires a path argument to resolve inside both allowed_roots and the repository; false is accepted but does not disable repository containment.",
+      "type": "boolean"
+    },
+    "network_commands": {
+      "description": "Additional network command tokens to reject in a command argument. Matching uses shlex tokenization; built-in program basenames and the git/npm/npx/pip/pip3/uv subcommand rules are always enforced, and shell syntax, shell wrappers, and backslash/quote/dollar escapes are always denied.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "required_session_files": {
+      "description": "Repository-relative files that must exist for the session command, in addition to .aegis/project.json. Entries must not be absolute or contain '..'.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "bash_allowlist": {
+      "description": "Optional exact Bash command allow-list, default []. Bash is denied unless the command tokenizes (shlex.split(posix=False)) to exactly the same token list as one entry. No prefix or fnmatch matching. Shell and network heuristics can still deny an allowlisted command.",
+      "type": "array",
+      "default": [],
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}
