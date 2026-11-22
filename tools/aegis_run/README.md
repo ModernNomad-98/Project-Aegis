@@ -34,8 +34,8 @@ is passed.
 enforce it with a standard-library schema-lite validator (no `jsonschema`
 dependency). The checks include required fields, `additionalProperties: false`,
 enums, RFC3339 UTC `Z` timestamps, SHA-256 patterns, artifact kind values,
-non-empty limitations for export/verify, a final outcome, and `path` null only
-when `external` is true. A missing schema fails closed with `SCHEMA_MISSING` and
+at least one event and non-empty limitations for export/verify, a final
+outcome, and `path` null only when `external` is true. A missing schema fails closed with `SCHEMA_MISSING` and
 exit 1; an unparsable schema fails with `SCHEMA_INVALID`.
 
 ## Layout

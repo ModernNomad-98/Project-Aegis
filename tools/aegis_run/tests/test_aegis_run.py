@@ -171,7 +171,7 @@ class RunRecordTest(unittest.TestCase):
 
     def test_init_refuses_to_overwrite(self) -> None:
         self.init()
-        code, _out, _err = run_cli(
+        code, out, err = run_cli(
             "init",
             "--dir",
             str(self.run_dir),
@@ -183,6 +183,25 @@ class RunRecordTest(unittest.TestCase):
             "host-b",
         )
         self.assertEqual(code, 1)
+        self.assertIn("refusing to overwrite", err)
+        self.assertNotIn("Traceback", out + err)
+
+    def test_init_rejects_record_file_as_directory_cleanly(self) -> None:
+        self.init()
+        code, out, err = run_cli(
+            "init",
+            "--dir",
+            str(self.record_path),
+            "--app",
+            "other",
+            "--aegis-commit",
+            COMMIT,
+            "--host",
+            "host-b",
+        )
+        self.assertEqual(code, 1)
+        self.assertIn("not a directory", err)
+        self.assertNotIn("Traceback", out + err)
 
     def test_version_flag(self) -> None:
         code, out, _err = run_cli("--version")
@@ -294,6 +313,7 @@ class RunRecordTest(unittest.TestCase):
         self.assertFalse(entry["portable"])
         self.assertTrue(entry["external"])
         self.assertEqual(entry["sha256"], sha256_bytes(b"outside"))
+        self.add_event()
         self.finish()
         self.export()
         record_text = self.record_path.read_text(encoding="utf-8")
@@ -352,6 +372,14 @@ class RunRecordTest(unittest.TestCase):
         self.init()
         code, _out, _err = run_cli("export", "--dir", str(self.run_dir))
         self.assertEqual(code, 1)
+        self.assertFalse(self.manifest_path.exists())
+
+    def test_export_rejects_empty_events(self) -> None:
+        self.init()
+        self.finish()
+        code, _out, err = run_cli("export", "--dir", str(self.run_dir))
+        self.assertEqual(code, 1)
+        self.assertIn("events", err)
         self.assertFalse(self.manifest_path.exists())
 
     # -- verify -------------------------------------------------------
@@ -441,6 +469,29 @@ class RunRecordTest(unittest.TestCase):
         code, out, _err = run_cli("verify", "--dir", str(self.run_dir))
         self.assertEqual(code, 1)
         self.assertIn("symbolic link", out)
+
+    def test_verify_rejects_empty_events(self) -> None:
+        self.export_full()
+        self.rewrite(lambda record: record.update(events=[]))
+        (self.run_dir / "events.jsonl").write_text("", encoding="utf-8")
+        code, out, _err = run_cli("verify", "--dir", str(self.run_dir))
+        self.assertEqual(code, 1)
+        self.assertIn("events", out)
+
+    def test_verify_rejects_missing_events(self) -> None:
+        self.export_full()
+        self.rewrite(lambda record: record.pop("events"))
+        code, out, _err = run_cli("verify", "--dir", str(self.run_dir))
+        self.assertEqual(code, 1)
+        self.assertIn("events", out)
+
+    def test_verify_handles_non_utf8_event_log(self) -> None:
+        self.export_full()
+        (self.run_dir / "events.jsonl").write_bytes(b"\xff\xfe\x00")
+        code, out, err = run_cli("verify", "--dir", str(self.run_dir))
+        self.assertEqual(code, 1)
+        self.assertIn("not valid UTF-8", out)
+        self.assertNotIn("Traceback", out + err)
 
     # -- schema enforcement (D3) -------------------------------------
 

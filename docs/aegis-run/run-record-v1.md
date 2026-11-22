@@ -29,7 +29,7 @@ evidence of what was recorded and copied for that run, nothing wider.
 | `host` | non-empty string | yes | Where the run happened, as supplied and unverified. |
 | `model` | non-empty string or null | yes (key) | Model used by the builder, as supplied and unverified. A supplied value must be non-empty; `null` only when not recorded. |
 | `created_at` | RFC3339 UTC string ending `Z` | yes | Local-clock initialization time. Not trusted time. |
-| `events` | array of Event | yes | Mirrors `events.jsonl` exactly, in append order. |
+| `events` | array of Event | yes | Mirrors `events.jsonl` exactly, in append order. The schema allows an empty list only for a newly initialized run; `export` and `verify` require at least one event. |
 | `artifacts` | array of Artifact | yes | Copied artifacts plus any external references. |
 | `outcome` | `delivered`, `stopped`, `failed`, or `null` | yes | `null` until `finish`. `export` and `verify` require a final value. |
 | `limitations` | array of non-empty strings | yes | Stated scope limits. `init` starts it empty and the schema allows that only before finish (`minItems: 0`); `finish` and `export` require at least one entry, and `verify` rejects an exported record with none. |
@@ -53,6 +53,11 @@ flags are omitted.
 Appending an event writes one line to `events.jsonl` and then appends the same
 object to `events` in the record. `events.jsonl` is never rewritten or
 truncated by the CLI. A mismatch between the two is a verify failure.
+
+The schema permits an empty `events` array only for a run that has just been
+initialized. `export` and `verify` require at least one event, so a publishable
+run needs at least one recorded event. `events.jsonl` must be valid UTF-8; a
+non-UTF-8 log is a verify finding, not a traceback.
 
 ## Artifact fields
 
@@ -117,6 +122,8 @@ The enforcement is a standard-library subset of JSON Schema: `required`,
   `external` and `kind`, no unknown fields, a non-negative integer `bytes`, a
   64-lowercase-hex `sha256`, boolean `portable`/`external`, and a `kind` from
   the fixed enum or null. `path` is null only when `external` is true.
+- `events` may be an empty array only before any event is recorded; `export`
+  and `verify` require at least one event.
 - `limitations` must be an array of non-empty strings; `export` and `verify`
   additionally require at least one entry.
 - `outcome` must be `delivered`, `stopped` or `failed`; the schema permits null,
@@ -146,21 +153,22 @@ identity or quality evidence.
 4. `finish` sets `outcome` and `limitations` once; a second call is an error,
    and at least one non-empty `--limitation` is required.
 5. `export` loads the schema, requires a finished run, validates the record
-   against the schema plus the non-empty `limitations` rule, rewrites the record
-   canonically (atomic replace), then writes the manifest atomically with the
-   hash of those exact record bytes, and prints both paths. A missing schema is
-   `SCHEMA_MISSING`; invalid records are not written. JSON is deterministic:
-   sorted keys, UTF-8, LF, trailing newline.
+   against the schema plus the non-empty `events` and `limitations` rules,
+   rewrites the record canonically (atomic replace), then writes the manifest
+   atomically with the hash of those exact record bytes, and prints both paths.
+   A missing schema is `SCHEMA_MISSING`; invalid records are not written. JSON
+   is deterministic: sorted keys, UTF-8, LF, trailing newline.
 6. `verify` loads the schema (missing => `SCHEMA_MISSING`) and requires
    `aegis-run.json` and `manifest.json`. It enforces the loaded schema, including
    required fields, enums, RFC3339 `Z` timestamps, SHA-256 patterns, the
-   `kind` enum, unknown-property rejection, non-empty limitations, a final
-   outcome and the `path`/`external` rule. It then checks the event log mirror,
-   each copied artifact exists as a regular file inside `D` with the recorded
-   size and SHA-256 and without traversal or symbolic-link escape, and the
-   manifest's schema, record name, `record_sha256` and artifact projection.
-   Every finding is printed as `FAIL: ...` and the exit code is 1. With no
-   findings it prints `PASS` and the scope block below, then exits 0.
+   `kind` enum, unknown-property rejection, at least one event, non-empty
+   limitations, a final outcome and the `path`/`external` rule. It then checks
+   the event log mirror (a non-UTF-8 log is a finding), each copied artifact
+   exists as a regular file inside `D` with the recorded size and SHA-256 and
+   without traversal or symbolic-link escape, and the manifest's schema, record
+   name, `record_sha256` and artifact projection. Every finding is printed as
+   `FAIL: ...` and the exit code is 1. With no findings it prints `PASS` and the
+   scope block below, then exits 0.
 
 Exit codes: `0` success/PASS, `1` record failure or verify FAIL, `2` argument
 or usage failure.

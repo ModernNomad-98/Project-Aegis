@@ -61,7 +61,8 @@
     },
     "events": {
       "type": "array",
-      "description": "Events in append order; mirrors events.jsonl exactly.",
+      "minItems": 0,
+      "description": "Events in append order; mirrors events.jsonl exactly. May be empty only for a newly initialized run; export and verify require at least one event.",
       "items": {
         "$ref": "#/$defs/event"
       }

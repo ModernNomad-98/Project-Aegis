@@ -79,7 +79,10 @@ and run a standard-library schema-lite validator: `required`,
 - `run_id` is a UUID; `app`, `aegis_commit`, `host` and a supplied `model` are
   non-empty strings; `model` may be `null` when omitted.
 - Event `type` and `status` use their fixed v1 enums; `note` and `actor` are
-  string or null; unknown event properties are rejected.
+  string or null; unknown event properties are rejected. The schema permits an
+  empty `events` list only for a just-initialized run; `export` and `verify`
+  require at least one event, so a publishable run needs at least one recorded
+  event.
 - Artifacts require `path`, `source`, `bytes`, `sha256`, `portable`, `external`
   and `kind`; `path` is null only when `external` is true; `kind` is one of
   `log`, `screenshot`, `report`, `note`, `dataset`, `other` or null; `bytes` is
@@ -108,13 +111,14 @@ VERIFIED: record structure and copied artifact hashes only. NOT PROVEN: host/mod
 ```
 
 PASS proves internal consistency at verification time: the record parses, the
-loaded schema accepts it, and it has the required v1 fields, including a
-non-empty `limitations` and a final `outcome`; the manifest's `record_sha256` equals the SHA-256 of the record file
-as it exists then; every copied artifact is a regular file inside the run
-directory, free of traversal and symbolic links, with the recorded size and
-hash; the event log mirrors the record; and the manifest's artifact list matches
-the record's. Any byte change, missing file, absolute path, traversal attempt or
-missing field fails.
+loaded schema accepts it, and it has the required v1 fields, including at least
+one event, non-empty `limitations` and a final `outcome`; the manifest's
+`record_sha256` equals the SHA-256 of the record file as it exists then; every
+copied artifact is a regular file inside the run directory, free of traversal and
+symbolic links, with the recorded size and hash; the event log is valid UTF-8 and
+mirrors the record; and the manifest's artifact list matches the record's. Any
+byte change, missing file, absolute path, traversal attempt, non-UTF-8 event log,
+empty event list or missing field fails.
 
 PASS does not prove who produced the record, that its events are complete or
 truthful, that the host or model values are accurate, that the application works

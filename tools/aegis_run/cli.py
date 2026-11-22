@@ -127,6 +127,8 @@ def _load_schema() -> dict[str, Any]:
         raw = SCHEMA_PATH.read_text(encoding="utf-8")
     except OSError as exc:
         raise SchemaError("SCHEMA_MISSING: %s (%s)" % (SCHEMA_PATH, exc)) from exc
+    except UnicodeDecodeError as exc:
+        raise SchemaError("SCHEMA_INVALID: %s (%s)" % (SCHEMA_PATH, exc)) from exc
     try:
         schema = json.loads(raw)
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -271,6 +273,9 @@ def _schema_findings(schema: dict[str, Any], record: dict[str, Any]) -> list[str
     """Apply schema.json plus the record-level rules the schema cannot express."""
     findings: list[str] = []
     _validate_node(schema, schema, record, "", findings)
+    events = record.get("events")
+    if isinstance(events, list) and not events:
+        findings.append("schema: events must contain at least one entry")
     limitations = record.get("limitations")
     if not isinstance(limitations, list) or not limitations:
         findings.append("schema: limitations must contain at least one entry")
@@ -378,10 +383,15 @@ def cmd_init(args: argparse.Namespace) -> int:
     commit = _require_text(args.aegis_commit, "--aegis-commit")
     host = _require_text(args.host, "--host")
     directory = Path(args.dir).expanduser().resolve()
+    if directory.exists() and not directory.is_dir():
+        raise CliError("run directory path is not a directory: %s" % directory)
     record_path = directory / RECORD_NAME
     if record_path.exists():
         raise CliError("refusing to overwrite existing record: %s" % record_path)
-    directory.mkdir(parents=True, exist_ok=True)
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise CliError("cannot create run directory %s: %s" % (directory, exc)) from exc
     record = {
         "schema": RECORD_SCHEMA,
         "run_id": str(uuid.uuid4()),
@@ -587,8 +597,16 @@ def _check_mirror(directory: Path, events: list[Any], findings: list[str]) -> No
         if events:
             findings.append("missing event log: %s" % EVENTS_NAME)
         return
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        findings.append("event log is not valid UTF-8: %s" % EVENTS_NAME)
+        return
+    except OSError as exc:
+        findings.append("event log is unreadable: %s" % exc)
+        return
     appended = []
-    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+    for number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
             continue
         try:
