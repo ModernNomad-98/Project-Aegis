@@ -43,7 +43,7 @@ Status: fixed for the project; open.
 
 ### U-6 — The agent ignored its own skill-first governance
 Stage: deliver. Category: process.
-What happened: an implementation was started from a brief before the matching Aegis safety skill was read; the feedback log was updated only after the owner prompted.
+What happened: an implementation was started from a brief before the matching library safety skill was read; the feedback log was updated only after the owner prompted.
 Effect: repeated implementation-audit rounds; record lagged the work. Not measured.
 Idea: require the matching skill and source hash in the coordinator brief before build dispatch.
 Status: corrected for the session; open.
@@ -101,9 +101,9 @@ Effect: one extra merger cycle, not measured.
 Idea: require the posted verdict id in the merger brief and post it first.
 Status: fixed for the project; open.
 
-### A-8 — Skill-first sequencing failed while building an Aegis tool
+### A-8 — Skill-first sequencing failed while building a library tool
 Stage: implement. Category: process.
-What happened: the adopt/doctor build began before its matching tool-safety skill was read; six or more D3 rounds then surfaced symlink, wrapper-execution, partial-write, mode and read-only defects that a tool matrix would have front-loaded.
+What happened: the tool build began before its matching safety skill was read; six or more D3 rounds then surfaced symlink, wrapper-execution, partial-write, mode and read-only defects that a tool matrix would have front-loaded.
 Effect: avoidable review cycles; not measured.
 Idea: a machine-checkable "skills applied" row in every build brief; fail the brief if missing.
 Status: open.
