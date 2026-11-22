@@ -107,9 +107,19 @@ and `uv pip install`.
    `--cwd` (default: the repository), then require the result inside
    both the repository and an allowed root. Symlinks and junctions are resolved
    before containment, so an escape is denied. Case is folded for Windows
-   containment.
-4. Reject a built-in secret path or a `denied_paths` match.
-5. For a `command` argument, first deny shell syntax: `;`,
+   containment. `Grep` and `Glob` must carry an explicit, non-empty
+   `path`; a missing or empty path is denied, and no repository-root default
+   is applied. The default Claude adapter allow-list does not include either
+   tool; the rule applies when a custom policy enables them.
+4. Always deny a path argument that resolves exactly to the loaded policy
+   file, compared case-insensitively, or whose file identity
+   (`st_dev`, `st_ino`) equals the policy file's identity. The identity check
+   denies a hard link to the policy at another path. This runs before
+   repository and allowed-root containment, so the policy file is protected
+   regardless of where it lives and regardless of `allowed_tools`,
+   `allowed_roots` or `denied_paths`.
+5. Reject a built-in secret path or a `denied_paths` match.
+6. For a `command` argument, first deny shell syntax: `;`,
    `&`, `|`, `<`, `>`, `(`,
    `)`, `$(`, backtick or newline. Then deny backslash,
    single quote, double quote or dollar sign. This blocks `g\it`,
@@ -117,7 +127,7 @@ and `uv pip install`.
    Windows backslash paths or quoted arguments are denied; use
    `Read`/`Write` path arguments for paths. Commands that
    pass are tokenized with `shlex.split(posix=False)`.
-6. For Bash, the allowlist is the primary gate: allow only when the command
+7. For Bash, the allowlist is the primary gate: allow only when the command
    token list exactly equals an entry in `bash_allowlist`. A missing
    or empty allowlist denies every Bash command; no prefix or fnmatch matching
    is used. Shell/network heuristics remain defense-in-depth and can deny an
@@ -128,7 +138,12 @@ external OS or container sandbox. This is **L2 only**: a local policy check,
 not containment.
 
 Only top-level argument keys are inspected. A tool that carries a path or
-command in a nested structure is not path-checked by this version.
+command in a nested structure is not path-checked by this version. For
+`Grep` and `Glob`, the named `path` is checked, not the files a recursive
+search would reach: an explicit path that is the repository root or an ancestor
+of a denied directory can still traverse denied descendants. The guard does not
+enumerate results or inspect `pattern`/`glob` content. This residual
+parent-path traversal is reported, not addressed by a heuristic.
 
 ## Tests
 
@@ -140,7 +155,9 @@ The suite is standard library only and makes no network call. It covers Bash
 default-deny and exact allowlist matching, shell syntax and wrapper denial,
 backslash/quote/dollar escapes and concatenation, redirects and parentheses,
 non-adjacent subcommands, every built-in secret pattern including `.envrc`,
-invalid `denied_paths` globs, and the path/session rules. One Windows-only fixture
+invalid `denied_paths` globs, and the path/session rules. The Claude
+adapter suite additionally covers the explicit-path requirement for `Grep` and
+`Glob`. One Windows-only fixture
 creates a junction with `cmd /c mklink /J` to prove the escape is denied. The
 guard itself imports no `subprocess`, `socket` or HTTP client.
 
@@ -155,5 +172,7 @@ or `python script.py` can still run arbitrary or network code, and an
 allowlisted name can resolve to a different binary. Builds require an external
 OS or container sandbox. This is L2 only: a local policy check, not
 containment. It is one policy layer, useful only when an adapter invokes it and
-blocks on 10, 3, 2 and every other non-zero result. Host status and evidence are
-in the [user guide](../../docs/aegis-enforcement/README.md).
+blocks on 10, 3, 2 and every other non-zero result. Policy-file protection is
+path-based after symlink resolution and case-folding; a pre-existing hard link
+at a different path is not recognized as the same file. Host status and evidence
+are in the [user guide](../../docs/aegis-enforcement/README.md).

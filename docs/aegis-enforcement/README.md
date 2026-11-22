@@ -3,8 +3,9 @@
 This page documents Aegis Guard v1, a local policy check for coding-agent tool
 calls, and the current, deliberately narrow host status for enforcement work.
 
-**No hooks are installed by this repository or by this change. No enforcement
-claim is made.** Aegis Guard is a command that returns a decision. It does not
+**This repository ships no installed host hooks. The Claude adapter installs
+repository-local hooks only into a repository you name, and no enforcement claim
+is made.** Aegis Guard is a command that returns a decision. It does not
 intercept a host's tool calls by itself, does not install a plugin, extension,
 settings file, wrapper or host hook, and does not provide an operating-system
 sandbox.
@@ -179,6 +180,21 @@ For `path`, `file_path` and `notebook_path`:
 - UNC paths (`\\server\share`), device paths
   (`\\.\` and `\\?\`) and drive-relative paths
   (`C:foo`) are denied, as are reserved device names.
+- A path that resolves exactly to the loaded policy file is always denied,
+  compared case-insensitively, before repository or allowed-root containment.
+  A path whose file identity (`st_dev`, `st_ino`) matches the policy file is
+  also denied, which catches a hard link to the policy at another path. The
+  policy file is therefore protected wherever it lives, regardless of
+  `allowed_tools`, `allowed_roots` or `denied_paths`.
+- `Grep` and `Glob` must supply an explicit, non-empty `path`. A missing
+  path is denied; no repository-root default is applied. The supplied path is
+  checked by the same containment and deny rules. Only that path is checked:
+  an explicit root or ancestor of a denied directory can still let a recursive
+  search reach denied descendants, because the guard does not enumerate results
+  or inspect `pattern`/`glob` content. This residual parent-path traversal
+  is reported, not addressed by a heuristic. The default Claude adapter does
+  not allow `Grep` or `Glob`; this rule applies only to a custom policy that
+  enables them.
 - The resolved path must be inside the repository **and** an allowed root.
   `allowed_roots` alone is not sufficient; repository containment
   cannot be disabled.
@@ -209,28 +225,31 @@ documented in [Aegis Adopt](../aegis-adopt/README.md).
 ## Host status matrix
 
 The versions below are the recorded target matrix for this work. Aegis Guard
-does not detect host versions, and no host was executed to produce this table.
-The status is a statement about available evidence and permitted reliance, not
-a claim that the host is configured or protected.
+does not detect host versions. The Claude CLI row is based on a live
+disposable-repository run on 2026-11-22; the other rows are target versions
+that were not executed for this evidence. The status is a statement about
+available evidence and permitted reliance, not a claim that the host is
+configured or protected.
 
 | Host | Version | Status | Plain-language meaning | Evidence basis |
 | --- | --- | --- | --- | --- |
-| Claude CLI | 2.1.311 | candidate | The next integration candidate; not installed as a hook here and not validated for this work. | No hook installed and no pre-tool event captured. Candidate only. |
+| Claude CLI | 2.1.311 | L2 tool gate; L1 UNRUN | The PreToolUse tool gate blocked a protected Write and a Bash call. The SessionStart hook exited 2, but the session continued, so the L1 session gate is not achieved. | Live disposable-repo run on Windows, 2026-11-22: Write to the policy path and Bash were denied by the hook; SessionStart exit 2 did not block. |
 | Claude VS Code | 2.1.330 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Codex CLI | 0.149.1 | external containment required | Do not rely on a host hook; run the host inside an OS or container sandbox. | No tested pre-tool hook in this change; external containment is the boundary. |
 | Codex VS Code | 26.1117.41037 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Cursor | 3.24.18 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Gemini | not installed | blocked | No installed host and no test path; do not claim support. | Not installed; no run or test possible. |
 
-Exact labels: Claude CLI 2.1.311 (candidate), Claude VS Code 2.1.330
-(unqualified), Codex CLI 0.149.1 (external containment required), Codex VS Code
-26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini (blocked; not
-installed).
+Exact labels: Claude CLI 2.1.311 (L2 tool gate; L1 UNRUN), Claude VS Code
+2.1.330 (unqualified), Codex CLI 0.149.1 (external containment required), Codex
+VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini
+(blocked; not installed).
 
 ### Status definitions
 
-- **candidate**: the host is the next integration candidate. No hook is
-  installed and no pre-tool interception test exists in this change.
+- **L2 tool gate; L1 UNRUN**: the PreToolUse hook blocked tool calls on the
+  observed host, but the SessionStart hook did not block the session. Only the
+  per-tool layer is effective; do not claim a session gate.
 - **unqualified**: no Aegis-specific hook, interception test or containment
   evidence. It must not be described as protected or enforced.
 - **external containment required**: a host hook is not the boundary. Run the
@@ -240,11 +259,13 @@ installed).
 
 ## No hooks installed
 
-This repository installs no Claude CLI, Claude VS Code, Codex CLI, Codex VS
-Code, Cursor, Gemini, shell, Git or package-manager hook. It writes no host
-settings, plugin, extension or wrapper. The matrix records status, not an
-installed integration. Installing a hook would be a separate, reviewed change
-with its own evidence.
+This source repository ships no Claude CLI, Claude VS Code, Codex CLI, Codex VS
+Code, Cursor, Gemini, shell, Git or package-manager hook, and it installs no
+global or user-level settings. The Claude CLI evidence comes from the
+repository-local adapter installed only in a disposable repository, not in this
+source checkout. The matrix records observed status, not a source-checkout
+installation. Installing a hook elsewhere is a separate change with its own
+evidence.
 
 ## No enforcement claim
 
@@ -260,8 +281,9 @@ container containment where the matrix says it is required.
 
 ```bash
 python -m unittest discover -s tools/aegis_guard/tests -v
+python -m unittest discover -s tools/aegis_claude/tests -v
 python -m json.tool tools/aegis_guard/policy.schema.json
-python scripts/ci/check-markdown-links.py docs/aegis-enforcement/README.md tools/aegis_guard/README.md
+python scripts/ci/check-markdown-links.py docs/aegis-enforcement/README.md tools/aegis_guard/README.md docs/aegis-claude/README.md tools/aegis_claude/README.md
 ```
 
 The test suite covers allow/deny decisions, fail-closed unlisted tools, Bash
@@ -272,12 +294,14 @@ UNC/device/drive-relative paths, symlink or junction escape, every built-in
 secret pattern and network rule, non-adjacent git/npm/npx/pip/pip3/uv
 subcommands, shell metacharacters, redirects, parentheses, shell wrappers,
 backslash/quote/dollar escapes, quote and variable concatenation, and the
-session marker and required files. It makes no network call. The guard imports
-no `subprocess`, `socket` or HTTP client; the only `subprocess` use is a
-Windows-only `mklink /J` test fixture for the junction case.
+session marker and required files. The adapter suite adds install/uninstall,
+hook mapping, protected-path, and non-default policy-path cases. Neither suite
+makes a network call. The guard imports no `subprocess`, `socket` or HTTP
+client; the only `subprocess` use is a Windows-only `mklink /J` test fixture
+for the junction case.
 
 ## Provenance
 
-Drafted by DeepSeek (DeepSeek Harness) on 2026-11-22. Host version values are
-the supplied matrix, not a live detection result. No host was executed for this
-document.
+Drafted by DeepSeek (DeepSeek Harness) on 2026-11-22. Claude CLI 2.1.311 was
+executed live on Windows for the L2/L1 evidence; the other host version values
+are the supplied matrix, not a live detection result.

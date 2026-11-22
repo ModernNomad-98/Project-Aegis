@@ -94,6 +94,7 @@ DEFAULT_DENIED_PATHS = (
     "**/credentials*",
 )
 PATH_ARG_KEYS = ("path", "file_path", "notebook_path")
+PATH_REQUIRED_TOOLS = frozenset({"Grep", "Glob"})
 REQUIRED_POLICY_FIELDS = (
     "schema",
     "allowed_tools",
@@ -652,8 +653,46 @@ def _bash_allowlisted(policy: Policy, tokens: list[str]) -> bool:
     return False
 
 
+def _path_identity(path: Path) -> str:
+    """A resolved, case-folded comparison key for one path.
+
+    The policy file itself must stay protected on every platform, so this uses
+    case-folding in addition to the host's path folding. False positives on a
+    case-sensitive filesystem are preferred to a denial bypass.
+    """
+
+    try:
+        resolved = path.resolve(strict=False)
+    except (OSError, RuntimeError, ValueError):
+        resolved = path
+    return os.path.normcase(os.fspath(resolved)).casefold()
+
+
+def _file_identity(path: Path) -> tuple[int, int] | None:
+    """Return (st_dev, st_ino) for an existing file, or None.
+
+    This catches a hard link to the policy file at a different path. A zero
+    inode is treated as unavailable so filesystems that do not expose stable
+    identities cannot make unrelated files compare equal.
+    """
+
+    try:
+        status = path.stat()
+    except (OSError, ValueError):
+        return None
+    if status.st_ino == 0:
+        return None
+    return (int(status.st_dev), int(status.st_ino))
+
+
 def _path_problem(
-    policy: Policy, repo: Path, cwd: Path, raw: str, key: str
+    policy: Policy,
+    repo: Path,
+    cwd: Path,
+    raw: str,
+    key: str,
+    protected_policy: Path,
+    protected_identity: tuple[int, int] | None,
 ) -> str | None:
     if NUL in raw:
         raise UsageError(f"argument '{key}' must not contain NUL")
@@ -662,6 +701,11 @@ def _path_problem(
     if _has_traversal(raw):
         return f"path traversal rejected for {key}: {raw}"
     target = _resolve_target(cwd, raw)
+    if _path_identity(target) == _path_identity(protected_policy) or (
+        protected_identity is not None
+        and _file_identity(target) == protected_identity
+    ):
+        return f"policy file is protected from {key}: {raw}"
     if not _is_within(target, repo):
         return f"path outside repository for {key}: {raw}"
     roots = tuple(_resolve_target(repo, root) for root in policy.allowed_roots)
@@ -685,6 +729,11 @@ def evaluate_check(
 
     repo_root = _resolve_repository(repo)
     cwd_root = _resolve_cwd(os.fspath(cwd) if cwd is not None else None, repo_root)
+    try:
+        protected_policy = Path(policy.path).resolve(strict=False)
+    except (OSError, RuntimeError, ValueError):
+        protected_policy = Path(policy.path)
+    protected_identity = _file_identity(protected_policy)
     if type(tool) is not str or not tool.strip():
         raise UsageError("--tool must be a non-empty string")
     if type(args) is not dict:
@@ -697,13 +746,36 @@ def evaluate_check(
             "deny", f"tool '{tool}' is not in allowed_tools", policy.sha256
         )
 
+    if tool in PATH_REQUIRED_TOOLS:
+        if "path" not in args or args["path"] is None:
+            return Decision(
+                "deny",
+                f"{tool} requires an explicit path; repository-root search "
+                "is not allowed",
+                policy.sha256,
+            )
+        if type(args["path"]) is str and args["path"] == "":
+            return Decision(
+                "deny",
+                f"{tool} requires a non-empty explicit path",
+                policy.sha256,
+            )
+
     for key in PATH_ARG_KEYS:
         if key not in args:
             continue
         raw = args[key]
         if type(raw) is not str or raw == "":
             raise UsageError(f"argument '{key}' must be a non-empty string")
-        problem = _path_problem(policy, repo_root, cwd_root, raw, key)
+        problem = _path_problem(
+            policy,
+            repo_root,
+            cwd_root,
+            raw,
+            key,
+            protected_policy,
+            protected_identity,
+        )
         if problem is not None:
             return Decision("deny", problem, policy.sha256)
 
