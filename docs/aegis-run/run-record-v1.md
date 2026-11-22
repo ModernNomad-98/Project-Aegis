@@ -190,7 +190,10 @@ identity or quality evidence.
    Every row ID is validated against `^SS-[0-9]{3,}$` before anything is written,
    so a bad ID cannot produce a partial import. `watch` polls that file and calls
    the same sync; `install-hook` writes `<repo>/.git/hooks/post-commit` (outside
-   `D`) and `uninstall-hook` removes only a hook carrying the aegis_run marker.
+   `D`), whose body changes directory to the named Aegis checkout and runs
+   `python -P -m tools.aegis_run` so a repository-local `tools/` package cannot
+   shadow it, and `uninstall-hook` removes only a hook carrying the aegis_run
+   marker.
 6. `export` loads the schema, requires a finished run, validates the record
    against the schema plus the non-empty `events` and `limitations` rules,
    rewrites the record canonically (atomic replace), then writes the manifest

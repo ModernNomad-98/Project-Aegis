@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -619,6 +620,20 @@ THIRD_ROW = (
 )
 
 
+def find_posix_sh() -> str | None:
+    """Locate a POSIX sh so a written hook can actually be executed."""
+    candidate = shutil.which("sh")
+    if candidate:
+        return candidate
+    git = shutil.which("git")
+    if git:
+        root = Path(git).resolve().parent.parent
+        for relative in ("bin/sh.exe", "usr/bin/sh.exe", "bin/sh", "usr/bin/sh"):
+            if (root / relative).is_file():
+                return str(root / relative)
+    return None
+
+
 def state_document(rows) -> str:
     body = "".join("| %s | %s | %s | %s |\n" % row for row in rows)
     return (
@@ -1118,7 +1133,10 @@ class ProjectStateSyncTest(unittest.TestCase):
         text = hook.read_text(encoding="utf-8")
         self.assertTrue(text.startswith("#!/bin/sh"))
         self.assertIn(cli.HOOK_MARKER, text)
-        self.assertIn("python -m tools.aegis_run sync", text)
+        self.assertIn("python -P -m tools.aegis_run sync", text)
+        self.assertIn(
+            "cd '%s' || exit 0" % Path(REPO_ROOT).as_posix(), text
+        )
         self.assertIn(Path(self.run_dir).resolve().as_posix(), text)
         self.assertIn(Path(self.state_path).resolve().as_posix(), text)
         self.assertIn("PYTHONPATH=", text)
@@ -1188,6 +1206,44 @@ class ProjectStateSyncTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("not a git repository", err)
         self.assertNotIn("Traceback", out + err)
+
+    def test_hook_ignores_a_repo_local_shadow_tools_package(self) -> None:
+        sh = find_posix_sh()
+        if sh is None:
+            self.skipTest("POSIX sh unavailable on this host")
+        self.init()
+        self.write_state(SNAPSHOT_ROWS)
+        repo = self.make_repo()
+        shadow = repo / "tools" / "aegis_run"
+        shadow.mkdir(parents=True)
+        (repo / "tools" / "__init__.py").write_text("", encoding="utf-8")
+        (shadow / "__init__.py").write_text("", encoding="utf-8")
+        (shadow / "__main__.py").write_text(
+            "print('SHADOW-EXECUTED')\n", encoding="utf-8"
+        )
+        code, _out, err = self.install(repo)
+        self.assertEqual(code, 0, err)
+        environment = dict(os.environ)
+        environment.pop("PYTHONPATH", None)
+        environment["PATH"] = (
+            str(Path(sys.executable).parent) + os.pathsep + environment.get("PATH", "")
+        )
+        result = subprocess.run(
+            [sh, str(self.hook_path(repo))],
+            cwd=str(repo),
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=180,
+        )
+        combined = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 0, combined)
+        self.assertNotIn("SHADOW-EXECUTED", combined)
+        self.assertEqual(len(self.events()), 2)
+        self.assertEqual(
+            [event["source_id"] for event in self.events()], ["SS-001", "SS-002"]
+        )
 
     def test_hook_script_carries_no_network_commands(self) -> None:
         self.init()

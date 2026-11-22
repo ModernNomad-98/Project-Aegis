@@ -67,8 +67,19 @@ local process: Ctrl-C exits 0, nothing is daemonized, and it makes no network
 call. Start it once per session, or use the hook below.
 
 `install-hook` writes `<repo>/.git/hooks/post-commit` (POSIX `sh`, absolute
-paths, no secrets) that runs `PYTHONPATH=<aegis-path> python -m
-tools.aegis_run sync ...` and exits 0 even when sync reports nothing, so a
+shell-quoted paths, no secrets). The hook body is:
+
+```sh
+cd '<aegis-path>' || exit 0
+PYTHONPATH='<aegis-path>' python -P -m tools.aegis_run sync --dir '<D>' --project-state '<state>' || :
+exit 0
+```
+
+The `cd` plus `-P` matter: git runs hooks from the repository root, where a
+repository-local `tools/` package would otherwise shadow the checkout on
+`sys.path` and the hook would run the wrong code. `-P` stops the working
+directory being prepended, so `tools` resolves through `PYTHONPATH` to the
+named Aegis checkout. The hook exits 0 even when sync reports nothing, so a
 commit is never blocked. It refuses to replace a hook it did not write; with
 `--force` it backs the old hook up to `post-commit.bak-<timestamp>`.
 `uninstall-hook` removes only a hook carrying the marker and reports it; a hook

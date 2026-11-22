@@ -802,9 +802,10 @@ def _hook_script(directory: Path, state: Path, aegis_path: Path) -> str:
         "# %s" % HOOK_MARKER,
         "# Installed by 'python -m tools.aegis_run install-hook'; local files only.",
         "# Remove with 'python -m tools.aegis_run uninstall-hook --repo <repo>'.",
+        "cd %s || exit 0" % _sh_quote(_hook_path(aegis_path)),
         "PYTHONPATH=%s" % _sh_quote(_hook_path(aegis_path)),
         "export PYTHONPATH",
-        "python -m tools.aegis_run sync --dir %s --project-state %s || :"
+        "python -P -m tools.aegis_run sync --dir %s --project-state %s || :"
         % (_sh_quote(_hook_path(directory)), _sh_quote(_hook_path(state))),
         "printf '%s\\n' 'aegis_run: project-state sync after commit (local only;"
         " the commit is never blocked)'",

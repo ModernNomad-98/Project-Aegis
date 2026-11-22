@@ -54,7 +54,7 @@ the tool version.
 | `export --dir D` | Loads `schema.json`, validates the record against it, then atomically writes the canonical record and `manifest.json` with `record_sha256` and the artifact projection. | Requires a finished run with a non-empty `limitations` list and a final outcome. A missing schema fails as `SCHEMA_MISSING`; schema violations fail before any file is written. Deterministic JSON: sorted keys, UTF-8, LF. |
 | `sync --dir D --project-state PATH [--dry-run]` | Imports each unseen row of the project-state `## State snapshots` table as an event keyed by `source_id`. | On a first import every row except the latest becomes `type: note` ("historical snapshot SS-xxx imported from project-state; not observed live") and only the latest becomes `type: stage`, `status: started`; later rows are `type: stage`, `status: started`. Idempotent by `source_id`; never writes `passed` and never infers one. Holds `D/sync.lock` (single writer). `--dry-run` prints and writes nothing. A missing file, section, header or a bad row exits 1 cleanly. |
 | `watch --dir D --project-state PATH [--interval 30]` | Polls the project-state mtime and runs the same `sync` on change, printing one line per change. | Local foreground process, minimum 5-second interval, Ctrl-C exits 0. Not daemonized, no network. |
-| `install-hook --repo PATH --dir D --project-state PATH --aegis-path PATH [--force]` | Writes `PATH/.git/hooks/post-commit` (POSIX `sh`) that runs `PYTHONPATH=<aegis-path> python -m tools.aegis_run sync ...`, prints one notice and exits 0. | Absolute paths, shell-quoted, no secrets. Refuses a hook it did not write; `--force` backs it up to `post-commit.bak-<timestamp>`. |
+| `install-hook --repo PATH --dir D --project-state PATH --aegis-path PATH [--force]` | Writes `PATH/.git/hooks/post-commit` (POSIX `sh`) that `cd`s to the Aegis checkout, runs `PYTHONPATH=<aegis-path> python -P -m tools.aegis_run sync ...`, prints one notice and exits 0. | Absolute shell-quoted paths, no secrets. `cd` + `-P` stop a repository-local `tools/` package shadowing the checkout. Refuses a hook it did not write; `--force` backs it up to `post-commit.bak-<timestamp>`. |
 | `uninstall-hook --repo PATH` | Removes the `post-commit` hook only when it carries the aegis_run marker. | Reports what it did; a foreign hook or no hook is exit 1. |
 | `verify --dir D [--allow-external]` | Loads `schema.json` and enforces it: required fields, enums, RFC3339 UTC `Z` timestamps, SHA-256 patterns, artifact kind enum, unknown-property rejection, non-empty limitations, final outcome and the `path`/`external` rule. It then recomputes every copied artifact hash and size, recomputes `record_sha256`, and checks the event mirror, manifest projection, traversal and symlink escape. | Fail closed: a missing schema is `SCHEMA_MISSING` and any finding exits 1. External entries are `EXTERNAL/UNVERIFIED` and fail verification unless `--allow-external` is explicit. |
 
@@ -99,6 +99,9 @@ What the import means, and what it does not:
 - **One file outside the run directory.** `install-hook` writes
   `<repo>/.git/hooks/post-commit`; `uninstall-hook` removes only a hook that
   carries the aegis_run marker. Nothing else is written outside `D`.
+- **The hook runs the named checkout, not the repository.** It changes directory
+  to `--aegis-path` and runs `python -P`, so a repository-local `tools/`
+  package cannot shadow the Aegis `tools.aegis_run`.
 
 ## Files in a run directory
 
