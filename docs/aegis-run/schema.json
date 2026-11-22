@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aegis.run-record/1",
+  "title": "Aegis Run Record v1",
+  "description": "Record of one Aegis-assisted application run. verify can check record structure and copied artifact hashes offline; the record does not prove host or model identity, app correctness, security, delivery or universal support.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "run_id",
+    "app",
+    "aegis_commit",
+    "host",
+    "model",
+    "created_at",
+    "events",
+    "artifacts",
+    "outcome",
+    "limitations"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aegis.run-record/1",
+      "description": "Record format and version."
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "format": "uuid",
+      "description": "UUID4 generated at init; identifies this run attempt."
+    },
+    "app": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Application name supplied by the operator."
+    },
+    "aegis_commit": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exact Aegis commit asserted for the run; not validated."
+    },
+    "host": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Host where the run happened."
+    },
+    "model": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "description": "Model used by the builder; a non-empty string when supplied, null only when not supplied. Required key, unverified value."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$",
+      "description": "UTC initialization time from the local clock."
+    },
+    "owner": {
+      "type": ["string", "null"],
+      "description": "Accountable owner; optional key, null when not supplied."
+    },
+    "events": {
+      "type": "array",
+      "description": "Events in append order; mirrors events.jsonl exactly.",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Artifacts: copied entries plus any external references.",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "outcome": {
+      "enum": ["delivered", "stopped", "failed", null],
+      "description": "Run outcome; null only before finish. export and verify require a non-null value."
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 0,
+      "description": "Stated scope limits; empty only before finish. finish and export require at least one, and verify rejects an exported record with none.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ts", "type", "stage", "status", "note", "actor"],
+      "properties": {
+        "ts": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$",
+          "description": "UTC append time from the local clock."
+        },
+        "type": {
+          "enum": ["stage", "approval", "note"]
+        },
+        "stage": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Operator-supplied stage label."
+        },
+        "status": {
+          "enum": ["started", "passed", "failed", "skipped"]
+        },
+        "note": {
+          "type": ["string", "null"],
+          "description": "Free text, exported verbatim."
+        },
+        "actor": {
+          "type": ["string", "null"],
+          "description": "Actor supplied by the operator."
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "source", "bytes", "sha256", "portable", "external", "kind"],
+      "properties": {
+        "path": {
+          "type": ["string", "null"],
+          "description": "Copied artifact path relative to the run directory, with / separators; null only when external is true. Never absolute."
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Original file reference, relative to the run directory and slash-normalized; may begin with ../. Never absolute."
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Exact file size at recording time."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the exact file bytes."
+        },
+        "portable": {
+          "type": "boolean",
+          "description": "True only for a copied artifact with a relative path."
+        },
+        "external": {
+          "type": "boolean",
+          "description": "True for a reference that was hashed but not copied; verify treats it as EXTERNAL/UNVERIFIED."
+        },
+        "kind": {
+          "type": ["string", "null"],
+          "enum": ["log", "screenshot", "report", "note", "dataset", "other", null],
+          "description": "Operator label from the fixed v1 kind set; null when not supplied."
+        }
+      }
+    }
+  }
+}

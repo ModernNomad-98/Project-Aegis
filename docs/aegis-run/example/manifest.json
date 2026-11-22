@@ -1,0 +1,15 @@
+{
+  "artifacts": [
+    {
+      "bytes": 88,
+      "external": false,
+      "path": "artifacts/fe8c9ac79886-sample.txt",
+      "portable": true,
+      "sha256": "fe8c9ac7988688b53d44e981d5c9724c9f5aa587c7fce73a97e869a9bc091ca7",
+      "source": "evidence/sample.txt"
+    }
+  ],
+  "record": "aegis-run.json",
+  "record_sha256": "c0ffeb93c3ecdefc055c2a6e4730311bdb3e602a670aff46109d83939ae06cd1",
+  "schema": "aegis.run-manifest/1"
+}

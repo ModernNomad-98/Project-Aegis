@@ -1,0 +1,2 @@
+{"actor": "example-builder", "note": "synthetic example only", "stage": "1", "status": "started", "ts": "2026-11-22T07:25:29Z", "type": "stage"}
+{"actor": "example-builder", "note": "synthetic example only", "stage": "1", "status": "passed", "ts": "2026-11-22T07:25:30Z", "type": "stage"}

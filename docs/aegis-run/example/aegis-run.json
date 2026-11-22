@@ -1,0 +1,44 @@
+{
+  "aegis_commit": "47cc2f9e",
+  "app": "example-app",
+  "artifacts": [
+    {
+      "bytes": 88,
+      "external": false,
+      "kind": "note",
+      "path": "artifacts/fe8c9ac79886-sample.txt",
+      "portable": true,
+      "sha256": "fe8c9ac7988688b53d44e981d5c9724c9f5aa587c7fce73a97e869a9bc091ca7",
+      "source": "evidence/sample.txt"
+    }
+  ],
+  "created_at": "2026-11-22T07:25:29Z",
+  "events": [
+    {
+      "actor": "example-builder",
+      "note": "synthetic example only",
+      "stage": "1",
+      "status": "started",
+      "ts": "2026-11-22T07:25:29Z",
+      "type": "stage"
+    },
+    {
+      "actor": "example-builder",
+      "note": "synthetic example only",
+      "stage": "1",
+      "status": "passed",
+      "ts": "2026-11-22T07:25:30Z",
+      "type": "stage"
+    }
+  ],
+  "host": "example-host",
+  "limitations": [
+    "synthetic example; not a real app run",
+    "no claim about any application"
+  ],
+  "model": "example-model",
+  "outcome": "delivered",
+  "owner": "example-owner",
+  "run_id": "96d97326-58b6-4856-86dd-0d9674b05173",
+  "schema": "aegis.run-record/1"
+}
