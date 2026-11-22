@@ -43,6 +43,13 @@ Effect: an extra owner message.
 Idea for Aegis: treat a report-without-work as a process failure when the queue is not empty.
 Status: fixed for this project by the continuing goal. Open for Aegis.
 
+### U-6 — The agent ignored its own skill-first governance (2026-11-22)
+In the owner's words: "that's bad, you ignored your own governance"
+What happened: while building the adopt/doctor tool, the coordinator started from a brief instead of loading the matching Aegis skills first; `agent-tool-safety-guard` was only read after the owner challenged the process, and the feedback log was not updated until prompted. Record: this chat; the safety review then found repeated wrapper/path/atomicity defects.
+Effect: avoidable D3 review cycles; the governance record lagged the implementation. Not measured.
+Idea for Aegis: a machine-checkable coordinator brief that records the matching skill and source hash before a builder is dispatched, and blocks the dispatch when the field is absent.
+Status: corrected for this session (skill read, log updated); open for Aegis.
+
 ## Part B — noticed by the build session (not owner-confirmed)
 
 ### B-001 — Scaffold generator was deferred after being scoped (2026-11-20)
@@ -65,7 +72,7 @@ In the owner's words: no direct quote; the owner supplied the exception in U-3.
 What happened: PR #1185's advisory gate returned REQUIRED_INPUT_UNAVAILABLE because its B/D/E stage declarations have no pinned machine-readable form (scripts/ci/aegis_verdict_gate_fetch.py line 116, as reported by the build session). Record: PR #1185 comments.
 Effect: an owner exception for a docs-only merge.
 Idea for Aegis: publish the stage-declaration format, or record the gate as intentionally not wired and neutral.
-Status: fixed for this project by exception; open for Aegis.
+Status: fixed for Aegis by PR #1199 (merge 47cc2f9e, 2026-11-21): the gate is skipped by default, publishes no status/evidence and is never required. Option C remains deferred pending T6/T24/T23/T4.
 
 ### B-004 — Final reviewers could not verify checks or hashes (2026-11-20)
 In the owner's words: no direct quote.
@@ -80,7 +87,7 @@ In the owner's words: no direct quote.
 What happened: the ancestry, evidence-pack and scaffold suites (13+16+19 = 48 tests, as reported by the build session) run only by hand; wiring them needs a protected .github change and an owner grant. Record: docs/offline-ci.md and the three test files.
 Effect: the tests can be skipped without a red check.
 Idea for Aegis: a small workflow step for these suites.
-Status: open for Aegis (needs a grant).
+Status: fixed by PR #1198 (merge b659e670): local-tool-tests runs the 48 ancestry/evidence-pack/scaffold tests. The newer run-record/adopt suites remain unwired (B-011).
 
 ### B-006 — Docs claimed no repository script executes while one is imported (2026-11-20)
 In the owner's words: no direct quote.
@@ -95,6 +102,37 @@ What happened: on the tracker PR #1186 the Stage F review returned ACCEPT but th
 Effect: one extra merger cycle. Not measured.
 Idea for Aegis: the merger brief must require the posted Stage F comment id, and the coordinator must post the verdict before dispatching it.
 Status: fixed for this project (verdict posted, then merged 46bd3b40). Open for Aegis.
+
+### B-008 — Sessions started without knowing Aegis existed (2026-11-21)
+In the owner's words: "I just had two instance that didn't even know aegis existed anywhere."
+What happened: two build sessions began in repositories that use Aegis but did not load it; the exact hosts/directories were not supplied. Aegis has no adoption marker or startup doctor; discovery relies on the host reading AGENTS.md/CLAUDE.md or .claude/skills.
+Effect: sessions miss the skills entirely; not measured.
+Idea for Aegis: one-command adopt writes .aegis/project.json, START-HERE, wrappers and startup blocks; doctor verifies them. Hosts that ignore startup files remain instruction-only, not enforced.
+Status: in progress; adopt/doctor implementation exists in a lane but is not merged. Open for Aegis.
+
+### B-009 — Run Record needed a human command at every stage (2026-11-22)
+In the owner's words: "that's manual as fuck, who's going to remember that at every stage?"
+What happened: v1 required init/event/artifact/finish/export by hand at each stage. Fixed by sync/watch/hook (PR #1202, merge 3d4f779d) and the project-orchestrator call after confirmed project-state writes (PR #1203, merge 5aec94e3), with an explicit UNRUN fallback.
+Effect: no per-stage human command when the tool is discoverable; a stock consumer still needs adopt.
+Status: fixed for the source workflow; consumer adoption remains open (B-008).
+
+### B-010 — Docs advertised a Python command that could not run (2026-11-22)
+What happened: docs and the Stage B brief said `python -P -m tools.aegis_run` without PYTHONPATH; -P suppresses the current directory, so it raised ModuleNotFoundError. The correct forms are `python -m` from the Aegis root or `PYTHONPATH=<checkout> python -P -m` from elsewhere.
+Effect: a reviewer following the docs would report the tool missing.
+Idea for Aegis: test every documented invocation in the docs check.
+Status: corrected in docs and skill text; regression test not yet wired.
+
+### B-011 — New run-record/adopt self-tests are not CI-wired (2026-11-22)
+What happened: the 72 run-record tests and 50 adopt tests run only by hand; CI's local-tool-tests covers the older 48. Wiring them needs a protected .github change and an owner grant.
+Effect: regressions in the new tools can merge without a red check.
+Idea for Aegis: add one local-tool-tests step for tools/aegis_run and tools/aegis_adopt.
+Status: open for Aegis (needs a grant).
+
+### B-012 — Skill-first sequencing failed while building an Aegis tool (2026-11-22)
+What happened: the adopt/doctor build was dispatched before its matching safety skill was read; the PR evidence table was not assembled at plan time; the feedback log was updated only after an owner prompt. D3 then surfaced symlink escape, wrapper execution, partial-write, mode-loss and read-only-target defects one at a time.
+Effect: at least six extra D3 rounds that a tool-safety matrix would have front-loaded. Not measured.
+Idea for Aegis: require a "skills applied" table before build dispatch and fail the brief if the matching skill row is missing; keep the feedback log as a running log, not a closing artifact.
+Status: open for Aegis; the adopt PR is paused until the skill evidence is attached.
 
 ## Worked well
 
