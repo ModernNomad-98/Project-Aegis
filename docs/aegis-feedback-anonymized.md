@@ -41,6 +41,13 @@ Effect: an extra owner message.
 Idea: treat a report-without-work as a process failure when the queue is not empty.
 Status: fixed for the project; open.
 
+### U-6 — The agent ignored its own skill-first governance
+Stage: deliver. Category: process.
+What happened: an implementation was started from a brief before the matching Aegis safety skill was read; the feedback log was updated only after the owner prompted.
+Effect: repeated implementation-audit rounds; record lagged the work. Not measured.
+Idea: require the matching skill and source hash in the coordinator brief before build dispatch.
+Status: corrected for the session; open.
+
 ## Build-session noticed
 
 ### A-1 — A scoped item was deferred instead of built
@@ -109,3 +116,10 @@ What happened: the merges in this batch carry verdicts naming the exact head and
 Effect: each of these merges can be re-checked from its receipt.
 Idea: keep this default.
 Status: working.
+
+### A-3 — Skill-first sequencing failed while building an Aegis tool
+Stage: implement. Category: process.
+What happened: the adopt/doctor build began before its matching tool-safety skill was read; six or more D3 rounds then surfaced symlink, wrapper-execution, partial-write, mode and read-only defects that a tool matrix would have front-loaded.
+Effect: avoidable review cycles; not measured.
+Idea: a machine-checkable "skills applied" row in every build brief; fail the brief if missing.
+Status: open.
