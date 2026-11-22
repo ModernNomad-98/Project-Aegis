@@ -15,17 +15,28 @@ verify and export load docs/aegis-run/schema.json from the repository root and
 enforce it with a standard-library schema-lite validator. A missing schema
 fails closed as SCHEMA_MISSING. Exit codes: 0 success/PASS, 1 record failure or
 verify FAIL (fail closed), 2 argument/usage failure.
+
+Automatic project-state sync: sync imports unseen rows of the
+"## State snapshots" table in a project-state file, keyed by the row ID in
+source_id. On a first import every row except the latest becomes a type=note
+event, and only the latest becomes type=stage, status=started; later rows become
+type=stage, status=started. It never infers a passed stage. Sync holds an
+exclusive lock file in the run directory, so concurrent runs cannot duplicate an
+import. watch polls that file locally and repeats the same sync on change.
+install-hook and uninstall-hook manage a local post-commit hook that calls sync.
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import json
 import os
 import re
 import shutil
 import sys
+import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,6 +52,14 @@ SCHEMA_PATH = Path(__file__).resolve().parents[2] / "docs" / "aegis-run" / "sche
 EVENT_TYPES = ("stage", "approval", "note")
 EVENT_STATUSES = ("started", "passed", "failed", "skipped")
 OUTCOMES = ("delivered", "stopped", "failed")
+SYNC_ACTOR = "project-state-sync"
+SNAPSHOT_HEADING = "State snapshots"
+MIN_WATCH_INTERVAL = 5
+HOOK_NAME = "post-commit"
+HOOK_MARKER = "AEGIS_RUN_HOOK_MARKER: aegis_run post-commit v1"
+LOCK_NAME = "sync.lock"
+LOCK_TIMEOUT_SECONDS = 5.0
+LOCK_STALE_SECONDS = 120.0
 ARTIFACT_KINDS = ("log", "screenshot", "report", "note", "dataset", "other")
 MANIFEST_ARTIFACT_FIELDS = ("path", "source", "bytes", "sha256", "portable", "external")
 SCOPE = (
@@ -49,6 +68,7 @@ SCOPE = (
     "universal support."
 )
 RFC3339_Z = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
+SNAPSHOT_ID = re.compile(r"^SS-[0-9]{3,}$")
 
 EXIT_OK = 0
 EXIT_FAIL = 1
@@ -276,6 +296,21 @@ def _schema_findings(schema: dict[str, Any], record: dict[str, Any]) -> list[str
     events = record.get("events")
     if isinstance(events, list) and not events:
         findings.append("schema: events must contain at least one entry")
+    if isinstance(events, list):
+        for index, event in enumerate(events):
+            if not isinstance(event, dict) or "source_id" not in event:
+                continue
+            if event.get("actor") != SYNC_ACTOR:
+                findings.append(
+                    "schema: events/%d/source_id is only allowed on %s events"
+                    % (index, SYNC_ACTOR)
+                )
+            value = event.get("source_id")
+            if not isinstance(value, str) or not value.strip():
+                findings.append(
+                    "schema: events/%d/source_id must be a non-empty "
+                    "string matching ^SS-[0-9]{3,}$" % index
+                )
     limitations = record.get("limitations")
     if not isinstance(limitations, list) or not limitations:
         findings.append("schema: limitations must contain at least one entry")
@@ -412,6 +447,17 @@ def cmd_init(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _append_event(directory: Path, record: dict[str, Any], event: dict[str, Any]) -> None:
+    """Append one event to events.jsonl, then mirror it into the record."""
+    line = json.dumps(event, sort_keys=True, ensure_ascii=False)
+    with open(directory / EVENTS_NAME, "a", encoding="utf-8", newline="\n") as handle:
+        handle.write(line + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    record["events"].append(event)
+    _save_record(directory, record)
+
+
 def cmd_event(args: argparse.Namespace) -> int:
     directory = _run_dir(args.dir)
     record = _read_record(directory)
@@ -424,17 +470,415 @@ def cmd_event(args: argparse.Namespace) -> int:
         "note": args.note,
         "actor": args.actor,
     }
-    line = json.dumps(event, sort_keys=True, ensure_ascii=False)
-    with open(directory / EVENTS_NAME, "a", encoding="utf-8", newline="\n") as handle:
-        handle.write(line + "\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-    record["events"].append(event)
-    _save_record(directory, record)
+    _append_event(directory, record, event)
     print(
         "event %d: %s %s/%s"
         % (len(record["events"]), event["type"], event["stage"], event["status"])
     )
+    return EXIT_OK
+
+
+# -- project-state sync and watch --------------------------------------
+
+
+def _read_text(path: Path, label: str) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise CliError("%s is not valid UTF-8: %s" % (label, exc)) from exc
+    except OSError as exc:
+        raise CliError("cannot read %s %s: %s" % (label, path, exc)) from exc
+
+
+def _project_state_file(value: str) -> Path:
+    path = Path(value).expanduser().resolve()
+    if not path.is_file():
+        raise CliError("project-state file not found: %s" % path)
+    return path
+
+
+def _snapshot_section(text: str) -> list[str]:
+    """Return the lines of the first '## State snapshots ...' section."""
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if not line.startswith("## "):
+            continue
+        title = line[3:].strip()
+        if title == SNAPSHOT_HEADING or title.startswith(SNAPSHOT_HEADING + " "):
+            start = index + 1
+            break
+    if start is None:
+        raise CliError("project-state has no '## %s' section" % SNAPSHOT_HEADING)
+    for index in range(start, len(lines)):
+        if lines[index].startswith("## "):
+            return lines[start:index]
+    return lines[start:]
+
+
+def _row_cells(line: str) -> list[str]:
+    body = line.strip()
+    if body.startswith("|"):
+        body = body[1:]
+    if body.endswith("|"):
+        body = body[:-1]
+    return [cell.strip() for cell in body.split("|")]
+
+
+_PLACEHOLDER_CELLS = {"", "-", "\u2014", "(none yet)", "(none recorded)"}
+
+
+def _valid_snapshot_date(value: str) -> bool:
+    token = value.split()[0] if value.split() else ""
+    try:
+        datetime.strptime(token, "%Y-%m-%d")
+    except ValueError:
+        return False
+    return True
+
+
+def _parse_snapshots(text: str) -> list[dict[str, str]]:
+    """Parse the State snapshots table; a structural problem is a CliError."""
+    rows = [line for line in _snapshot_section(text) if line.strip().startswith("|")]
+    if not rows:
+        raise CliError("project-state has no State snapshots table")
+    header = _row_cells(rows[0])
+    if (
+        len(header) != 4
+        or header[0].lower() != "id"
+        or "date" not in header[1].lower()
+        or "stage" not in header[2].lower()
+        or "next" not in header[3].lower()
+    ):
+        raise CliError(
+            "project-state State snapshots header must be "
+            "'| ID | Date | Current stage | Next recommended action |'"
+        )
+    if len(rows) < 2 or not all(
+        re.fullmatch(r":?-{2,}:?", cell) for cell in _row_cells(rows[1])
+    ):
+        raise CliError("project-state State snapshots table has no header separator row")
+    snapshots: list[dict[str, str]] = []
+    for line in rows[2:]:
+        cells = _row_cells(line)
+        if all(cell in _PLACEHOLDER_CELLS for cell in cells):
+            continue
+        if len(cells) != 4:
+            raise CliError(
+                "malformed State snapshots row (expected 4 columns): %s" % line.strip()
+            )
+        snapshot_id, date, stage, next_action = cells
+        if snapshot_id in _PLACEHOLDER_CELLS:
+            raise CliError(
+                "malformed State snapshots row (missing ID): %s" % line.strip()
+            )
+        if not SNAPSHOT_ID.match(snapshot_id):
+            raise CliError(
+                "malformed State snapshots row (ID must match SS- followed by at "
+                "least three digits): %s" % line.strip()
+            )
+        if not _valid_snapshot_date(date):
+            raise CliError(
+                "malformed State snapshots row %s (missing or invalid date)" % snapshot_id
+            )
+        if not stage:
+            raise CliError("malformed State snapshots row %s (missing stage)" % snapshot_id)
+        if not next_action:
+            raise CliError(
+                "malformed State snapshots row %s (missing next action)" % snapshot_id
+            )
+        snapshots.append(
+            {"id": snapshot_id, "date": date, "stage": stage, "next": next_action}
+        )
+    return snapshots
+
+
+def _historical_event(snapshot: dict[str, str]) -> dict[str, Any]:
+    """An older snapshot from the first import: history, never a live claim."""
+    return {
+        "ts": _now(),
+        "type": "note",
+        "stage": snapshot["stage"],
+        "status": "started",
+        "note": "historical snapshot %s imported from project-state; not observed live"
+        % snapshot["id"],
+        "actor": SYNC_ACTOR,
+        "source_id": snapshot["id"],
+    }
+
+
+def _current_event(snapshot: dict[str, str]) -> dict[str, Any]:
+    """The latest snapshot: the current stage, started, never passed."""
+    return {
+        "ts": _now(),
+        "type": "stage",
+        "stage": snapshot["stage"],
+        "status": "started",
+        "note": "Imported from project-state; next: %s" % snapshot["next"],
+        "actor": SYNC_ACTOR,
+        "source_id": snapshot["id"],
+    }
+
+
+def _imported_snapshot_ids(events: Any) -> set[str]:
+    if not isinstance(events, list):
+        return set()
+    return {
+        event["source_id"]
+        for event in events
+        if isinstance(event, dict) and isinstance(event.get("source_id"), str)
+    }
+
+
+def _lock_is_stale(path: Path) -> bool:
+    try:
+        return (time.time() - path.stat().st_mtime) > LOCK_STALE_SECONDS
+    except OSError:
+        return False
+
+
+@contextlib.contextmanager
+def _sync_lock(directory: Path):
+    """Exclusive single-writer lock in the run directory; always released."""
+    path = directory / LOCK_NAME
+    deadline = time.monotonic() + LOCK_TIMEOUT_SECONDS
+    while True:
+        try:
+            handle = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            if _lock_is_stale(path):
+                raise CliError(
+                    "stale sync lock older than %ds: %s "
+                    "(remove it manually if no sync is running)"
+                    % (LOCK_STALE_SECONDS, path)
+                )
+            if time.monotonic() >= deadline:
+                raise CliError(
+                    "sync lock is held (another sync is running?): %s" % path
+                )
+            time.sleep(0.05)
+            continue
+        except OSError as exc:
+            raise CliError("cannot create sync lock %s: %s" % (path, exc)) from exc
+        try:
+            os.write(handle, ("%d\n" % os.getpid()).encode("ascii"))
+        finally:
+            os.close(handle)
+        break
+    try:
+        yield
+    finally:
+        try:
+            path.unlink()
+        except OSError:
+            pass
+
+
+def _pending_snapshots(
+    record: dict[str, Any], snapshots: list[dict[str, str]]
+) -> tuple[list[dict[str, str]], bool]:
+    """Return unseen snapshots and whether this is the first import."""
+    seen = _imported_snapshot_ids(record.get("events"))
+    first_import = not seen
+    pending: list[dict[str, str]] = []
+    for snapshot in snapshots:
+        if snapshot["id"] in seen:
+            continue
+        seen.add(snapshot["id"])
+        pending.append(snapshot)
+    return pending, first_import
+
+
+def _apply_sync(
+    directory: Path,
+    record: dict[str, Any],
+    snapshots: list[dict[str, str]],
+    dry_run: bool,
+) -> tuple[int, int]:
+    pending, first_import = _pending_snapshots(record, snapshots)
+    for index, snapshot in enumerate(pending):
+        historical = first_import and index < len(pending) - 1
+        kind = "note" if historical else "stage"
+        if dry_run:
+            print(
+                "dry-run: would append %s type=%s status=started stage=%s"
+                % (snapshot["id"], kind, snapshot["stage"])
+            )
+            continue
+        event = _historical_event(snapshot) if historical else _current_event(snapshot)
+        _append_event(directory, record, event)
+        print(
+            "appended %s type=%s status=started stage=%s"
+            % (snapshot["id"], event["type"], snapshot["stage"])
+        )
+    return len(pending), len(snapshots) - len(pending)
+
+
+def cmd_sync(args: argparse.Namespace) -> int:
+    directory = _run_dir(args.dir)
+    state = _project_state_file(args.project_state)
+    snapshots = _parse_snapshots(_read_text(state, "project-state"))
+    if getattr(args, "dry_run", False):
+        pending, already = _apply_sync(directory, _read_record(directory), snapshots, True)
+        print(
+            "sync: dry-run, %d would append, %d already imported, 0 written"
+            % (pending, already)
+        )
+        return EXIT_OK
+    with _sync_lock(directory):
+        pending, already = _apply_sync(directory, _read_record(directory), snapshots, False)
+    print("sync: %d new, %d already imported" % (pending, already))
+    return EXIT_OK
+
+
+def _watch_interval(value: float) -> float:
+    if value < MIN_WATCH_INTERVAL:
+        print(
+            "note: --interval %g is below the %ds minimum; using %ds"
+            % (value, MIN_WATCH_INTERVAL, MIN_WATCH_INTERVAL),
+            file=sys.stderr,
+        )
+        return float(MIN_WATCH_INTERVAL)
+    return float(value)
+
+
+def _mtime(path: Path) -> float | None:
+    try:
+        return path.stat().st_mtime
+    except OSError:
+        return None
+
+
+def _watch_once(args: argparse.Namespace, last: float | None) -> tuple[float | None, bool]:
+    """Poll the mtime once and run the same sync on change. Not a loop."""
+    state = Path(args.project_state).expanduser().resolve()
+    current = _mtime(state)
+    if current is None:
+        if last is not None:
+            print("warning: project-state is not readable: %s" % state, file=sys.stderr)
+        return current, False
+    if last is not None and current == last:
+        return last, False
+    print("changed: %s" % state)
+    cmd_sync(args)
+    return current, True
+
+
+def cmd_watch(args: argparse.Namespace) -> int:
+    interval = _watch_interval(args.interval)
+    state = _project_state_file(args.project_state)
+    _run_dir(args.dir)
+    print("watching %s every %gs (Ctrl-C to stop); local only" % (state, interval))
+    last = _mtime(state)
+    try:
+        while True:
+            time.sleep(interval)
+            try:
+                last, _ran = _watch_once(args, last)
+            except CliError as exc:
+                print("error: %s" % exc, file=sys.stderr)
+    except KeyboardInterrupt:
+        print("")
+        print("watch stopped")
+        return EXIT_OK
+
+
+# -- post-commit hook --------------------------------------------------
+
+
+def _sh_quote(value: object) -> str:
+    """Quote one value for POSIX sh; single quotes, safely escaped."""
+    return "'" + str(value).replace("'", "'\\''") + "'"
+
+
+def _hook_path(path: Path) -> str:
+    """Absolute path with forward slashes, so a POSIX sh hook reads it literally."""
+    return Path(path).as_posix()
+
+
+def _hook_script(directory: Path, state: Path, aegis_path: Path) -> str:
+    lines = [
+        "#!/bin/sh",
+        "# %s" % HOOK_MARKER,
+        "# Installed by 'python -m tools.aegis_run install-hook'; local files only.",
+        "# Remove with 'python -m tools.aegis_run uninstall-hook --repo <repo>'.",
+        "PYTHONPATH=%s" % _sh_quote(_hook_path(aegis_path)),
+        "export PYTHONPATH",
+        "python -m tools.aegis_run sync --dir %s --project-state %s || :"
+        % (_sh_quote(_hook_path(directory)), _sh_quote(_hook_path(state))),
+        "printf '%s\\n' 'aegis_run: project-state sync after commit (local only;"
+        " the commit is never blocked)'",
+        "exit 0",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _hook_owns(path: Path) -> bool:
+    try:
+        return HOOK_MARKER in _read_text(path, "hook")
+    except CliError:
+        return False
+
+
+def _git_repo(value: str) -> Path:
+    repo = Path(value).expanduser().resolve()
+    if not repo.is_dir():
+        raise CliError("repository not found: %s" % repo)
+    if not (repo / ".git").exists():
+        raise CliError("not a git repository (no .git): %s" % repo)
+    return repo
+
+
+def cmd_install_hook(args: argparse.Namespace) -> int:
+    repo = _git_repo(args.repo)
+    directory = _run_dir(args.dir)
+    state = _project_state_file(args.project_state)
+    aegis_path = Path(args.aegis_path).expanduser().resolve()
+    if not aegis_path.is_dir():
+        raise CliError("Aegis checkout not found: %s" % aegis_path)
+    hooks = repo / ".git" / "hooks"
+    try:
+        hooks.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise CliError("cannot create hooks directory %s: %s" % (hooks, exc)) from exc
+    hook = hooks / HOOK_NAME
+    if hook.exists() and not _hook_owns(hook):
+        if not args.force:
+            raise CliError(
+                "refusing to replace a post-commit hook aegis_run did not write: %s "
+                "(rerun with --force to back it up)" % hook
+            )
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        backup = hook.with_name("%s.bak-%s" % (HOOK_NAME, stamp))
+        try:
+            os.replace(hook, backup)
+        except OSError as exc:
+            raise CliError("cannot back up existing hook %s: %s" % (hook, exc)) from exc
+        print("backed up existing hook: %s" % backup)
+    _atomic_write(hook, _hook_script(directory, state, aegis_path))
+    try:
+        os.chmod(hook, 0o755)
+    except OSError as exc:
+        raise CliError("hook written but not made executable: %s (%s)" % (hook, exc)) from exc
+    print("installed post-commit hook: %s" % hook)
+    return EXIT_OK
+
+
+def cmd_uninstall_hook(args: argparse.Namespace) -> int:
+    repo = _git_repo(args.repo)
+    hook = repo / ".git" / "hooks" / HOOK_NAME
+    if not hook.exists():
+        raise CliError("no post-commit hook installed: %s" % hook)
+    if not _hook_owns(hook):
+        raise CliError(
+            "refusing to remove a post-commit hook aegis_run did not write: %s" % hook
+        )
+    try:
+        hook.unlink()
+    except OSError as exc:
+        raise CliError("cannot remove hook %s: %s" % (hook, exc)) from exc
+    print("removed post-commit hook: %s" % hook)
     return EXIT_OK
 
 
@@ -764,6 +1208,52 @@ def build_parser() -> argparse.ArgumentParser:
         help="accept EXTERNAL/UNVERIFIED references instead of failing",
     )
     verify.set_defaults(func=cmd_verify)
+
+    sync = subparsers.add_parser(
+        "sync", help="import new project-state snapshots as started stage events"
+    )
+    sync.add_argument("--dir", required=True, metavar="D")
+    sync.add_argument("--project-state", required=True, metavar="PATH")
+    sync.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print what would append and write nothing",
+    )
+    sync.set_defaults(func=cmd_sync)
+
+    watch = subparsers.add_parser(
+        "watch", help="poll project-state and run sync on change (Ctrl-C stops)"
+    )
+    watch.add_argument("--dir", required=True, metavar="D")
+    watch.add_argument("--project-state", required=True, metavar="PATH")
+    watch.add_argument(
+        "--interval",
+        type=float,
+        default=30.0,
+        metavar="SECONDS",
+        help="poll interval in seconds (minimum 5)",
+    )
+    watch.set_defaults(func=cmd_watch)
+
+    install = subparsers.add_parser(
+        "install-hook", help="install a post-commit hook that runs sync"
+    )
+    install.add_argument("--repo", required=True, metavar="PATH")
+    install.add_argument("--dir", required=True, metavar="D")
+    install.add_argument("--project-state", required=True, metavar="PATH")
+    install.add_argument("--aegis-path", required=True, metavar="PATH")
+    install.add_argument(
+        "--force",
+        action="store_true",
+        help="back up and replace an existing post-commit hook",
+    )
+    install.set_defaults(func=cmd_install_hook)
+
+    uninstall = subparsers.add_parser(
+        "uninstall-hook", help="remove the post-commit hook aegis_run installed"
+    )
+    uninstall.add_argument("--repo", required=True, metavar="PATH")
+    uninstall.set_defaults(func=cmd_uninstall_hook)
     return parser
 
 

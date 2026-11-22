@@ -52,10 +52,53 @@ the tool version.
 | `artifact --dir D --path FILE [--kind log\|screenshot\|report\|note\|dataset\|other] [--external]` | Hashes one existing file (SHA-256 and byte size). By default it also copies the file to `D/artifacts/<sha256-prefix>-<basename>`. | Default entries are `portable: true` with relative `path` and `source`; never absolute. `--external` stores a reference without copying: `external: true`, `portable: false`, `path: null`. Re-recording the same `source` replaces its entry. `kind` is optional and must be one of the listed values. |
 | `finish --dir D --outcome delivered\|stopped\|failed --limitation TEXT` | Records the outcome and at least one limitation; repeat `--limitation`. | Once per run; blank limitations are rejected; export requires it. |
 | `export --dir D` | Loads `schema.json`, validates the record against it, then atomically writes the canonical record and `manifest.json` with `record_sha256` and the artifact projection. | Requires a finished run with a non-empty `limitations` list and a final outcome. A missing schema fails as `SCHEMA_MISSING`; schema violations fail before any file is written. Deterministic JSON: sorted keys, UTF-8, LF. |
+| `sync --dir D --project-state PATH [--dry-run]` | Imports each unseen row of the project-state `## State snapshots` table as an event keyed by `source_id`. | On a first import every row except the latest becomes `type: note` ("historical snapshot SS-xxx imported from project-state; not observed live") and only the latest becomes `type: stage`, `status: started`; later rows are `type: stage`, `status: started`. Idempotent by `source_id`; never writes `passed` and never infers one. Holds `D/sync.lock` (single writer). `--dry-run` prints and writes nothing. A missing file, section, header or a bad row exits 1 cleanly. |
+| `watch --dir D --project-state PATH [--interval 30]` | Polls the project-state mtime and runs the same `sync` on change, printing one line per change. | Local foreground process, minimum 5-second interval, Ctrl-C exits 0. Not daemonized, no network. |
+| `install-hook --repo PATH --dir D --project-state PATH --aegis-path PATH [--force]` | Writes `PATH/.git/hooks/post-commit` (POSIX `sh`) that runs `PYTHONPATH=<aegis-path> python -m tools.aegis_run sync ...`, prints one notice and exits 0. | Absolute paths, shell-quoted, no secrets. Refuses a hook it did not write; `--force` backs it up to `post-commit.bak-<timestamp>`. |
+| `uninstall-hook --repo PATH` | Removes the `post-commit` hook only when it carries the aegis_run marker. | Reports what it did; a foreign hook or no hook is exit 1. |
 | `verify --dir D [--allow-external]` | Loads `schema.json` and enforces it: required fields, enums, RFC3339 UTC `Z` timestamps, SHA-256 patterns, artifact kind enum, unknown-property rejection, non-empty limitations, final outcome and the `path`/`external` rule. It then recomputes every copied artifact hash and size, recomputes `record_sha256`, and checks the event mirror, manifest projection, traversal and symlink escape. | Fail closed: a missing schema is `SCHEMA_MISSING` and any finding exits 1. External entries are `EXTERNAL/UNVERIFIED` and fail verification unless `--allow-external` is explicit. |
 
 Exit codes: `0` success or PASS, `1` record/verify failure, `2` argument or
 usage failure.
+
+## Automatic project-state sync
+
+Writing an event by hand at every stage does not survive a busy day. `sync`
+imports the append-only `## State snapshots` table of `docs/project-state.md`
+instead, so the record follows the project state that already exists.
+
+Wire it up once, with either option:
+
+- **Watch once per session.** `python -m tools.aegis_run watch --dir D
+  --project-state docs/project-state.md` polls locally and syncs on each change.
+- **Run it after every commit.** `python -m tools.aegis_run install-hook --repo .
+  --dir D --project-state docs/project-state.md --aegis-path .` writes a
+  `post-commit` hook that calls `sync`; the same command can be called from CI
+  or a post-commit step directly. `uninstall-hook --repo .` removes it.
+
+What the import means, and what it does not:
+
+- A snapshot row records **the current stage, not completion**. The event is
+  always `status: started`.
+- **No passed inference.** `sync` never writes `passed`, never upgrades a stage,
+  and never treats a later snapshot as proof that an earlier stage finished.
+  Passing a stage is a human or reviewer act recorded with `event`.
+- **History is labelled as history.** On a first import, all rows except the
+  latest become `type: note` events reading "historical snapshot SS-xxx imported
+  from project-state; not observed live". Only the latest row becomes a
+  `type: stage`, `status: started` event. Rows added later become stage events.
+- **Idempotent.** The row ID is stored in the event field `source_id`, so
+  re-running reports `0 new` and appends nothing. `--dry-run` prints what would
+  append and writes nothing.
+- **Single writer.** `sync` takes an exclusive `D/sync.lock`, retried for about
+  five seconds, so two concurrent syncs cannot double-import a row. A lock older
+  than 120 seconds is never removed automatically: sync fails and names the lock
+  path, to be removed by hand only if no sync is running.
+- **Local only.** Neither `sync`, `watch` nor the hook uses the network or
+  credentials, and none of them writes the project-state file.
+- **One file outside the run directory.** `install-hook` writes
+  `<repo>/.git/hooks/post-commit`; `uninstall-hook` removes only a hook that
+  carries the aegis_run marker. Nothing else is written outside `D`.
 
 ## Files in a run directory
 
@@ -65,6 +108,7 @@ usage failure.
 | `events.jsonl` | Append-only event log, one compact JSON object per line; mirrors `events` in the record. |
 | `artifacts/` | Copied artifact bytes, named `<sha256-prefix>-<basename>`. These are the files `verify` re-hashes. |
 | `manifest.json` | `schema: aegis.run-manifest/1`, `record: "aegis-run.json"`, `record_sha256`, and `artifacts` entries of `path`, `source`, `bytes`, `sha256`, `portable`, `external`. Written by `export`. |
+| `sync.lock` | Transient exclusive lock held by `sync` while it reads and appends. Absent between runs; a stale one fails the run and is left for manual removal. |
 
 ## Schema enforcement
 
@@ -79,7 +123,10 @@ and run a standard-library schema-lite validator: `required`,
 - `run_id` is a UUID; `app`, `aegis_commit`, `host` and a supplied `model` are
   non-empty strings; `model` may be `null` when omitted.
 - Event `type` and `status` use their fixed v1 enums; `note` and `actor` are
-  string or null; unknown event properties are rejected. The schema permits an
+  string or null; unknown event properties are rejected. The optional
+  `source_id` is a string (never null or empty), must match `^SS-[0-9]{3,}$`,
+  and is accepted only on events whose `actor` is `project-state-sync`; hand
+  written events omit it. The schema permits an
   empty `events` list only for a just-initialized run; `export` and `verify`
   require at least one event, so a publishable run needs at least one recorded
   event.

@@ -118,6 +118,11 @@
         "actor": {
           "type": ["string", "null"],
           "description": "Actor supplied by the operator."
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^SS-[0-9]{3,}$",
+          "description": "Optional provenance identifier for a project-state sync event: the snapshot row ID, SS- followed by at least three digits. A string, never null. Allowed only on events whose actor is project-state-sync; omitted entirely on events entered by hand. Additive optional field; it changes no required field."
         }
       }
     },
