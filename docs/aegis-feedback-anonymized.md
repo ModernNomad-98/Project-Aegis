@@ -101,6 +101,13 @@ Effect: one extra merger cycle, not measured.
 Idea: require the posted verdict id in the merger brief and post it first.
 Status: fixed for the project; open.
 
+### A-8 — Skill-first sequencing failed while building an Aegis tool
+Stage: implement. Category: process.
+What happened: the adopt/doctor build began before its matching tool-safety skill was read; six or more D3 rounds then surfaced symlink, wrapper-execution, partial-write, mode and read-only defects that a tool matrix would have front-loaded.
+Effect: avoidable review cycles; not measured.
+Idea: a machine-checkable "skills applied" row in every build brief; fail the brief if missing.
+Status: open.
+
 ## Worked well
 
 ### W-1 — Independent audits caught real defects before merge
@@ -117,9 +124,3 @@ Effect: each of these merges can be re-checked from its receipt.
 Idea: keep this default.
 Status: working.
 
-### A-3 — Skill-first sequencing failed while building an Aegis tool
-Stage: implement. Category: process.
-What happened: the adopt/doctor build began before its matching tool-safety skill was read; six or more D3 rounds then surfaced symlink, wrapper-execution, partial-write, mode and read-only defects that a tool matrix would have front-loaded.
-Effect: avoidable review cycles; not measured.
-Idea: a machine-checkable "skills applied" row in every build brief; fail the brief if missing.
-Status: open.
