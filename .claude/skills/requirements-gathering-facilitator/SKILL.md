@@ -108,6 +108,48 @@ present at once. The exact shape of an interactive turn, and the FINAL REQUIREME
 BRIEF that appears only once no spec-blocking question remains, are in Output
 Format.
 
+**First-version scope question.** After every 5th answered discovery question,
+while the first-version scope card is unanswered and the user has named at least
+one capability, that card is the highest-value unanswered item and is the one
+question of the turn. Count every answered discovery question, including an
+answer to the scope question that leaves it undecided; the count does not
+restart. Put the list inside the question text: at most three of the
+capabilities the user has named, in the user's words and in the user's own
+order, so the question stays complete when only the question is displayed. The
+user's own order is the order the user stated if the user stated one, and
+otherwise the order in which the user first named them; do not rank, reorder or
+choose among them, and add none. When the user has named more than three, the
+same question names the others as left for later, so nothing the user named is
+dropped; when the user has named three or fewer, the question has no later part.
+The question offers the two answers for this one target, yes or change it, has
+exactly one question mark and requests nothing else. A yes, or an answer that
+states the first version in the user's own words (any number of capabilities),
+is a user-owned scope decision: return it to the orchestrator's pending-decision
+batch, treat the card as answered, and ask for no further capabilities. If the
+user answers change it without saying what the first version should be, the card
+stays unanswered and the next question is for the same card: it asks which of
+the capabilities the user named the first version should do, naming all of them
+inside the question in the user's own order. An answer that settles the card
+ends feature exploration only; every remaining spec-blocking question is still
+asked, one per turn. If the user is not ready to decide, the card stays
+unanswered, discovery continues, and the scope question is due again after every
+5th answered question until the user answers it; once the card is answered, do
+not ask the scope question again unless the user reopens scope by naming a new
+capability or asking to change the first version. A change to a first version
+that the orchestrator has already recorded as approved is a scope change after
+approval: return it to the orchestrator as that, not as a batch item.
+
+**Held-back ideas.** A capability (something the product would do for its users)
+that the user has not named is never proposed to the user as a question; hold it
+back, and offer the held-back ideas only when the user asks what else the
+product could do. A question that clarifies a capability the user already named
+is still an ordinary discovery question. The held-back rule covers proposed
+features only. It does not limit the Safety area of the elicitation sheet: when
+that area applies, its four questions are asked even though the user has not
+named what they ask about. It does not limit step 4 either: questions about
+non-goals, edge cases, failure expectations, constraints and data handling ask
+what the user needs and are not proposed features.
+
 1. **Restate the ask as a problem, not a solution.** Take the incoming
    request and ask what outcome it's meant to produce. Push the stated
    solution one level up ("you asked for X — what would X let you do
@@ -125,6 +167,8 @@ Format.
    not solving), edge cases, error/failure expectations, and compliance
    or data-handling obligations. Unstated non-goals are where scope
    silently explodes.
+   For a sensitive product, the Safety area of the elicitation sheet applies and
+   its four targets are spec-blocking.
 5. **Define success and its measure.** How will everyone know this
    worked? Elicit the observable outcome and, where possible, a metric —
    without inventing false precision. "Done" and "successful" are
@@ -220,6 +264,13 @@ Known / assumed / unknown clearly separated
 - [ ] A presented build choice explains terms, costs, reasons, pros and cons,
       and a context-based recommendation before one atomic question; it does
       not confuse a choice answer with authority to build.
+- [ ] The first-version scope question was asked after every 5th answered
+      question while its card was unanswered, named at most three capabilities
+      in the user's own order inside the question text with any others left for
+      later, offered yes or change it, and was not repeated once answered; no
+      capability the user had not named was proposed as a question (held-back
+      ideas), while the Safety questions were still asked; for a sensitive
+      product the four Safety targets were treated as spec-blocking.
 
 ## Gotchas
 
@@ -243,6 +294,9 @@ Known / assumed / unknown clearly separated
 - Facilitation is not deciding. When you find yourself picking the
   priority or resolving the trade-off, stop — that's a human owner's
   call to record, not yours to make.
+- Suggesting features is not discovery. Each capability the assistant proposes
+  becomes another question the user must answer, and the first version never
+  closes; hold the idea back until the user asks what else is possible.
 
 ## Stop Conditions
 
