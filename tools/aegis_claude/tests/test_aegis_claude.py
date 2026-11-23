@@ -634,6 +634,62 @@ class HookTests(AdapterTestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "")
 
+    def test_session_start_camel_case_alias(self) -> None:
+        self.prepare()
+        result = self.hook({"hook_event_name": "sessionStart"})
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_pretooluse_camel_case_alias(self) -> None:
+        self.prepare()
+        (self.repo / "src").mkdir()
+        (self.repo / "src" / "app.py").write_text("x = 1\n", encoding="utf-8")
+        result = self.hook(
+            {
+                "hook_event_name": "preToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "src/app.py"},
+                "cwd": str(self.repo),
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        denied = self.hook(
+            {
+                "hook_event_name": "preToolUse",
+                "tool_name": "Bash",
+                "tool_input": {"command": "echo hi"},
+                "cwd": str(self.repo),
+            }
+        )
+        self.assertEqual(denied.returncode, 2, denied.stderr)
+        self.assertIn("blocked", denied.stderr)
+
+    def test_gemini_beforetool_alias_denies_bash(self) -> None:
+        self.prepare()
+        result = self.hook(
+            {
+                "hook_event_name": "BeforeTool",
+                "tool_name": "run_shell_command",
+                "tool_input": {"command": "echo hi"},
+                "cwd": str(self.repo),
+            }
+        )
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("blocked", result.stderr)
+
+    def test_gemini_read_file_maps_to_read(self) -> None:
+        self.prepare()
+        (self.repo / "src").mkdir()
+        (self.repo / "src" / "app.py").write_text("x = 1\n", encoding="utf-8")
+        result = self.hook(
+            {
+                "hook_event_name": "BeforeTool",
+                "tool_name": "read_file",
+                "tool_input": {"file_path": "src/app.py"},
+                "cwd": str(self.repo),
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_session_start_missing_marker(self) -> None:
         self.write_default_policy()
         result = self.hook({"hook_event_name": "SessionStart"})

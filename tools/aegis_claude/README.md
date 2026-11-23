@@ -190,6 +190,21 @@ did not stop that host from starting the session; the session continued without
 gate. Do not rely on <code>SessionStart</code> to prevent a tool call; the
 <code>PreToolUse</code> L2 gate is the effective layer.
 
+Cursor Agent sends the same hook events with camelCase names. The adapter
+accepts <code>preToolUse</code> as an alias for <code>PreToolUse</code> and
+<code>sessionStart</code> for <code>SessionStart</code>, so a Cursor-invoked
+hook reaches the same policy check rather than being rejected as an
+unsupported event. Cursor can omit <code>cwd</code>; the hook then defaults
+to the repository root. An empty or non-string <code>cwd</code> exits 2.
+
+Gemini CLI's <code>gemini hooks migrate --from-claude</code> emits a
+<code>BeforeTool</code> event and Gemini-specific tool names. The adapter maps
+<code>BeforeTool</code> to <code>PreToolUse</code> and maps
+<code>run_shell_command</code>, <code>read_file</code>, <code>write_file</code>,
+<code>replace</code>, <code>glob</code>, <code>search_file_content</code>,
+<code>web_fetch</code> and <code>google_web_search</code> to the canonical Aegis
+tool names before policy evaluation.
+
 ### PreToolUse
 
 The hook runs:
