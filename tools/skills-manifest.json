@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "02bc985996b1964b50430a1bc436826eb36c577b",
+  "source_revision": "322e02e66e245599acfd85c2389b657d349ee50a",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -931,7 +931,7 @@
     {
       "name": "requirements-gathering-facilitator",
       "path": ".claude/skills/requirements-gathering-facilitator/SKILL.md",
-      "sha256": "db5c6795ae85bbf07faa5a791702e76edf09a0305399600f56d34975029b8c37"
+      "sha256": "f60ed8dac29ee95644c2f7b4f8ad566af66abf3244340272ca328b32a47813df"
     },
     {
       "name": "resilience-architecture-reviewer",
