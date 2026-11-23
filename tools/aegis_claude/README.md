@@ -194,8 +194,8 @@ Cursor Agent sends the same hook events with camelCase names. The adapter
 accepts <code>preToolUse</code> as an alias for <code>PreToolUse</code> and
 <code>sessionStart</code> for <code>SessionStart</code>, so a Cursor-invoked
 hook reaches the same policy check rather than being rejected as an
-unsupported event. Cursor can omit <code>cwd</code>; that payload still fails
-closed in the event parser.
+unsupported event. Cursor can omit <code>cwd</code>; the hook then defaults
+to the repository root. An empty or non-string <code>cwd</code> exits 2.
 
 ### PreToolUse
 
