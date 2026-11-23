@@ -231,6 +231,7 @@ def _pre_tool_use(payload: dict[str, Any], repo: Path, policy: Path) -> int:
     tool = payload.get("tool_name")
     if not isinstance(tool, str) or tool.strip() == "":
         raise HookError("hook input field 'tool_name' must be a non-empty string")
+    tool = TOOL_ALIASES.get(tool, tool)
     tool_input = payload.get("tool_input")
     if not isinstance(tool_input, dict):
         raise HookError("hook input field 'tool_input' must be a JSON object")
@@ -246,11 +247,23 @@ def _pre_tool_use(payload: dict[str, Any], repo: Path, policy: Path) -> int:
     return EXIT_BLOCK
 
 
+TOOL_ALIASES = {
+    "run_shell_command": "Bash",
+    "read_file": "Read",
+    "write_file": "Write",
+    "replace": "Edit",
+    "glob": "Glob",
+    "search_file_content": "Grep",
+    "web_fetch": "WebFetch",
+    "google_web_search": "WebSearch",
+}
+
 EVENT_ALIASES = {
     "SessionStart": "SessionStart",
     "sessionStart": "SessionStart",
     "PreToolUse": "PreToolUse",
     "preToolUse": "PreToolUse",
+    "BeforeTool": "PreToolUse",
 }
 
 
