@@ -14,11 +14,13 @@ Bash is denied by default; only exact `bash_allowlist` entries pass. Builds
 require an external OS or container sandbox. This is L2 only: a local policy
 check, not containment.
 
-One containment result is recorded: the
+Two containment results are recorded, both for the container launch only. The
 [Claude Code CLI container profile](L3-claude-container.md) qualifies for L3
-only when the CLI is launched through that container. No other host has
-containment evidence, and no enforcement claim is made for any other launch
-path.
+when the CLI is launched through that container; the
+[Codex CLI container profile](L3-codex-container.md) gives container
+containment with no Aegis tool-policy gate inside it, so its secrets are
+excluded by the mount set rather than by policy. No other host has containment
+evidence, and no enforcement claim is made for any other launch path.
 
 The implementation is [`tools/aegis_guard/cli.py`](../../tools/aegis_guard/cli.py),
 the contract is
@@ -162,8 +164,8 @@ is attempted; quoted text is denied before tokenization. No shell is executed
 and no general shell parser is implemented; false positives are accepted.
 
 **The command scanner is defense-in-depth, not a sandbox.** It is a lexical
-policy check, not process containment. Use an OS or container sandbox where the
-host matrix says external containment is required.
+policy check, not process containment. Use an OS or container sandbox for any
+host the matrix records without containment evidence.
 
 These syntax and heuristic checks run before the Bash allowlist gate. A command
 must pass both; an allowlisted command can still be denied here.
@@ -231,10 +233,11 @@ documented in [Aegis Adopt](../aegis-adopt/README.md).
 ## Host status matrix
 
 The versions below are the recorded target matrix for this work. Aegis Guard
-does not detect host versions. The two Claude Code CLI rows are based on
-live runs on 2026-11-22, one in a disposable repository on Windows and one
-inside the container; the other rows are target versions that were not executed
-for this evidence. The status is a statement about
+does not detect host versions. The two Claude Code CLI rows and the Codex CLI
+container row are based on live runs on 2026-11-22, one Claude run in a
+disposable repository on Windows and two runs inside containers; the other rows
+are target versions that were not executed for this evidence. The status is a
+statement about
 available evidence and permitted reliance, not a claim that the host is
 configured or protected.
 
@@ -243,15 +246,17 @@ configured or protected.
 | Claude CLI | 2.1.311 | L2 tool gate; L1 UNRUN | The PreToolUse tool gate blocked a protected Write and a Bash call. The SessionStart hook exited 2, but the session continued, so the L1 session gate is not achieved. | Live disposable-repo run on Windows, 2026-11-22: Write to the policy path and Bash were denied by the hook; SessionStart exit 2 did not block. |
 | Claude Code CLI, container | 2.1.311 in `aegis-claude-l3:2.1.311-python` | L3 qualified (container launch only) | L3 holds only when the CLI is started through the Aegis container: read-only root, dropped capabilities, non-root, and no route out except an allow-list proxy. Started natively on Windows it is still L2. | Live container run on Windows, 2026-11-22: direct egress was unreachable, the proxy refused a non-allow-listed target, a workspace write succeeded, and a write to `/etc/passwd` was denied; see [the L3 profile](L3-claude-container.md). |
 | Claude VS Code | 2.1.330 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
-| Codex CLI | 0.149.1 | external containment required | Do not rely on a host hook; run the host inside an OS or container sandbox. | No tested pre-tool hook in this change; external containment is the boundary. |
+| Codex CLI | 0.149.1 | unqualified | No hook and no containment evidence for this native version. Running it inside the container profile is a candidate, not a tested run. | No native run and no tested pre-tool hook; the container profile was exercised only on 0.171.0. |
+| Codex CLI, container | 0.171.0 in `aegis-codex-l3:latest` | L3 containment (container launch only; not Aegis tool policy) | L3 holds only when Codex is started through the Aegis container: read-only root, dropped capabilities, non-root, and no route out except an allow-list proxy. Aegis Guard is not wired to Codex, so `.env` and tool denies are not enforced inside it; secrets must be excluded by the mount set. | Live container run on Windows, 2026-11-22: the model call through the proxy succeeded, a workspace write succeeded, a root write was refused, direct egress was unreachable, and the proxy refused a non-allow-listed target; see [the L3 profile](L3-codex-container.md). |
 | Codex VS Code | 26.1117.41037 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Cursor | 3.24.18 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Gemini | not installed | blocked | No installed host and no test path; do not claim support. | Not installed; no run or test possible. |
 
 Exact labels: Claude CLI 2.1.311 (L2 tool gate; L1 UNRUN), Claude Code CLI
 container profile (L3 qualified; container launch only), Claude VS Code
-2.1.330 (unqualified), Codex CLI 0.149.1 (external containment required), Codex
-VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini
+2.1.330 (unqualified), Codex CLI 0.149.1 (unqualified), Codex
+CLI container profile (L3 containment; container launch only, not Aegis tool
+policy), Codex VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini
 (blocked; not installed).
 
 ### Status definitions
@@ -262,11 +267,21 @@ VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini
 - **L3 qualified (container launch only)**: the CLI ran inside a container the
   host cannot escape, and the recorded tests confirm the boundary. The claim
   covers that one launch path; the same CLI started natively is still L2.
+- **L3 containment (container launch only; not Aegis tool policy)**: the CLI
+  ran inside a container with no observed route out. The recorded tests confirm
+  the tool, workspace and network outcomes only: a model call and a workspace
+  write succeeded, a root write was refused by the read-only root, direct egress
+  was unreachable and the proxy refused a non-allow-listed target. Capability
+  dropping, `no-new-privileges`, uid `1000` and the tmpfs mounts are launch
+  flags, not individually probed. Unlike the L3 qualified row, no Aegis
+  tool-policy hook runs inside this container, so tool and secret-path denies
+  are not enforced; the claim covers containment for that launch path only.
 - **unqualified**: no Aegis-specific hook, interception test or containment
   evidence. It must not be described as protected or enforced.
-- **external containment required**: a host hook is not the boundary. Run the
-  host inside an operating-system or container sandbox and treat Aegis Guard as
-  one additional policy check, never as the containment layer.
+- **external containment required**: no row currently carries this status. It
+  records the requirement that a host hook is not the boundary: run such a host
+  inside an operating-system or container sandbox and treat Aegis Guard as one
+  additional policy check, never as the containment layer.
 - **blocked**: no installed host or no viable test path. No support claim.
 
 ## No hooks installed
@@ -287,7 +302,7 @@ not a sandbox. Aegis Guard cannot stop a process that is already running,
 inspect a host's internal tool dispatch, prevent a host from ignoring exit 10
 or 3, or prove that any host honours the contract. Even a correct
 adapter is only as strong as the host's willingness to block. Use OS or
-container containment where the matrix says it is required.
+container containment for any host the matrix records without containment evidence.
 
 ## Verification
 
