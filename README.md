@@ -819,6 +819,24 @@ Two ways in:
   drifts on every skill edit and bakes in the three live caveats. The copy is per-user
   opt-in only.
 
+**Starting in ChatGPT or another chat app.** In one user-reported run (ChatGPT free plan, mobile
+web; not verified by the project), a link plus "please use Project Aegis" did not load the
+skills. With a start prompt that told the assistant to open the orchestrator skill file, the
+assistant's replies carried the skills' markers; whether it opened the files is not known. The
+prompt below is new and has not been trialled by the project. Paste the start prompt at the
+beginning of every new chat.
+
+> "I have an idea for an application, but I'm not a developer. Please open
+> https://github.com/ModernNomad-98/Project-Aegis and read the file
+> .claude/skills/project-orchestrator/SKILL.md, then follow it to guide me from my idea to a
+> first version, opening any other skill file it sends you to. Ask me one question at a time, in
+> plain language, and in each reply tell me which stage we are in. Build nothing until I approve
+> the first version. If you cannot open a file, stop and tell me. Never say you used a skill
+> file you did not open."
+
+After the first reply, ask: "Which skill files did you open?" `aegis-setup` is MANUAL-ONLY: do
+not ask a chat app to run it.
+
 #### Your first session
 
 **From a vague idea.** If you're not a developer and you have an idea but
