@@ -14,6 +14,12 @@ Bash is denied by default; only exact `bash_allowlist` entries pass. Builds
 require an external OS or container sandbox. This is L2 only: a local policy
 check, not containment.
 
+One containment result is recorded: the
+[Claude Code CLI container profile](L3-claude-container.md) qualifies for L3
+only when the CLI is launched through that container. No other host has
+containment evidence, and no enforcement claim is made for any other launch
+path.
+
 The implementation is [`tools/aegis_guard/cli.py`](../../tools/aegis_guard/cli.py),
 the contract is
 [`policy.schema.json`](../../tools/aegis_guard/policy.schema.json), and
@@ -225,22 +231,25 @@ documented in [Aegis Adopt](../aegis-adopt/README.md).
 ## Host status matrix
 
 The versions below are the recorded target matrix for this work. Aegis Guard
-does not detect host versions. The Claude CLI row is based on a live
-disposable-repository run on 2026-11-22; the other rows are target versions
-that were not executed for this evidence. The status is a statement about
+does not detect host versions. The two Claude Code CLI rows are based on
+live runs on 2026-11-22, one in a disposable repository on Windows and one
+inside the container; the other rows are target versions that were not executed
+for this evidence. The status is a statement about
 available evidence and permitted reliance, not a claim that the host is
 configured or protected.
 
 | Host | Version | Status | Plain-language meaning | Evidence basis |
 | --- | --- | --- | --- | --- |
 | Claude CLI | 2.1.311 | L2 tool gate; L1 UNRUN | The PreToolUse tool gate blocked a protected Write and a Bash call. The SessionStart hook exited 2, but the session continued, so the L1 session gate is not achieved. | Live disposable-repo run on Windows, 2026-11-22: Write to the policy path and Bash were denied by the hook; SessionStart exit 2 did not block. |
+| Claude Code CLI, container | 2.1.311 in `aegis-claude-l3:2.1.311-python` | L3 qualified (container launch only) | L3 holds only when the CLI is started through the Aegis container: read-only root, dropped capabilities, non-root, and no route out except an allow-list proxy. Started natively on Windows it is still L2. | Live container run on Windows, 2026-11-22: direct egress was unreachable, the proxy refused a non-allow-listed target, a workspace write succeeded, and a write to `/etc/passwd` was denied; see [the L3 profile](L3-claude-container.md). |
 | Claude VS Code | 2.1.330 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Codex CLI | 0.149.1 | external containment required | Do not rely on a host hook; run the host inside an OS or container sandbox. | No tested pre-tool hook in this change; external containment is the boundary. |
 | Codex VS Code | 26.1117.41037 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Cursor | 3.24.18 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Gemini | not installed | blocked | No installed host and no test path; do not claim support. | Not installed; no run or test possible. |
 
-Exact labels: Claude CLI 2.1.311 (L2 tool gate; L1 UNRUN), Claude VS Code
+Exact labels: Claude CLI 2.1.311 (L2 tool gate; L1 UNRUN), Claude Code CLI
+container profile (L3 qualified; container launch only), Claude VS Code
 2.1.330 (unqualified), Codex CLI 0.149.1 (external containment required), Codex
 VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini
 (blocked; not installed).
@@ -250,6 +259,9 @@ VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini
 - **L2 tool gate; L1 UNRUN**: the PreToolUse hook blocked tool calls on the
   observed host, but the SessionStart hook did not block the session. Only the
   per-tool layer is effective; do not claim a session gate.
+- **L3 qualified (container launch only)**: the CLI ran inside a container the
+  host cannot escape, and the recorded tests confirm the boundary. The claim
+  covers that one launch path; the same CLI started natively is still L2.
 - **unqualified**: no Aegis-specific hook, interception test or containment
   evidence. It must not be described as protected or enforced.
 - **external containment required**: a host hook is not the boundary. Run the
