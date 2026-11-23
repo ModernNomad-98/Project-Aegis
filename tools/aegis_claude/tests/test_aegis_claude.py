@@ -652,6 +652,16 @@ class HookTests(AdapterTestCase):
             }
         )
         self.assertEqual(result.returncode, 0, result.stderr)
+        denied = self.hook(
+            {
+                "hook_event_name": "preToolUse",
+                "tool_name": "Bash",
+                "tool_input": {"command": "echo hi"},
+                "cwd": str(self.repo),
+            }
+        )
+        self.assertEqual(denied.returncode, 2, denied.stderr)
+        self.assertIn("blocked", denied.stderr)
 
     def test_session_start_missing_marker(self) -> None:
         self.write_default_policy()
