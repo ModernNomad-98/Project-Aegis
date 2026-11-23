@@ -246,10 +246,19 @@ def _pre_tool_use(payload: dict[str, Any], repo: Path, policy: Path) -> int:
     return EXIT_BLOCK
 
 
+EVENT_ALIASES = {
+    "SessionStart": "SessionStart",
+    "sessionStart": "SessionStart",
+    "PreToolUse": "PreToolUse",
+    "preToolUse": "PreToolUse",
+}
+
+
 def run(payload: dict[str, Any], repo: Path, policy: Path) -> int:
     event = payload.get("hook_event_name")
     if not isinstance(event, str) or event == "":
         raise HookError("hook input field 'hook_event_name' is required")
+    event = EVENT_ALIASES.get(event, event)
     if event == "SessionStart":
         return _session_start(repo, policy)
     if event == "PreToolUse":

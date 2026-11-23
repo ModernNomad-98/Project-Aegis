@@ -190,6 +190,12 @@ did not stop that host from starting the session; the session continued without
 gate. Do not rely on <code>SessionStart</code> to prevent a tool call; the
 <code>PreToolUse</code> L2 gate is the effective layer.
 
+Cursor Agent sends the same hook events with camelCase names. The adapter
+accepts <code>preToolUse</code> as an alias for <code>PreToolUse</code> and
+<code>sessionStart</code> for <code>SessionStart</code>, so a Cursor-invoked
+hook is evaluated by the same guard rather than rejected as an unsupported
+event.
+
 ### PreToolUse
 
 The hook runs:
