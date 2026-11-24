@@ -236,7 +236,8 @@ The versions below are the recorded host matrix for this work. Aegis Guard does
 not detect host versions. The two Claude Code CLI rows and the Codex CLI
 container row are based on live runs on 2026-11-22: one Claude run in a
 disposable repository on Windows and two runs inside containers; the container
-versions are the image tags, not a live detection result. The Cursor and Codex
+versions come from the image tags or recorded image contents, not a live
+detection result. The Cursor and Codex
 VS Code rows are based on hosted runs recorded on 2026-11-23, plus the Cursor
 follow-up retest on 2026-11-24 at PR #1215 (merged in `626d304`). The Gemini
 row rests on an external record dated 2026-11-23, not a repository-hosted run.
@@ -372,8 +373,8 @@ for the junction case.
 
 Drafted by DeepSeek (DeepSeek Harness) on 2026-11-22. Claude CLI 2.1.311 was
 executed live on Windows for the L2/L1 evidence. The two container rows were
-live launches whose versions come from the image names, not from Aegis Guard
-detection. Cursor 3.24.18 and Codex VS Code 26.51120.41243 on VS Code 1.147.0
+live launches: Claude 2.1.311 comes from its image tag, and Codex `codex-cli`
+0.171.0 comes from the recorded image/L3 profile, not from Aegis Guard detection. Cursor 3.24.18 and Codex VS Code 26.51120.41243 on VS Code 1.147.0
 are reported from hosted records dated 2026-11-23; Gemini 0.70.0 is reported
 from an external record dated 2026-11-23. Cursor also has a separate 3.31.15
 payload capture dated 2026-11-23 23:48 PT (HOSTED-2A) and a 2026-11-24 retest
