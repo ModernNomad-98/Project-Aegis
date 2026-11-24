@@ -194,8 +194,11 @@ Cursor Agent sends the same hook events with camelCase names. The adapter
 accepts <code>preToolUse</code> as an alias for <code>PreToolUse</code> and
 <code>sessionStart</code> for <code>SessionStart</code>, so a Cursor-invoked
 hook reaches the same policy check rather than being rejected as an
-unsupported event. Cursor can omit <code>cwd</code>; the hook then defaults
-to the repository root. An empty or non-string <code>cwd</code> exits 2.
+unsupported event. Cursor can omit <code>cwd</code> or may send an empty
+string; in both cases the hook defaults to the repository root. A non-string,
+non-null <code>cwd</code> (number, boolean, array or object) exits 2;
+<code>null</code> is treated like an omitted <code>cwd</code>. The default is
+the repository root, not the host's working directory; see the limits below.
 
 Gemini CLI's <code>gemini hooks migrate --from-claude</code> emits a
 <code>BeforeTool</code> event and Gemini-specific tool names. The adapter maps
@@ -281,8 +284,10 @@ outside-repository paths, <code>.env</code>, <code>WebFetch</code>, protected
 <code>.aegis</code>/<code>.claude</code>/<code>.git</code> paths, non-default
 policy paths, default Grep/Glob denial, the custom-policy Grep/Glob
 explicit-path rule, and hard-link identity denial, malformed and
-invalid-UTF-8 stdin, missing tool fields, payload <code>cwd</code>, and no
-<code>__pycache__</code> residue. It makes no network call.
+invalid-UTF-8 stdin, missing tool fields, omitted, null, empty, relative and
+non-string, non-null payload <code>cwd</code> (null is accepted as omitted),
+duplicate <code>cwd</code> keys, and no <code>__pycache__</code> residue. It
+makes no network call.
 
 ## Limits
 
@@ -310,6 +315,14 @@ invalid-UTF-8 stdin, missing tool fields, payload <code>cwd</code>, and no
   A repository, policy or Aegis path containing a double quote,
   dollar sign, backtick, percent sign or newline is rejected at install time
   rather than embedded in a shell command.
+- **An absent, null or empty <code>cwd</code> is assumed to be the repository
+  root.** The hook has no other way to learn the host's working directory. A
+  host that resolves relative tool paths from a different directory could
+  therefore have a path checked under a different base than the one it actually
+  uses. The guard's repository and allowed-root containment still applies, but
+  the checked path may not be the touched path. In the Cursor 3.31.15 payload
+  captured for HOSTED-2A, both the top-level <code>cwd</code> and the
+  <code>cwd</code> inside <code>tool_input</code> were the empty string.
 - **Only top-level tool arguments are inspected** by Aegis Guard. A custom
   tool with a path nested inside another argument object is outside its check.
   The default <code>Read</code>, <code>Write</code> and <code>Edit</code> tools

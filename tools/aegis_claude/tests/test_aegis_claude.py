@@ -1219,6 +1219,204 @@ class HookTests(AdapterTestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("outside repository", result.stderr)
 
+    # HOSTED-2A cwd matrix, T-01..T-13 in the accepted plan. T-02 and T-04..T-09
+    # are the fail-before closure against the unmodified _event_cwd; the rest
+    # are pins on existing or newly documented behaviour.
+
+    def _write_read_target(self) -> None:
+        (self.repo / "src").mkdir(exist_ok=True)
+        (self.repo / "src" / "app.py").write_text("x = 1\n", encoding="utf-8")
+
+    def test_pretooluse_missing_cwd_defaults_to_repo(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "src/app.py"},
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_pretooluse_empty_cwd_defaults_to_repo(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "src/app.py"},
+                "cwd": "",
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_pretooluse_null_cwd_defaults_to_repo(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "src/app.py"},
+                "cwd": None,
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_pretooluse_empty_cwd_camel_case_alias(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        result = self.hook(
+            {
+                "hook_event_name": "preToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "src/app.py"},
+                "cwd": "",
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_pretooluse_empty_cwd_uses_repo_as_base(self) -> None:
+        self.prepare()
+        (self.repo / "notes.txt").write_text("hello\n", encoding="utf-8")
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "notes.txt"},
+                "cwd": "",
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_pretooluse_empty_cwd_denies_traversal(self) -> None:
+        self.prepare()
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "../outside.txt"},
+                "cwd": "",
+            }
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("traversal", result.stderr)
+
+    def test_pretooluse_empty_cwd_denies_dotenv(self) -> None:
+        self.prepare()
+        (self.repo / ".env").write_text("TOKEN=secret\n", encoding="utf-8")
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": ".env"},
+                "cwd": "",
+            }
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("denied by pattern", result.stderr)
+
+    def test_pretooluse_empty_cwd_denies_policy_read(self) -> None:
+        self.prepare()
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": ".aegis/policy.json"},
+                "cwd": "",
+            }
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("policy file is protected", result.stderr)
+
+    def test_pretooluse_empty_cwd_cursor_shell_policy_denial(self) -> None:
+        self.prepare()
+        result = self.hook(
+            {
+                "conversation_id": "test-conversation",
+                "generation_id": "test-generation",
+                "model": "test-model",
+                "tool_name": "Shell",
+                "tool_input": {"command": "echo hi", "cwd": "", "timeout": 30000},
+                "tool_use_id": "test-tool-use",
+                "cwd": "",
+                "session_id": "test-session",
+                "hook_event_name": "preToolUse",
+                "cursor_version": "3.31.15",
+                "workspace_roots": [str(self.repo)],
+                "transcript_path": None,
+            }
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("not in allowed_tools", result.stderr)
+        self.assertNotIn("cwd must be", result.stderr)
+
+    def test_pretooluse_non_string_cwd_rejected(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        for value in (123, True, [], {}):
+            with self.subTest(cwd=value):
+                result = self.hook(
+                    {
+                        "hook_event_name": "PreToolUse",
+                        "tool_name": "Read",
+                        "tool_input": {"file_path": "src/app.py"},
+                        "cwd": value,
+                    }
+                )
+                self.assertEqual(result.returncode, 2)
+                self.assertIn(
+                    "hook input field 'cwd' must be a string or null",
+                    result.stderr,
+                )
+
+    def test_pretooluse_duplicate_cwd_rejected(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        raw = (
+            '{"hook_event_name": "PreToolUse", "tool_name": "Read", '
+            '"tool_input": {"file_path": "src/app.py"}, '
+            '"cwd": "", "cwd": "src"}'
+        )
+        result = self.hook(raw)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("duplicate JSON key", result.stderr)
+
+    def test_pretooluse_relative_cwd_resolves_against_repo(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "app.py"},
+                "cwd": "src",
+            }
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_pretooluse_nonexistent_cwd_fails_closed(self) -> None:
+        self.prepare()
+        self._write_read_target()
+        result = self.hook(
+            {
+                "hook_event_name": "PreToolUse",
+                "tool_name": "Read",
+                "tool_input": {"file_path": "src/app.py"},
+                "cwd": "missing-dir",
+            }
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("cwd not found", result.stderr)
+
     def test_pretooluse_missing_policy(self) -> None:
         self.adopt()
         result = self.hook(

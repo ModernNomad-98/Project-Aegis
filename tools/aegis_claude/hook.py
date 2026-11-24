@@ -138,8 +138,13 @@ def _event_cwd(payload: dict[str, Any], repo: Path) -> Path:
     raw = payload.get("cwd")
     if raw is None:
         return repo
-    if not isinstance(raw, str) or raw == "":
-        raise HookError("hook input field 'cwd' must be a non-empty string")
+    if not isinstance(raw, str):
+        raise HookError("hook input field 'cwd' must be a string or null")
+    if raw == "":
+        # Cursor Agent is reported to send "" on the first tool call of a
+        # session. An empty string is a degenerate encoding of an omitted
+        # field, not a path.
+        return repo
     try:
         cwd = Path(raw).expanduser()
         if not cwd.is_absolute():
