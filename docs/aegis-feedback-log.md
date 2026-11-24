@@ -136,11 +136,74 @@ Effect: at least six extra D3 rounds that a tool-safety matrix would have front-
 Idea for Aegis: require a "skills applied" table before build dispatch and fail the brief if the matching skill row is missing; keep the feedback log as a running log, not a closing artifact.
 Status: open for Aegis; the adopt PR is paused until the skill evidence is attached.
 
+Status update (2026-11-24): the adopt/doctor work this entry refers to merged as
+PR #1205 (merge `21d16ce6`); the sentence "the adopt PR is paused until the
+skill evidence is attached" is overtaken and is not a current state. The
+sequencing defect is not shown fixed: the five-column "Aegis skills applied"
+section is required in every PR body and checked at final review (`AGENTS.md`,
+"Aegis skills applied and review evidence"), but its content has no machine
+check (`AGENTS.md`, "Enforcement and limits"), and no brief gate fails a
+dispatch when the matching skill row is absent. This status update is made in
+the docs-sync change, which is one instance, not a verified fix. Status: open
+for Aegis.
+
 ### B-013 — Enforcement stopped at L2 partial (2026-11-22)
 What happened: the Claude Code 2.1.311 adapter was proven in a disposable repo: Bash, .env reads and policy writes were blocked; Read was allowed; SessionStart exit 2 did **not** block startup. Codex CLI's account rejects every tested model; Gemini is not installed; the VS Code extensions and Cursor are unqualified. There is no OS sandbox.
 Effect: one L2 tool gate, not containment. A host that ignores hooks bypasses it; allowlisted commands can still run arbitrary code.
 Idea for Aegis: require L3 external containment before any surface is called enforced; qualify each host/mode separately.
 Status: open; L1 and L3 UNRUN.
+
+Status update (2026-11-24): the L2 tool gate is the only proven Aegis L2
+tool-policy result, and it is proven only for Claude CLI 2.1.311; L1 remains
+UNRUN. Four statements in the entry are superseded or scoped. "Gemini is not
+installed" is superseded by an external record of Gemini CLI 0.70.0 in the test
+VM; this repository has no installation evidence of its own, and that record
+does not prove an Aegis tool-gate result, so Gemini is L2 UNKNOWN rather than
+partially qualified. The clause "the VS Code extensions and Cursor are
+unqualified" is superseded in part: Cursor has the 3.24.18 Remote-SSH run
+recorded in the host matrix, but the result is UI-observed only: Shell was shown
+blocked (the pre-#1215 adapter first failed closed on an empty `cwd`; the retry
+was denied by default-deny), a README read was shown allowed and a secret read
+shown denied, while raw hook exit codes and JSON were not logged, so the hook
+layer is not proven; Codex VS Code is the instruction-only row in that matrix,
+and Claude VS Code was not exercised and remains unqualified. The empty-string
+`cwd` Shell path was retested on 2026-11-24 at PR #1215 (3.24.18 session A and
+a 3.31.15 E1 run; sessions B/C covered the README and secret reads), merged in
+`626d304`; the empty-string Read default
+remains unit-tested only. "There is no OS sandbox" is qualified, not deleted:
+there is no per-host OS sandbox for native launches on the Windows host, and
+the only containment results are the two container launch paths recorded in the
+matrix. Codex VS Code 26.51120.41243 on VS Code 1.147.0 rendered and answered
+one bounded READY prompt, but it has no Aegis hook and is instruction-only —
+meaning no hook, not a tested enforcement mode — and uncontained; the owner
+accepted that on 2026-11-23, and Codex CLI in the container remains the contained
+Codex path. "Codex CLI's account rejects every tested model" is scoped to the
+earlier native Codex CLI attempt recorded in this entry (version not recorded)
+and was not re-tested here; it is not a current statement about Codex VS Code,
+where the account lookup succeeded
+(`authenticatedAccountPresent=true`) before the READY prompt, nor about Codex CLI
+0.171.0 in the container, whose model call through the proxy succeeded. The
+Gemini record does not prove an Aegis decision: it lists
+`secrets/credential.txt` as blocked without saying which layer blocked it,
+attributes the `.env` refusal to Gemini's own path guard, and says both that
+`run_shell_command` was denied and that a shell ran under YOLO, so the shell
+outcome is UNKNOWN and the host is L2 UNKNOWN — no Aegis tool-gate result
+proven. L3 remains unproven for Cursor, Codex VS Code and Gemini; the only L3
+results are the two container launch paths. Status: open; L2 is proven only for
+Claude CLI 2.1.311, L2 is unproven for Gemini and UI-observed only for Cursor,
+L1 UNRUN, and L3 is not proven for the new rows.
+
+### B-014 — Plaintext GitHub token embedded in a git remote URL (2026-11-24)
+
+What happened: the Cursor-fix repository C:\src\Project Aegis\aegis-batch40\git-cursorfix and its aegis-hosted2a worktree carried a GitHub token in plaintext in remote.origin.url, in the form `https://x-access-token:REDACTED@github.com/ModernNomad-98/Project-Aegis.git`. The token was noticed during the HOSTED-2 work and recorded in BACKLOG-DELTA-2026-11-23.md as a rotation item, but it was not removed then. The repository was initialized from main.tgz (which contains no .git) on 2026-11-23 06:54; the exact setup command is not recoverable from retained shell history. The .git/config timestamp of 2026-11-24 00:07:41 is the git push -u rewrite that added branch tracking, not the token insertion. The URL shape matches the earlier x-access-token:$(gh auth token) push fallback.
+
+Effect: any process or user able to read the worktree could read a live GitHub token. The token was in .git/config; it was not found in tracked repository content by this review, and the full exposure surface (session logs, backups, copies, other credential stores) was not enumerated. The owner reported revoking the embedded token on 2026-11-24 and re-authenticating; the pre-re-authentication check reported the old keyring token invalid, and the current check reports a valid keyring token with push access (scopes gist, read:org, repo, workflow; gh api shows admin/push). A plain git ls-remote succeeds only because the repository is public, so it is not evidence that the credential works.
+
+Remediation (2026-11-24): the token was removed from origin for git-cursorfix; the aegis-hosted2a worktree now uses https://github.com/ModernNomad-98/Project-Aegis.git. The token was not printed. The earlier 205-remote/0-remaining sentence was incomplete and is corrected here. On 2026-11-24 a full-tree scan of C:\src\Project Aegis (1,461 repository configs / 1,135 remote URLs) found 20 token-bearing URLs and cleaned them; an independent rescan of the same tree found 0. The scan covers files named config and the x-access-token:/gh*_ patterns; other credential forms or filenames were not enumerated. Whether the 20 URLs embedded one or several credentials is not established. Authentication through the gh credential helper was tried with a fetch; the fetch alone is not proof the credential worked, because the repository is public.
+
+Idea for Aegis: never write credentials into remote URLs or tracked config; use the credential helper or a one-shot Authorization header; add a preflight scan for token patterns in .git/config and docs; and treat any discovered token as a security incident requiring rotation and a recorded remediation, not just a backlog note.
+
+Status: CONTAINED — token revoked per owner; all found remotes cleaned; independent rescan 0; the exposure-surface review remains open. Severity: security violation.
 
 ## Worked well
 
