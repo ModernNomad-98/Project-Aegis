@@ -232,13 +232,15 @@ documented in [Aegis Adopt](../aegis-adopt/README.md).
 
 ## Host status matrix
 
-The versions below are the recorded target matrix for this work. Aegis Guard
-does not detect host versions. The two Claude Code CLI rows and the Codex CLI
-container row are based on live runs on 2026-11-22, one Claude run in a
-disposable repository on Windows and two runs inside containers; the other rows
-are target versions that were not executed for this evidence. The status is a
-statement about
-available evidence and permitted reliance, not a claim that the host is
+The versions below are the recorded host matrix for this work. Aegis Guard does
+not detect host versions. The two Claude Code CLI rows and the Codex CLI
+container row are based on live runs on 2026-11-22: one Claude run in a
+disposable repository on Windows and two runs inside containers. The Cursor,
+Codex VS Code and Gemini rows are based on hosted runs recorded on 2026-11-23;
+the evidence column names their records and artifacts, and the artifact hashes
+that exist follow the table; Gemini has none. The remaining rows are target
+versions that were not executed for this evidence. The status is a statement
+about available evidence and permitted reliance, not a claim that the host is
 configured or protected.
 
 | Host | Version | Status | Plain-language meaning | Evidence basis |
@@ -248,22 +250,45 @@ configured or protected.
 | Claude VS Code | 2.1.330 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
 | Codex CLI | 0.149.1 | unqualified | No hook and no containment evidence for this native version. Running it inside the container profile is a candidate, not a tested run. | No native run and no tested pre-tool hook; the container profile was exercised only on 0.171.0. |
 | Codex CLI, container | 0.171.0 in `aegis-codex-l3:latest` | L3 containment (container launch only; not Aegis tool policy) | L3 holds only when Codex is started through the Aegis container: read-only root, dropped capabilities, non-root, and no route out except an allow-list proxy. Aegis Guard is not wired to Codex, so `.env` and tool denies are not enforced inside it; secrets must be excluded by the mount set. | Live container run on Windows, 2026-11-22: the model call through the proxy succeeded, a workspace write succeeded, a root write was refused, direct egress was unreachable, and the proxy refused a non-allow-listed target; see [the L3 profile](L3-codex-container.md). |
-| Codex VS Code | 26.1117.41037 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
-| Cursor | 3.24.18 | unqualified | No Aegis-specific interception test or containment evidence; do not rely on it. | No hook installed and no interception evidence in this change. |
-| Gemini | not installed | blocked | No installed host and no test path; do not claim support. | Not installed; no run or test possible. |
+| Codex VS Code | 26.51120.41243 on VS Code 1.147.0 | instruction-only; functional-but-uncontained | The Codex panel rendered over Remote-SSH and one bounded prompt returned READY. There is no Aegis hook; the extension host runs as the VM user, and the record states UFW was off; egress was not probed. Not protected, not qualified, not contained; Codex CLI in the container remains the contained Codex path. | Hosted run 2026-11-23 (HOSTED-4): `retest2/codex-ready.png`, `retest2/latest-session-log.txt` (`outcome=success`); owner accepted as functional but uncontained on 2026-11-23. |
+| Cursor | 3.24.18 | L2 tool gate observed; L3 UNRUN; uncontained | In one 3.24.18 Remote-SSH session the Claude-compatible hook denied Shell (the pre-#1215 adapter first failed closed on an empty `cwd`; the retry was denied by default-deny), allowed a README read and denied a secret read. The gate is advisory, the agent ran as the VM user and Cursor's terminal sandbox did not start, so this is not containment. The empty-string `cwd` Shell path was retested on 3.24.18 at PR #1215, merged in `626d304`; the empty-string Read default remains unit-tested only. | Hosted run 2026-11-23 (HOSTED-2): `shell-denied.png`, `readme-allowed.png`, `secret-blocked.png`; empty `cwd` captured on 3.31.15; the Shell empty-`cwd` path was retested on 3.24.18 at PR #1215, merged in `626d304`; the empty-string Read default is unit-tested only. Exact hook exit codes and raw JSON were not logged in HOSTED-2. |
+| Gemini | 0.70.0 (external record) | L2 partial — UNKNOWN | A Gemini CLI 0.70.0 session read a README. The record lists `secrets/credential.txt` as blocked but does not say which layer blocked it; it attributes the `~/.gemini/.env` refusal to Gemini's own path guard, not Aegis Guard. The same record says both that `run_shell_command` was denied and that a shell ran `echo hi` under YOLO, so the shell outcome is UNKNOWN and no Aegis policy decision is proven. Not qualified and not contained. | External NEXT-HOSTED-1 record, 2026-11-23; Gemini hook-event support merged in PR #1213 (`7afbb6fc`). No repository-side run; L3 UNRUN. |
+
+Evidence hashes for the 2026-11-23 hosted rows (SHA-256):
+- Cursor `shell-denied.png`: `06014DACB24D586B0CC47B23CDA113A6DD9D757CDC100418F2D1E91E84825733`
+- Cursor `readme-allowed.png`: `257F2767FD77E961FB6339E2BDBBAD2F3BEE7DAC6EABB1E4EFEDAC11E7F22995`
+- Cursor `secret-blocked.png`: `D63DFD7CC38B7076195A31F24525E199327C58406020DA850775C47627B7D127`
+- Codex VS Code `codex-ready.png`: `F96DCD94033E5CC06998111F82D9E74165C13B02360098D565FBEDD3B9BC26B6`
+- Codex VS Code `latest-session-log.txt`: `6A3E585CF95E4576A7D443A18B8D5659AFA3B25C68B57593D140628141109394`
+
+The Gemini row has no artifact hash; it rests on the external NEXT-HOSTED-1
+record only.
 
 Exact labels: Claude CLI 2.1.311 (L2 tool gate; L1 UNRUN), Claude Code CLI
 container profile (L3 qualified; container launch only), Claude VS Code
-2.1.330 (unqualified), Codex CLI 0.149.1 (unqualified), Codex
-CLI container profile (L3 containment; container launch only, not Aegis tool
-policy), Codex VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified), Gemini
-(blocked; not installed).
+2.1.330 (unqualified), Codex CLI 0.149.1 (unqualified), Codex CLI container
+profile (L3 containment; container launch only, not Aegis tool policy),
+Codex VS Code 26.51120.41243 on VS Code 1.147.0 (instruction-only; functional-but-uncontained),
+Cursor 3.24.18 (L2 tool gate observed; L3 UNRUN; uncontained; 3.31.15 empty-`cwd` payload),
+Gemini 0.70.0 (L2 partial — UNKNOWN; external record only).
 
 ### Status definitions
 
 - **L2 tool gate; L1 UNRUN**: the PreToolUse hook blocked tool calls on the
   observed host, but the SessionStart hook did not block the session. Only the
   per-tool layer is effective; do not claim a session gate.
+- **L2 tool gate observed; L3 UNRUN; uncontained**: a host hook returned a
+  policy decision on observed tool calls, but no containment test was run and the
+  host ran with ordinary user rights. The gate is advisory and bypassable; do
+  not describe the host as contained or protected. The label covers only the
+  observed host and launch path.
+- **L2 partial — UNKNOWN**: the host was exercised, but the recorded outcomes do
+  not establish which policy layer acted, or they contradict each other. No
+  Aegis tool-gate result and no containment result is proven.
+- **instruction-only; functional-but-uncontained**: the host runs and can
+  complete a task, but it has no Aegis hook or policy gate. Reliance is on the
+  host's own instruction files and behavior, not on Aegis. It must not be
+  described as protected, qualified or contained.
 - **L3 qualified (container launch only)**: the CLI ran inside a container the
   host cannot escape, and the recorded tests confirm the boundary. The claim
   covers that one launch path; the same CLI started natively is still L2.
@@ -277,7 +302,9 @@ policy), Codex VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified)
   tool-policy hook runs inside this container, so tool and secret-path denies
   are not enforced; the claim covers containment for that launch path only.
 - **unqualified**: no Aegis-specific hook, interception test or containment
-  evidence. It must not be described as protected or enforced.
+  evidence. A host with a working surface but no hook is recorded as
+  instruction-only, not unqualified. It must not be described as protected or
+  enforced.
 - **external containment required**: no row currently carries this status. It
   records the requirement that a host hook is not the boundary: run such a host
   inside an operating-system or container sandbox and treat Aegis Guard as one
@@ -288,11 +315,13 @@ policy), Codex VS Code 26.1117.41037 (unqualified), Cursor 3.24.18 (unqualified)
 
 This source repository ships no Claude CLI, Claude VS Code, Codex CLI, Codex VS
 Code, Cursor, Gemini, shell, Git or package-manager hook, and it installs no
-global or user-level settings. The Claude CLI evidence comes from the
-repository-local adapter installed only in a disposable repository, not in this
-source checkout. The matrix records observed status, not a source-checkout
-installation. Installing a hook elsewhere is a separate change with its own
-evidence.
+global or user-level settings. The Claude CLI and Cursor runs used the
+repository-local adapter installed only in disposable test repositories, not in
+this source checkout. The Gemini record describes a hook migration, but it
+attributes the `.env` refusal to Gemini's own path guard, not to that adapter.
+Codex VS Code has no adapter. The matrix records observed status, not a
+source-checkout installation. Installing a hook elsewhere is a separate change
+with its own evidence.
 
 ## No enforcement claim
 
@@ -330,5 +359,8 @@ for the junction case.
 ## Provenance
 
 Drafted by DeepSeek (DeepSeek Harness) on 2026-11-22. Claude CLI 2.1.311 was
-executed live on Windows for the L2/L1 evidence; the other host version values
-are the supplied matrix, not a live detection result.
+executed live on Windows for the L2/L1 evidence. Cursor 3.24.18, Codex VS Code
+26.51120.41243 on VS Code 1.147.0 and Gemini 0.70.0 are reported from hosted
+records dated 2026-11-23; their versions were observed in those records, not
+detected by Aegis Guard. The remaining host version values are the supplied
+matrix, not a live detection result.

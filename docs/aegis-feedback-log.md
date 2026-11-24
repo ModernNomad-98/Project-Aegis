@@ -134,11 +134,45 @@ Effect: at least six extra D3 rounds that a tool-safety matrix would have front-
 Idea for Aegis: require a "skills applied" table before build dispatch and fail the brief if the matching skill row is missing; keep the feedback log as a running log, not a closing artifact.
 Status: open for Aegis; the adopt PR is paused until the skill evidence is attached.
 
+Status update (2026-11-24): the adopt/doctor work this entry refers to merged as
+PR #1205 (merge `21d16ce6`); the sentence "the adopt PR is paused until the
+skill evidence is attached" is overtaken and is not a current state. The
+sequencing defect is not shown fixed: the five-column "Aegis skills applied"
+section is required in every PR body and checked at final review (`AGENTS.md`,
+"Aegis skills applied and review evidence"), but its content has no machine
+check (`AGENTS.md`, "Enforcement and limits"), and no brief gate fails a
+dispatch when the matching skill row is absent. This status update is made in
+the docs-sync change, which is one instance, not a verified fix. Status: open
+for Aegis.
+
 ### B-013 — Enforcement stopped at L2 partial (2026-11-22)
 What happened: the Claude Code 2.1.311 adapter was proven in a disposable repo: Bash, .env reads and policy writes were blocked; Read was allowed; SessionStart exit 2 did **not** block startup. Codex CLI's account rejects every tested model; Gemini is not installed; the VS Code extensions and Cursor are unqualified. There is no OS sandbox.
 Effect: one L2 tool gate, not containment. A host that ignores hooks bypasses it; allowlisted commands can still run arbitrary code.
 Idea for Aegis: require L3 external containment before any surface is called enforced; qualify each host/mode separately.
 Status: open; L1 and L3 UNRUN.
+
+Status update (2026-11-24): the L2 tool gate remains the only proven Aegis layer
+for Claude CLI 2.1.311, and L1 remains UNRUN. Two statements in the entry are
+superseded. "Gemini is not installed" is superseded by an external record of
+Gemini CLI 0.70.0 in the test VM; this repository has no installation evidence
+of its own. The clause "the VS Code extensions and Cursor are unqualified" is
+superseded in part: Cursor has the 3.24.18 Remote-SSH run recorded in the host
+matrix, where Shell was denied (the pre-#1215 adapter first failed closed on an
+empty `cwd`; the retry was denied by default-deny), a README read was allowed,
+and a secret read was denied; Codex VS Code is the instruction-only row in that
+matrix, and Claude VS Code remains unqualified. The empty-string `cwd` Shell
+path was retested on 3.24.18 at PR #1215, merged in `626d304`; the empty-string
+Read default remains unit-tested only. Codex VS Code 26.51120.41243 on VS Code
+1.147.0 rendered and answered one bounded prompt, but it has no Aegis hook and
+is instruction-only and uncontained; the owner accepted that on 2026-11-23, and
+Codex CLI in the container remains the contained Codex path. The Gemini record
+does not prove an Aegis decision: it lists `secrets/credential.txt` as blocked
+without saying which layer blocked it, attributes the `.env` refusal to Gemini's
+own path guard, and says both that `run_shell_command` was denied and that a
+shell ran under YOLO, so the shell outcome is UNKNOWN. L3 remains unproven for
+Cursor, Codex VS Code and Gemini; the only L3 results are the two container
+launch paths. Status: open; L2 partial remains, L1 UNRUN, and L3 is not proven
+for the new rows.
 
 ## Worked well
 
