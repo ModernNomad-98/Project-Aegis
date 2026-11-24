@@ -176,15 +176,15 @@ for the new rows.
 
 ### B-014 — Plaintext GitHub token embedded in a git remote URL (2026-11-24)
 
-What happened: the Cursor-fix repository C:\src\Project Aegis\aegis-batch40\git-cursorfix and its aegis-hosted2a worktree carried a GitHub token in plaintext in remote.origin.url, in the form https://x-access-token:<redacted>@github.com/ModernNomad-98/Project-Aegis.git. The token was noticed during the HOSTED-2 work and recorded in BACKLOG-DELTA-2026-11-23.md as a rotation item, but it was not removed then. The repository was initialized from main.tgz (which contains no .git) on 2026-11-23 06:54; the exact setup command is not recoverable from retained shell history. The .git/config timestamp of 2026-11-24 00:07:41 is the git push -u rewrite that added branch tracking, not the token insertion. The URL shape matches the earlier x-access-token:$(gh auth token) push fallback.
+What happened: the Cursor-fix repository C:\src\Project Aegis\aegis-batch40\git-cursorfix and its aegis-hosted2a worktree carried a GitHub token in plaintext in remote.origin.url, in the form `https://x-access-token:REDACTED@github.com/ModernNomad-98/Project-Aegis.git`. The token was noticed during the HOSTED-2 work and recorded in BACKLOG-DELTA-2026-11-23.md as a rotation item, but it was not removed then. The repository was initialized from main.tgz (which contains no .git) on 2026-11-23 06:54; the exact setup command is not recoverable from retained shell history. The .git/config timestamp of 2026-11-24 00:07:41 is the git push -u rewrite that added branch tracking, not the token insertion. The URL shape matches the earlier x-access-token:$(gh auth token) push fallback.
 
 Effect: any process or user able to read the worktree could read a live, repo-scoped GitHub token. The token was in .git/config, not in tracked repository content, so it was not committed to GitHub. It was not revoked; rotation was deferred and remains outstanding. The full exposure surface (session logs, backups, copies) was not enumerated.
 
-Remediation (2026-11-24): the token was removed from origin for git-cursorfix; the aegis-hosted2a worktree now uses https://github.com/ModernNomad-98/Project-Aegis.git. Authentication through the gh credential helper was verified with a fetch. The token was not printed. Two older clones, stagef-781-clone and _sdb771-r6-audit-20261016, still had token-bearing remotes in the inventory and were not changed.
+Remediation (2026-11-24): the token was removed from origin for git-cursorfix; the aegis-hosted2a worktree now uses https://github.com/ModernNomad-98/Project-Aegis.git. Authentication through the gh credential helper was verified with a fetch. The token was not printed. All token-bearing remotes under C:\src\Project Aegis have now been cleaned: 205 repository remotes were scanned and 0 token-bearing remain; both older clones, stagef-781-clone and _sdb771-r6-audit-20261016, were cleaned rather than left unchanged.
 
 Idea for Aegis: never write credentials into remote URLs or tracked config; use the credential helper or a one-shot Authorization header; add a preflight scan for token patterns in .git/config and docs; and treat any discovered token as a security incident requiring rotation and a recorded remediation, not just a backlog note.
 
-Status: OPEN — the token still needs rotation, and the two older clones still need cleaning. Severity: security violation.
+Status: OPEN — the token itself is still valid, and rotation and revocation remain outstanding. Severity: security violation.
 
 ## Worked well
 
