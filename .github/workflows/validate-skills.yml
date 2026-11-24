@@ -157,6 +157,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
+          persist-credentials: false
           # The evidence-pack and ancestry suites resolve real commits, so the
           # checkout needs history rather than a shallow clone.
           fetch-depth: 0
@@ -178,6 +179,24 @@ jobs:
 
       - name: Run scaffold-skill tests
         run: python -P -B scripts/tests/test_scaffold_skill.py
+
+      # B-011 (2026-11-24): the run-record, adopt, guard and Claude adapter
+      # suites were enumerated by no workflow before this change. They are
+      # offline, use only the standard library and need python on PATH and the
+      # runner's git binary, not a Git work tree. -m unittest needs the checkout
+      # root on sys.path, so these runs match the -m unittest steps in the
+      # tools-tests jobs and take no leading flag.
+      - name: Run Aegis run-record tests
+        run: python -m unittest discover -s tools/aegis_run/tests -v
+
+      - name: Run Aegis adopt tests
+        run: python -m unittest discover -s tools/aegis_adopt/tests -v
+
+      - name: Run Aegis guard tests
+        run: python -m unittest discover -s tools/aegis_guard/tests -v
+
+      - name: Run Aegis Claude adapter tests
+        run: python -m unittest discover -s tools/aegis_claude/tests -v
 
   validate-skills:
     runs-on: ubuntu-latest

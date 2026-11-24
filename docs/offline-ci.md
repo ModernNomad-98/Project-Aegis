@@ -65,7 +65,7 @@ protection is unchanged.
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
 | `tools-tests-linux` on Ubuntu | Host-bridge Node callback tests, setup routing-contract suite, delivery-control suite | Isolated from the gates; not registered as required | 15 minutes |
 | `tools-tests-windows` on Windows | The same three suites, plus a read-only ownership diagnostic (token user, default owner, elevation, temp-root owners) recorded before the delivery-control suite | Isolated from the gates; not registered as required | 20 minutes |
-| `local-tool-tests` on Ubuntu | The three local-tool self-test suites — manifest ancestry (13 tests), evidence pack (16) and scaffold (19), 48 in total — run directly with `python -P -B`, with no dependency install | Advisory: path-filtered to a change under `scripts/` or `tools/`; not registered as required | 10 minutes |
+| `local-tool-tests` on Ubuntu | The seven local-tool self-test suites — manifest ancestry (13 tests), evidence pack (16), scaffold (19), run-record (72), adopt (61), guard (93) and Claude adapter (104) — 378 in total. The first three run directly with `python -P -B`; the four Aegis tool suites run `python -m unittest discover` and need `python` on `PATH` and the runner's `git` binary, not a Git work tree | Advisory: path-filtered to a change under `scripts/` or `tools/`; a `.github`-only pull request cannot run it, so the post-merge push run is the binding proof; not registered as required | 10 minutes |
 
 **Update (2026-10-15):** the two `tools-tests-*` rows above now additionally run the readability-acceptance suite (`tools/readability_acceptance/tests`), matching the workflow's `readability-tests` record-check step.
 
@@ -89,6 +89,15 @@ pull request touches `scripts/` or `tools/`, and on every push to `main`.
 It installs nothing (the suites import only the standard library), has no
 secret and no `permissions` block, and is not a required check: it is
 advisory, so a skipped run is recorded as skipped, never as passed.
+
+**Update (2026-11-24):** `local-tool-tests` now also runs the run-record (72),
+adopt (61), guard (93) and Claude adapter (104) suites — **330** tests — as four
+`python -m unittest discover` steps, for **378** in the job. The adapter is
+included because PR #1215 merged at `626d304`; there is no deferred increment.
+The job remains path-filtered to a change under `scripts/` or `tools/`, so a
+pull request that changes only `.github/` and documentation does not run it at
+its final head: no pre-merge result exists for those steps, and the post-merge
+push run on `main` is the binding proof that they execute.
 
 The two verification jobs run independently, without cross-platform fail-fast,
 automatic retries, quarantine or `continue-on-error`. A delivery closeout waits
@@ -120,6 +129,10 @@ The local-tool self-test suites (`scripts/tests/test_manifest_ancestry.py`,
 `local-tool-tests` job (added 2026-11-21) for the same reason, although their
 paths are inside the `gate-guard` set: that job is advisory, shares no runner
 with a gate, and the suites are test code, not gate code.
+The four Aegis tool suites (`tools/aegis_run/tests`, `tools/aegis_adopt/tests`,
+`tools/aegis_guard/tests` and `tools/aegis_claude/tests`) also run in
+`local-tool-tests` (added 2026-11-24). They are outside the `gate-guard` set,
+so the same isolation rule applies.
 
 The tools jobs use a read-only token, reference no secrets and do not persist
 checkout credentials. `scripts/tests/test_offline_ci.py` checks this layout. The
@@ -574,13 +587,31 @@ pack was written, even when the recorded ancestry result is `FAIL` or
 
 ## Local tool self-tests
 
-Three self-test suites cover the local tools added for the process-overhead work. They run in the advisory `local-tool-tests` job when a change touches `scripts/` or `tools/`, and that job is path-filtered and not a required check, so also run them by hand before changing those tools or their docs:
+Seven self-test suites cover the local tools added for the process-overhead work: three script suites and four Aegis tool suites. They run in the advisory `local-tool-tests` job when a change touches `scripts/` or `tools/`, and that job is path-filtered and not a required check, so also run them by hand before changing those tools or their docs:
 
 - `python -B -P scripts/tests/test_manifest_ancestry.py` — 13 tests for `scripts/check-manifest-ancestry.py`.
 - `python -B -P scripts/tests/test_generate_evidence_pack.py` — 16 tests for `scripts/generate-evidence-pack.py`.
 - `python -B -P scripts/tests/test_scaffold_skill.py` — 19 tests for `scripts/scaffold-skill.py`.
 
 All 48 passed locally on `main` at `1a871a48` (2026-11-20). The job is advisory coverage, not a substitute for a required check. The scaffold generator itself is documented under "Scaffolding" in [agent-speed-protocol.md](agent-speed-protocol.md#scaffolding); this page covers the ancestry checker and the evidence pack.
+
+### Aegis tool suites (added 2026-11-24)
+
+Four Aegis tool suites also run in `local-tool-tests`:
+
+- `python -m unittest discover -s tools/aegis_run/tests -v` — 72 tests for the run record.
+- `python -m unittest discover -s tools/aegis_adopt/tests -v` — 61 tests for adopt.
+- `python -m unittest discover -s tools/aegis_guard/tests -v` — 93 tests for the guard.
+- `python -m unittest discover -s tools/aegis_claude/tests -v` — 104 tests for the Claude adapter.
+
+They need `python` on `PATH` and the runner's `git` binary; they do not need the
+checkout to be a Git work tree. The adapter's 104 tests arrived with PR #1215
+(merge `626d304`), so no later increment is required. All 330 Aegis tool-suite
+tests were measured at `626d304` on Windows 11 / CPython 3.14.7 and Ubuntu
+24.04 / CPython 3.12.3. Because the job is path-filtered to `scripts/` or
+`tools/`, a pull request that changes only `.github/` and documentation cannot
+run these steps at its final head; the post-merge push run on `main` is the
+binding evidence for this wiring.
 
 ## Review packet (machine-readable)
 

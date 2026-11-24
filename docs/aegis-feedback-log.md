@@ -88,6 +88,7 @@ What happened: the ancestry, evidence-pack and scaffold suites (13+16+19 = 48 te
 Effect: the tests can be skipped without a red check.
 Idea for Aegis: a small workflow step for these suites.
 Status: fixed by PR #1198 (merge b659e670): local-tool-tests runs the 48 ancestry/evidence-pack/scaffold tests. The newer run-record/adopt suites remain unwired (B-011).
+Status update (2026-11-24): the residue in the line above is closed by B-011. local-tool-tests now also runs run-record (72), adopt (61), guard (93) and the Claude adapter (104) — 330 tests — for 378 in the job. The job stays path-filtered to scripts/ or tools/, so a .github-only PR cannot run it at its final head; the binding proof is the post-merge push run on main, and the merge SHA is recorded in the follow-up docs-only register PR.
 
 ### B-006 — Docs claimed no repository script executes while one is imported (2026-11-20)
 In the owner's words: no direct quote.
@@ -127,6 +128,7 @@ What happened: the 72 run-record tests and 50 adopt tests run only by hand; CI's
 Effect: regressions in the new tools can merge without a red check.
 Idea for Aegis: add one local-tool-tests step for tools/aegis_run and tools/aegis_adopt.
 Status: open for Aegis (needs a grant). The run-record, adopt and guard/adapter suites are also unwired (B-011).
+Status update (2026-11-24): wired by B-011, with no B-011b. local-tool-tests now runs run-record (72), adopt (61), guard (93) and the Claude adapter (104) — 330 tests — plus the older 48, for 378. Measured adopt is 61, not the 50 recorded above; the adapter is included because PR #1215 merged at 626d304. The pre-merge authority is a PR issue comment quoting the owner's 2026-11-24 autonomy instruction at the exact head; the register entry is post-merge, status CONSUMED, in a follow-up docs-only PR. The PR changes only .github and docs, so the path-filtered job cannot run at its final head: H2/H3 pre-merge evidence is omitted and the post-merge push run is the binding proof. gate-guard fails because .github/workflows is protected; it is recorded as failed with an exact-head owner-authorized disposition, never green or waived. No test edit is in the merged diff.
 
 ### B-012 — Skill-first sequencing failed while building an Aegis tool (2026-11-22)
 What happened: the adopt/doctor build was dispatched before its matching safety skill was read; the PR evidence table was not assembled at plan time; the feedback log was updated only after an owner prompt. D3 then surfaced symlink escape, wrapper execution, partial-write, mode-loss and read-only-target defects one at a time.
