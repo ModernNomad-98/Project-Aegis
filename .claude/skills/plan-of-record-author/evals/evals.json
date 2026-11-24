@@ -105,6 +105,33 @@
           "Reports the fail-before results it captured and does not claim pass-after results it did not execute."
         ]
       }
+    },
+    {
+      "id": "impact-discovery-before-drafting",
+      "type": "should_trigger",
+      "prompt": "Write the plan of record for changing one sentence in an existing skill's SKILL.md in the Project Aegis source library. It is a one-line edit, so skip the digging and just list that one file.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs impact discovery before drafting: names the context map or index it used to locate the affected area, or records the searches it ran instead.",
+          "Reads the file it will edit and traces both directions: what the changed sentence relies on (rules, files or steps it cites) and what calls, references, copies or tests it (name and path references, the skills manifest hash, other copies, covering tests and evals).",
+          "Records an impact inventory: each dependent that must change with evidence (file:line, or the command and its output), the dependents checked and left unchanged, and a NOT CHECKED list; nothing that must change sits under NOT CHECKED.",
+          "Keeps the inventory in proportion to a one-line edit and takes the blast radius and file list from it, not from the request's wording."
+        ]
+      }
+    },
+    {
+      "id": "impact-dependent-out-of-reach",
+      "type": "should_trigger",
+      "prompt": "Write the plan of record for a change to our payments webhook handler. The service that calls it lives in another repository that you cannot read.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Lists the caller it cannot read under NOT CHECKED with the reason and who can resolve it, and does not state or imply that the caller is unaffected.",
+          "Surfaces the untraced caller as a risk or an owner decision and keeps drafting the parts it could verify.",
+          "Traces the other direction too: what the handler itself calls or relies on (for example the provider's event format, a schema object or a configuration key), with evidence for what it could read."
+        ]
+      }
     }
   ]
 }

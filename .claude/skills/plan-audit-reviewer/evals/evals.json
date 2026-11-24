@@ -101,6 +101,32 @@
           "Does not issue ACCEPT while the plan's classification is missing or acknowledged-unclassified."
         ]
       }
+    },
+    {
+      "id": "impact-must-change-dependent-under-not-checked",
+      "type": "should_trigger",
+      "prompt": "Audit this captured plan-of-record revision. Its impact inventory lists the one skill file it edits. Its NOT CHECKED list has one line: 'manifests and other pins'. The skills manifest pins that file's hash.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs its own two-direction search for the edited file and records the commands, instead of grading the inventory by reading it.",
+          "Reports the manifest pin as a dependent that must change and that the plan lists only under NOT CHECKED, with evidence.",
+          "Returns REVISE with a minimal fix list bound to the captured hash; does not ACCEPT and does not add the missing row to the plan itself."
+        ]
+      }
+    },
+    {
+      "id": "impact-small-change-thin-evidence",
+      "type": "should_trigger",
+      "prompt": "Audit this plan for a one-word typo fix in a README sentence. The plan is three sentences in the pull request body and has no line saying what was read or traced. Nothing else in the repository quotes that sentence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs a quick search of its own, in proportion to the change, and confirms that nothing calls, references, copies or tests the sentence and that nothing must change with it.",
+          "Records the missing evidence line as a minor finding for the author to fix, and does not ask for an impact inventory, a separate planning artifact or a second full audit for it.",
+          "Returns ACCEPT bound to the captured revision, in one short paragraph."
+        ]
+      }
     }
   ]
 }

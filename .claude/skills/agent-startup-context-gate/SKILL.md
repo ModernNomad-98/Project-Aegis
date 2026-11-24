@@ -37,7 +37,7 @@ confidently building in the wrong place or against stale context.
 3. **Agent instructions:** `CLAUDE.md` (root and nested), `AGENTS.md`, and any
    tool-specific instruction files the repo carries.
 4. **Canonical status docs:** whatever the repo designates as current
-   (reconciliation records, roadmap, catalog, architecture docs).
+   (reconciliation records, roadmap, catalog, architecture docs), and its context map or index documents if it has any.
 5. **Task-referenced files:** every file or doc the task prompt names.
 
 ## Workflow
@@ -78,7 +78,7 @@ confidently building in the wrong place or against stale context.
    assumptions (unverified, each with the risk if wrong), and missing
    information (split into blocking vs non-blocking).
 7. **Emit the Startup Context Report** (see Output Format) and proceed only when
-   location is verified and no blocking unknowns remain; otherwise ask.
+   location is verified and no blocking unknowns remain; otherwise ask. PROCEED opens the work; it is not a plan. Before planning any change, locate the affected area (context map or index if the repository has one, otherwise searches you record), read what will change, and trace both directions: what it calls or relies on, and what calls, references, copies or tests it, with evidence in proportion to the change.
 
 
 ## Git Identity Gate (before the first commit)
@@ -292,6 +292,7 @@ Location: <path> — VERIFIED | FAILED
   Signals:  <independent location/role evidence used; missing fresh-repo signals identified>
 Working tree: <branch, ahead/behind, dirty files if any>
 Instructions read: <files, in order>
+Context map / index: <path to use when locating an affected area, or "none found" and the search to use instead>
 Facts:        <each with file:line or command evidence>
 Assumptions:  <each with risk-if-wrong>
 Missing info: <blocking> / <non-blocking>
@@ -306,6 +307,7 @@ Verdict: PROCEED | HALTED — <question for the human>
 - [ ] No assumption silently promoted to fact.
 - [ ] Every task-referenced file confirmed present, or flagged missing.
 - [ ] Blocking unknowns escalated to the human, not guessed around.
+- [ ] The report names the repository's context map or index, or says none was found.
 - [ ] Shared local resources use the mkdir lock with an owner token, a single-attempt trap release, bounded direct-child TERM/KILL, foreign/tokenless/successor preservation and a fail-closed unreadable-token path; unsupported platforms are SKIP/UNRUN, never PASS.
 - [ ] Effective hook path resolves core.hooksPath first (relative/tilde handled) before the git rev-parse --git-path fallback, and hook presence is not claimed as authenticity.
 

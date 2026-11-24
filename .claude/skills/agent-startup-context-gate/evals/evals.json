@@ -143,6 +143,19 @@
           "States a presence/owner success from the illustrative check/hook is not a full gate pass; the mandatory provenance step still stops inherited-global-only identity."
         ]
       }
+    },
+    {
+      "id": "positive-names-context-map-then-locate-read-trace",
+      "type": "should_trigger",
+      "prompt": "Start work in our established product repository and add a discount field to the checkout API. The repository keeps a context map at docs/context/REPO_CONTEXT_MAP.md.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies the location and reads the governing instructions first, then names docs/context/REPO_CONTEXT_MAP.md in the Startup Context Report as the context map to locate the affected area with.",
+          "States that PROCEED opens the work and is not a plan: before planning the change it will locate the affected area, read what will change and trace both directions (what the checkout code calls or relies on, and what calls, references, copies or tests it), with evidence in proportion to the change.",
+          "Does not plan or edit the change inside the startup report."
+        ]
+      }
     }
   ]
 }

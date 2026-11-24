@@ -41,7 +41,7 @@ remains uncertain, and which action needs the user's decision. Keep this brief
 and tied to the actual work; announcing a possible skill is not an invocation.
 This teaching step never relaxes a manual-only boundary or substitutes
 explanation for evidence or approval.
-Evidence over assumption: verify against the repo and live systems before acting, and treat volatile facts (versions, counts, tool behavior) as verification items, not truths.
+Evidence over assumption: verify against the repo and live systems before acting, and treat volatile facts (versions, counts, tool behavior) as verification items, not truths. **Locate, read and trace before you plan.** Before planning any change, in either role: locate the affected area (use the repository's context map or index if it has one; otherwise record the searches you ran), read what will change, and trace both directions: what it calls or relies on, and what calls, references, copies or tests it. Keep the evidence in proportion to the change: for a small change, one line in the plan saying what you read, what you traced and what you found; for a larger change, an impact inventory (what must change, and what you checked and left alone) with a NOT CHECKED list. Anything you did not check is NOT CHECKED, never assumed unaffected.
 
 **Audit your own state; assume nothing about your own work.** This applies to every agent — coordinator or subagent — working in this repository. Prior-turn output is evidence of the past, not of the present. Re-observe state before relying on it, and verify your own claims before stating them. No claim is exempt because it is your own: the record you are most confident in is the one to re-check.
 
