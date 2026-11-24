@@ -176,9 +176,25 @@ class InstallTests(AdapterTestCase):
         self.assertIn("python -P -m tools.aegis_claude.hook", expected)
         self.assertIn("--repo", expected)
         self.assertIn("--policy", expected)
-        # The Aegis checkout path for this repository contains a space, so the
-        # generated command must quote it.
-        self.assertIn('PYTHONPATH="', expected)
+
+        # Quoting depends on the checkout path, not on the runner. Construct
+        # both shapes so the assertion is deterministic on any host.
+        bare = cli.build_hook_command(
+            Path("/opt/aegis-checkout"), self.repo, self.policy
+        )
+        quoted = cli.build_hook_command(
+            Path("/opt/aegis checkout"), self.repo, self.policy
+        )
+        self.assertTrue(bare.startswith("PYTHONPATH=/opt/aegis-checkout "))
+        self.assertTrue(quoted.startswith('PYTHONPATH="/opt/aegis checkout" '))
+
+        # The installed command quotes the checkout only when it needs to.
+        aegis_path = self.aegis.resolve().as_posix()
+        if " " in aegis_path:
+            self.assertIn(f'PYTHONPATH="{aegis_path}"', expected)
+        else:
+            self.assertIn(f"PYTHONPATH={aegis_path}", expected)
+            self.assertNotIn('PYTHONPATH="', expected)
 
     def test_install_preserves_foreign_hooks_and_keys(self) -> None:
         foreign_session = {
