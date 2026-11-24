@@ -4,7 +4,7 @@
 - PLAN.md: what/why, scope and non-goals, blast radius, exact file inventory, count/gate deltas, protected-path/authority map, closure matrix, owner decisions, verification/re-base.
 - SPECS-ANNEX.md: inventory at the base, supersession/spec details, count coupling, closure staging, acceptance rows, authority.
 - A-ROWS.json: one row per acceptance criterion with an executable closure command, base expectation (fail-before) and after expectation (pass-after).
-- IMPACT.md: change size, risk, protected paths, authority and residual owner actions.
+- IMPACT.md: the impact inventory (must-change dependents with evidence, checked-unchanged dependents grouped with the search that found them, and the NOT CHECKED list), change size, risk, protected paths, authority and residual owner actions.
 - plan-binding.json: revision, base, artifacts and captures identities (bytes/LF/sha256), non-circular evidence bindings.
 - INDEX.md: what the plan answers, base, evidence, artifact identities, risks, next step.
 - final-verification.txt: the executed checks and their results at the captured revision.
