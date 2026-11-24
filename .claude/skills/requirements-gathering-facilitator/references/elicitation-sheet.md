@@ -87,6 +87,8 @@ information or decision target) and one quoted Ask (one atomic question).
   Ask: "What would make this feel over-built?"
 - Target: edge-case priority
   Ask: "Which single edge case worries you most?"
+- Target: first-version scope
+  Ask: "Should the first version do only <at most three capabilities the user named, in the user's own order>, leaving <any others the user named> for later, or do you want to change it?"
 
 **Constraints**
 
@@ -103,6 +105,23 @@ information or decision target) and one quoted Ask (one atomic question).
   Ask: "Are there legal or privacy rules the first version must follow?"
 - Target: sensitive data
   Ask: "Does this handle any personal or sensitive data?"
+
+**Safety (sensitive products only)**
+
+This area applies only when the product stores personal writing or
+health-related content, or includes an AI that talks to users. Decide that from
+what the user has already said or from the answer to the sensitive-data card;
+for any other product, do not ask these cards. When the area applies, its four
+targets are spec-blocking: the final brief waits for all four.
+
+- Target: crisis behaviour
+  Ask: "What should the product do when a user says they are in crisis or at risk of harm?"
+- Target: route to a real person
+  Ask: "How does a user reach a real person when the product cannot help?"
+- Target: who can read user content
+  Ask: "Who besides the user can read what the user writes or says?"
+- Target: deletion of user content
+  Ask: "How does a user delete what they have written or said?"
 
 **Dependencies**
 

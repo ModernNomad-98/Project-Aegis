@@ -200,6 +200,126 @@
           "Brief records the accumulated elicitation: restates the stated solution as a problem, identifies users and the current workaround, and captures non-goals, constraints and success measure from the supplied answers (confirmed), marking anything unanswered to-confirm."
         ]
       }
+    },
+    {
+      "id": "first-version-scope-question-after-nth-answer",
+      "type": "should_trigger",
+      "prompt": "Continue gathering requirements for a small app that helps a community garden group run its season. Five discovery questions have been answered so far: (1) the garden coordinator asked for the app, and the gardeners will use it; (2) today plots are assigned on a shared paper sheet; (3) the biggest problem is two members claiming the same plot; (4) the coordinator named three capabilities, in this order: a plot sign-up list, a watering rota, and a tool borrowing log; (5) the app only needs to work on phones. The first-version scope card is still unanswered. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Asks the first-version scope question as the one question of this turn, because 5 discovery questions have been answered and the scope card is unanswered.",
+          "The question names at most three capabilities inside the question text, in the user's own words and in the user's own order, and adds no capability the user did not name.",
+          "The turn contains exactly one question with exactly one question mark, offers yes or change it for that one target, and requests nothing else.",
+          "Does not produce the final requirements brief and does not rank or choose among the capabilities."
+        ]
+      }
+    },
+    {
+      "id": "first-version-scope-question-complete-when-displayed-alone",
+      "type": "should_trigger",
+      "prompt": "The requirements-gathering-facilitator is running under project-orchestrator, which shows the user only the ONE QUESTION field of the facilitator's turn and nothing else from it. The owner of a small bike repair shop has named five capabilities, in this order: online repair booking, a text message when the bike is ready, taking a deposit, printing job tickets, and a stock list. Five discovery questions have been answered and the first-version scope card is unanswered, so the scope question is due. Write exactly what the ONE QUESTION field should say.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "The question, read on its own in the orchestrator's ONE QUESTION field, names the first three capabilities in the user's own order and names every other capability the user named as left for later.",
+          "Nothing the user named is missing from the question and nothing the user did not name is in it.",
+          "The question does not depend on the discovery status line or on any other part of the turn to be understood."
+        ]
+      }
+    },
+    {
+      "id": "first-version-yes-ends-feature-exploration-only",
+      "type": "should_trigger",
+      "prompt": "The facilitator for a piano teacher's lesson scheduling app has just asked: 'Should the first version do only lesson booking, a reminder for each lesson, and a payment record, leaving a practice log for later, or do you want to change it?' The user replied: 'Yes, that is the first version.' Several spec-blocking questions are still open, including who can cancel a lesson and which devices the teacher uses. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the yes as a user-owned scope decision and returns it to the orchestrator's pending-decision batch; the facilitator records nothing itself.",
+          "Treats the first-version scope card as answered and asks for no further capabilities.",
+          "Continues with the remaining spec-blocking questions, one per turn; the yes ends feature exploration only.",
+          "Does not authorize building and does not claim that the project stage has advanced."
+        ]
+      }
+    },
+    {
+      "id": "first-version-change-it-without-a-stated-set",
+      "type": "should_trigger",
+      "prompt": "The facilitator has asked a food truck owner the first-version scope question, and the owner answered only: 'change it'. The owner had named four capabilities, in this order: online pre-orders, a loyalty stamp card, a daily specials board, and a map of today's location. The owner said nothing else about what the first version should include. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Leaves the first-version scope card unanswered, because the user said change it without saying what the first version should be.",
+          "Asks one question for the same card: which of the capabilities the user named the first version should do, naming all of them inside the question in the user's own order.",
+          "Does not choose, rank or cut the capabilities for the user, and adds none."
+        ]
+      }
+    },
+    {
+      "id": "first-version-scope-question-not-repeated-once-answered",
+      "type": "should_trigger",
+      "prompt": "A print shop owner already confirmed the first version earlier in this conversation: quote requests, an order status page, and a reorder button. The facilitator returned that decision to the orchestrator's pending-decision batch. Five more discovery questions have been answered since, so another scope question interval point has arrived, but the owner has not named a new capability or asked to change anything. Spec-blocking questions remain open, including which file formats the shop accepts and who approves a proof. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not ask the first-version scope question again, because its card is answered.",
+          "Does not treat the confirmed first version as open, since the user has neither named a new capability nor asked to change it.",
+          "Asks one remaining spec-blocking question as the one question of this turn."
+        ]
+      }
+    },
+    {
+      "id": "first-version-held-back-ideas-not-asked",
+      "type": "should_trigger",
+      "prompt": "Continue gathering requirements for a neighbourhood tool-sharing app. The user has named two capabilities so far: a list of tools members can lend, and a way to request a tool for the weekend. The assistant has several ideas the user never mentioned, such as ratings, a map of nearby members, and a damage deposit. The user has not asked what else the product could do. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not propose as a question any capability the user has not named; the idea is held back.",
+          "Offers the held-back ideas only when the user asks what else the product could do.",
+          "Asks one question that clarifies a capability the user already named or covers another unanswered card."
+        ]
+      }
+    },
+    {
+      "id": "safety-sensitive-product-asks-safety-targets",
+      "type": "should_trigger",
+      "prompt": "Continue gathering requirements for a journaling app where people write a private daily entry about their mood and can talk to an AI companion about their day. The user named three capabilities: a daily entry screen, a weekly mood chart, and a reminder. Every other spec-blocking question has been answered, so the requirements brief looks ready to write. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the product as sensitive and applies the Safety area: crisis behaviour, route to a real person, who can read user content, and deletion of user content.",
+          "Treats those four targets as spec-blocking and asks them one question per turn.",
+          "Does not produce the final requirements brief while any of the four is unanswered."
+        ]
+      }
+    },
+    {
+      "id": "safety-non-sensitive-product-skips-safety-targets",
+      "type": "should_trigger",
+      "prompt": "Continue gathering requirements for an app that lets school volunteers sign up for stalls at the annual book fair. The user named three capabilities: a stall list, a sign-up form, and a printed schedule. The product stores only stall names, dates and volunteer names, and has no chat feature or assistant that talks to users. One ordinary scope question is still unanswered. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not ask any card of the Safety area, because the product stores no personal writing or health-related content and includes no AI that talks to users.",
+          "Does not treat crisis behaviour, a route to a real person, reading of user content or deletion of user content as spec-blocking for this product.",
+          "Asks one ordinary discovery question for one unanswered card."
+        ]
+      }
+    },
+    {
+      "id": "safety-questions-asked-although-user-did-not-name-them",
+      "type": "should_trigger",
+      "prompt": "Continue gathering requirements for a daily journal app with an AI chat feature people use to talk through a hard day. The user named three capabilities, in this order: writing a daily entry, chatting with the AI, and a weekly summary. The user has not mentioned a human contact, who can read entries, or deleting entries, and has not asked what else the product could do. Give the facilitator's next turn.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Asks one Safety question, for example how a user reaches a real person, although the user has named neither a human contact nor deletion.",
+          "Does not hold the Safety questions back under the held-back rule; that rule covers proposed features only.",
+          "Does not propose any other capability the user has not named.",
+          "Does not produce the final requirements brief while a Safety target is unanswered."
+        ]
+      }
     }
   ]
 }
