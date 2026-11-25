@@ -7858,3 +7858,11 @@ carry this append, as the register's naming rule requires.
 - **Scope FORBIDDEN:** editing the protected test literals; changing required checks, gate-guard, branch protection.
 - **Evidence required:** exact head, pre-merge authority comment, post-merge push run on main, gate-guard red recorded with an exact-head disposition (never green, never waived).
 - **Recorded at / By:** 2026-11-24 / the Aegis delivery agent (DeepSeek Harness; configured route deepseek-flash; serving model not observable), transcribing only.
+### AEGIS-APR-178: Correction note — APR-176/APR-177 provenance and source (recording only; no new authority)
+
+- **Event:** CORRECTION — no grant, no scope change.
+- **Status at recording:** Corrects the two entries recorded 2026-11-24; both remain CONSUMED.
+- **APR-176:** the owner confirmed the paid-run line on 2026-11-24. The sealed EVG-13 report does not contain the quoted "GRANTED" paragraph; the quote is preserved only in the unsealed 2026-11-20 EVG-13 file, and the sealed holding note records "Run with a $100 cap" with the paid-run line listed as open. APR-176 is therefore recorded as owner-confirmed with that provenance gap, not as a sealed verbatim quote.
+- **APR-177:** the source path is `_aegis_evidence/2026-11-24/OWNER-DECISIONS-2026-11-23.md`, not `_A/evidence/...`.
+- **No new authority:** no protected path, key, spend or branch-protection authority is created.
+- **Recorded at / By:** 2026-11-24 / the Aegis delivery agent (DeepSeek Harness; configured route deepseek-flash; serving model not observable), transcribing the owner's confirmation only.
