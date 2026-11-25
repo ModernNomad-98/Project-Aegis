@@ -214,10 +214,65 @@ that failure is evidence about the input, not a merge gate, and no unrelated
 merge is blocked by it. Enable the variable only when B/D/E records and T6/T24
 authority exist; it is not automatic record detection.
 
-The signed attestation is a **planned** contract, described in
-[delivery-workflow.md](delivery-workflow.md#the-planned-stage-attestation-contract);
-no verifier, signing key or gate argument for it exists in this repository, and
-this page describes only the shipped neutral state.
+### The planned stage-attestation input
+
+**Planned contract, no implementation claim.** `aegis.stage-attestation/v1` is
+the machine-readable input a future gate would consume. No verifier, producer,
+signing key, workflow argument or required check for it exists in this
+repository, and the job's neutral default is unchanged.
+
+**Format.** One signed document per evaluated head: a compact JWS over a
+canonical (JCS) payload, under a closed four-member JWS header. The payload
+binds repository, change, merge target, `head_sha`, `tree_sha`, `base_sha`,
+plan hash, candidate, producer, reviewer and run. Its `stages` array holds one
+object per stage: D and E always, and B only when `plan_audit_applies` is true.
+Each stage object binds `head_sha` itself, with its record identity
+(`record_id`, `record_path`, `bytes`, `sha256`), verdict, holder,
+independence class and snapshot. F is not a stage: the payload's top-level
+`f_verdict` (`comment_id`, `value`, `posted_at`, `record_sha256`) must equal
+the F comment the adapter parsed.
+
+**What travels signed.** The signature covers hashes and references, not the
+record bytes. Each stage object names a `record_ref` locator plus the record's
+signed `sha256` and `bytes`. The raw record travels separately — one comment
+per stage, or a release asset when a record or the payload exceeds the budget —
+and the adapter re-fetches it and recomputes the hash. A record whose bytes
+disagree with the signed hash is refused, so editable transport cannot change
+what was signed.
+
+**Transport and budget.** The attestation comment starts with the sentinel
+line `aegis-stage-attestation/v1`, carries no 40-hex head and no verdict token
+on its first line, keeps the JWS in a fenced block, and is superseded rather
+than edited (two candidates for one head are a duplicate). Each record comment
+starts with `aegis-stage-record/v1 <stage>`. GitHub's 65,536-character comment
+cap is the outer bound; this contract adopts a 45,000-byte JCS payload ceiling
+(≈60,626 comment characters at RS256/2048-bit, 4,910 spare) and a
+60,000-character cap on the JWS comment and on each record comment or asset.
+Size is checked before JSON parsing or signature verification.
+
+**Fail-closed rules — absence, invalid input and valid input are different.**
+
+- *Absent (unavailable):* no attestation for the head. The adapter exits 0 with
+  no stage envelopes, the checker exits 1 naming `REQUIRED_INPUT_UNAVAILABLE`,
+  and the published status is a failure. Absence is not a pass; there is no
+  neutral token.
+- *Invalid (refused):* malformed JSON/JWS is `ATTESTATION_MALFORMED`; a bad
+  signature is `SIGNATURE_INVALID`; an unknown key is `KEY_UNKNOWN`; revoked,
+  expired or retired-after-window keys are `KEY_REVOKED`, `KEY_EXPIRED` or
+  `KEY_RETIRED`; a key outside its window is `KEY_NOT_YET_VALID` or
+  `KEY_WINDOW_CLOSED`; two candidates are `ATTESTATION_DUPLICATE`; an oversize
+  payload is `ATTESTATION_OVERSIZE` (a record over its bound is
+  `RECORD_OVERSIZE`); a missing F comment is
+  `ATTESTATION_F_VERDICT_UNAVAILABLE`; a signed F value that disagrees with the
+  parsed one is `ATTESTATION_F_VERDICT_MISMATCH`. The adapter exits 9 with the
+  specific code and writes no envelopes. An attestation for another head is
+  never bound: it is recorded stale and the run fails (exit 8, `HEAD_MOVED`, or
+  absent plus a stale record). These are refused inputs, not absence, and none
+  of them is rendered as a pass.
+- *Valid:* the checker runs C1-C13, and readiness is still false under T6 (no
+  supported authentication method is recorded), T24 (the revision-state store
+  is UNVERIFIED) and T7 (no disposition authority is defined). The attestation
+  is evidence, never a merge gate.
 
 ### Adapter, checker and publisher
 
