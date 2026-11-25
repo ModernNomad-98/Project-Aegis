@@ -202,10 +202,22 @@ and refuses to run unless the executed file is the default-branch
 The workflow has no `push`, `workflow_dispatch` or `workflow_run` trigger and
 no `continue-on-error`; it has one deliberate job-level operator switch,
 `AEGIS_VERDICT_GATE`. When the variable is unset (the default) the job is
-skipped, publishes no commit status and produces no evidence. GitHub may treat
-a skipped required check as satisfied, so the job must never be registered as
-required. Enable the variable only when B/D/E records and T6/T24 authority
-exist; it is not automatic record detection.
+**skipped**: it publishes **no commit status** and **evaluates nothing**. The
+skipped run is itself recorded by Actions — run id, event, ref, conclusion
+`skipped` — so the accurate statement is that it leaves **a record that no
+evaluation occurred**; it is not evidence of a verdict, and it is not the
+absence of a record. A skipped job is neutral in the UI but is **not a pass**:
+GitHub may treat a skipped required check as satisfied, which is why this job
+must never be registered as required. When enabled with no valid signed
+attestation, the job posts a **failure** naming `REQUIRED_INPUT_UNAVAILABLE`;
+that failure is evidence about the input, not a merge gate, and no unrelated
+merge is blocked by it. Enable the variable only when B/D/E records and T6/T24
+authority exist; it is not automatic record detection.
+
+The signed attestation is a **planned** contract, described in
+[delivery-workflow.md](delivery-workflow.md#the-planned-stage-attestation-contract);
+no verifier, signing key or gate argument for it exists in this repository, and
+this page describes only the shipped neutral state.
 
 ### Adapter, checker and publisher
 

@@ -507,11 +507,13 @@ the pointer, never the condition's requirement text.
 **The `aegis-verdict-gate` job is neutral/skip by default.** The workflow job is
 skipped unless repository variable `AEGIS_VERDICT_GATE` is exactly `on`; it
 registers no required context and must never be registered as one. A skipped
-job is neutral in the UI, publishes no commit status and produces no evidence,
-and GitHub may treat a skipped required check as satisfied. `AEGIS_VERDICT_GATE`
-is an operator switch, not automatic record detection: it defaults off, and
-enabling it is the operator's claim that the B/D/E stage records actually
-exist and the T6/T24 authority is present. Enable it only on that claim.
+job is neutral in the UI and publishes no commit status: the run itself is
+recorded with conclusion `skipped`, a record that no evaluation occurred and
+not evidence of a verdict. GitHub may treat a skipped required check as
+satisfied. `AEGIS_VERDICT_GATE` is an operator switch, not automatic record
+detection: it defaults off, and enabling it is the operator's claim that the
+B/D/E stage records actually exist and the T6/T24 authority is present. Enable
+it only on that claim.
 
 **Why the `MG` cells are links.** For an `MG` row the legitimate passing path is
 the linked condition itself. Stating that condition here would make this table
@@ -597,6 +599,34 @@ the original evidence identity and binds a target head; it does not replace or
 edit the original evidence, does not copy a `PASS`, does not waive required CI
 and does not create approval. A `VALID` reuse decision is a decision record;
 the review and approval route still applies.
+
+#### The planned stage-attestation contract
+
+**A planned contract, not an implementation.** The contract is
+`aegis.stage-attestation/v1`; it names the input a future gate would consume.
+No verifier, producer, signing key, workflow argument or required check exists
+for it, the job's neutral default is unchanged, and no C1 implementation is
+claimed here.
+
+- **Head-bound B/D/E/F declarations.** One attestation per change carries the
+  B, D, E and F stage declarations. Each binds the frozen head together with
+  the base, tree, change and plan identity, so a declaration cannot be replayed
+  onto another head and one issued for a stale head is never bound.
+- **Signed.** The declarations travel in a single signed record, verified
+  offline, so a record cannot be altered without detection. The signing
+  mechanism is an undecided owner decision (OD-1), and no key exists yet.
+- **Absence is not a pass.** The contract has no neutral token: missing,
+  malformed, stale, duplicate or signature-invalid input is absence, and
+  absence is never rendered as a pass. While `AEGIS_VERDICT_GATE` is unset the
+  job is skipped; enabled without a valid attestation it posts a failure naming
+  `REQUIRED_INPUT_UNAVAILABLE`.
+- **Readiness stays false.** A valid attestation would not make readiness true:
+  it remains false under T6 (no supported authentication method is recorded),
+  T24 (the revision-state store is UNVERIFIED) and T7 (no disposition authority
+  is defined). The attestation is evidence, never a merge gate.
+
+The shipped job is unchanged by this description: it stays non-required and
+neutral by default, and the contract above is not part of its input path.
 
 ### Self-approval and one active worker (pointer)
 
