@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "ef8dbb13059814a612a2059efa643a5a4b558838",
+  "source_revision": "14be37a3923aa070203e4bade3073fa2d4c25d07",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -46,7 +46,7 @@
     {
       "name": "agent-containment-reviewer",
       "path": ".claude/skills/agent-containment-reviewer/SKILL.md",
-      "sha256": "dc7b8db1a0a04ceb403a12f06aed52e45569e19fc43fcae4ee676311890955b8"
+      "sha256": "64d2c0ad5cad86973c04583cf3e52e71413ebd6b5506ddc5928bc055b792f102"
     },
     {
       "name": "agent-failure-recovery",
@@ -101,7 +101,7 @@
     {
       "name": "ai-closeout-reporter",
       "path": ".claude/skills/ai-closeout-reporter/SKILL.md",
-      "sha256": "c902828ab79fb94b4c8eae020834987c136002e05576844b643fe6d07a0bf765"
+      "sha256": "413f97ee0cb1605c1535ae0e0b746fbcbe09bfb90f35a678b45143d4bcbc02d5"
     },
     {
       "name": "ai-cost-guardrail-designer",
@@ -171,7 +171,7 @@
     {
       "name": "application-layer-pattern-advisor",
       "path": ".claude/skills/application-layer-pattern-advisor/SKILL.md",
-      "sha256": "bd6147a97f895d59e33a21da1cb6c5768274a7fd3368a81b00020d6ff13b0162"
+      "sha256": "684adf328305e6e144b118c6015169114f0080f3a4ca8650d2dfa58a47d6feb9"
     },
     {
       "name": "appsec-implementer",
@@ -226,7 +226,7 @@
     {
       "name": "azure-saas-architect",
       "path": ".claude/skills/azure-saas-architect/SKILL.md",
-      "sha256": "72f0bfde0e9da93dc42a3fa4e925d72ec5d0d1a9e32755f66a0dd681da14d455"
+      "sha256": "906802b9302da85084708b41f42106879a7f5ad56cc294759b89c408a585c254"
     },
     {
       "name": "background-job-orchestration-architect",
@@ -441,7 +441,7 @@
     {
       "name": "disaster-recovery-plan-author",
       "path": ".claude/skills/disaster-recovery-plan-author/SKILL.md",
-      "sha256": "a01fd632e3877bb7c3848a88ddfbfb982fab81b925154bd7b164f6b362a314c2"
+      "sha256": "ae05fe139a67721f41ad831c473ce42bc8f05a880cd237b1d88a29b42fe93458"
     },
     {
       "name": "docs-as-code-architect",
@@ -586,7 +586,7 @@
     {
       "name": "horizontal-scalability-reviewer",
       "path": ".claude/skills/horizontal-scalability-reviewer/SKILL.md",
-      "sha256": "9b1870cef2948d0f0efe7b97c1eff94f4708d23718113d5aad1110a6e8bde793"
+      "sha256": "f971384bb1c3ce3e8d03c33590c7180d7d58b7e5124df9ef0a09b23dbd3a82bb"
     },
     {
       "name": "human-agent-trust-reviewer",
@@ -626,12 +626,12 @@
     {
       "name": "inter-agent-comms-reviewer",
       "path": ".claude/skills/inter-agent-comms-reviewer/SKILL.md",
-      "sha256": "eb421773e3fc70de1722784c56897e750c50399a8ce9fe379feb7b36c2c3d9c8"
+      "sha256": "ac7a5f1cc62f3e23ccde1c3ab260df6b20b7e9f231937e1560ccecdd7aacd63c"
     },
     {
       "name": "interface-first-designer",
       "path": ".claude/skills/interface-first-designer/SKILL.md",
-      "sha256": "9d74614e25fc815a1ec0d38f9ff352ec1af1576f3aa576c42414484f4c2a87ce"
+      "sha256": "c75663e378279b432511e97d69ff7e952d84b1fd32bd58f6a995180a10c6e96e"
     },
     {
       "name": "intra-tenant-scope-architect",
@@ -691,7 +691,7 @@
     {
       "name": "membership-invitation-designer",
       "path": ".claude/skills/membership-invitation-designer/SKILL.md",
-      "sha256": "4d78b890a18f367c8adede645cf62691ebf0ac7ea432f0ed81e961d736125819"
+      "sha256": "5d28bf6e03ea0a7b52c5e50f0743a031109523531a652b90cf95ad48186af3c0"
     },
     {
       "name": "memory-context-poisoning-reviewer",
@@ -706,7 +706,7 @@
     {
       "name": "mobile-journey-test-designer",
       "path": ".claude/skills/mobile-journey-test-designer/SKILL.md",
-      "sha256": "81edb394e410242980c7a1441b56afa8d3130c55d7fe1646e0457ac6157f8b8d"
+      "sha256": "c06ad76350bd9968080ab18c69b5bd65c3277efd76a103a16f8e08be56778adf"
     },
     {
       "name": "mobile-viewport-craft",
@@ -996,7 +996,7 @@
     {
       "name": "saas-offboarding-architect",
       "path": ".claude/skills/saas-offboarding-architect/SKILL.md",
-      "sha256": "4a9eeb61861af543fef1dab8e17d3c5bb04cb3ee19938dadffb51907d4338633"
+      "sha256": "699ebfcfbcfd6896833f344702bcb493f5d5c814391151a4ff9d0260b754e5ba"
     },
     {
       "name": "saas-platform-architect",
@@ -1031,7 +1031,7 @@
     {
       "name": "screenshot-evidence-planner",
       "path": ".claude/skills/screenshot-evidence-planner/SKILL.md",
-      "sha256": "4f03a057160509eeb89529242415ab0e8be244cc34dcb2b558c3a4d170c9b46e"
+      "sha256": "09eeccc9577ba446fa8a8ca7b409d7d1cb63118b9ed6c9785b5f240cbbe6a9ed"
     },
     {
       "name": "search-architecture-designer",
@@ -1071,7 +1071,7 @@
     {
       "name": "security-regression-harness-designer",
       "path": ".claude/skills/security-regression-harness-designer/SKILL.md",
-      "sha256": "e940253d9b3ca72073ba7f64ae9da6efbdde6016d81d5a68682dd1fc3ce51c7c"
+      "sha256": "88871611e312679391a07b24a016ac5324c10867eacb39631f558427eedd47c6"
     },
     {
       "name": "security-scan-orchestrator",
@@ -1196,7 +1196,7 @@
     {
       "name": "superadmin-observability-console-designer",
       "path": ".claude/skills/superadmin-observability-console-designer/SKILL.md",
-      "sha256": "37cebb01b0a7c601fa0f72cd07ce1bb4df438a516680a116ed300896b0bfe3f5"
+      "sha256": "4d434f81766577360ab055673a87852d3deb6a2cc0c33a21f43bd64288857bc3"
     },
     {
       "name": "supply-chain-security-reviewer",
@@ -1236,7 +1236,7 @@
     {
       "name": "tenant-modeler",
       "path": ".claude/skills/tenant-modeler/SKILL.md",
-      "sha256": "3163e5b4334a2acdef1b94bd7019cdae548b408732f4b411107a3ccb94068360"
+      "sha256": "58b44f57054777c76d245060050c710018d69fb24fce97bdb436c63d66efa530"
     },
     {
       "name": "tenant-provisioning-designer",
