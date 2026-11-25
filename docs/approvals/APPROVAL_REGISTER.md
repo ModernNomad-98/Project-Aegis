@@ -7837,3 +7837,33 @@ carry this append, as the register's naming rule requires.
 - **Scope FORBIDDEN:** changing required checks, workflows, gate-guard, branch-protection settings or the approval mechanism; waiving or displaying a failed/skipped check as green/passed; merging without the exact-head independent PASS; using admin merge for any other unmet requirement or a non-required failure.
 - **Evidence required:** exact head, independent PASS naming head + bound-fields hash, reason for the bypass, every check state with run links, skipped lanes recorded never-passed, merge commit, receipt.
 - **Recorded at / By:** 2026-11-18 / the Aegis delivery agent (DeepSeek Harness; configured route deepseek-flash; serving model not observable), recording only.
+### AEGIS-APR-176: AEGIS-EVG-1 measurement run — synthetic data, $100 cap (owner direct chat instruction 2026-11-20; consumed by the three EVG-06 runs on 2026-11-22)
+
+- **Event:** GRANT — one measurement-run authorization for the AEGIS-EVG-1 package.
+- **Owner instruction (owner's preserved words, quoted):** "AEGIS-EVG-1 measurement run: GRANTED, for the runs planned in EVG-06 once that plan has passed its independent audit. Synthetic data only. No deploy to a live URL. Total spend cap $100 across all live runs. Record the grant in the approval register. Before the first run, post your estimate in status (runs x model x expected tokens). Record run ID, model, settings and actual cost per run. If the next run would push spend past $100, stop the runs, report what ran, and table the rest. Everything else keeps going."
+- **Source:** `C:\Temp\evg-13-package-report-2026-11-20.md`, section "Q1 (blocks EVG-07, the measurement run) — send the paid-run line"; captured at `_A/evidence/aegis-evg-1-2026-11-24/evg-13-package-report-2026-11-21.md`.
+- **Status at recording:** CONSUMED — three runs completed 2026-11-22, total approximately $0.9822 of the $100 cap (`evg-06-results-2026-11-22.md`; transcripts verified at `_A/evidence/evg-06-runs-2026-11-24/`).
+- **Scope allowed:** the three scripted persona runs (R1/R2/R3), synthetic data, no live deploy, at most $100.
+- **Scope FORBIDDEN:** further runs without a new decision; production data; deployment to a live URL.
+- **Evidence required:** run id, model, settings, per-run cost, full transcripts (retained at `_A/evidence/evg-06-runs-2026-11-24/`).
+- **Recorded at / By:** 2026-11-24 / the Aegis delivery agent (DeepSeek Harness; configured route deepseek-flash; serving model not observable), transcribing only.
+
+### AEGIS-APR-177: B-011 .github CI-wiring grant — one-time, consumed by PR #1217 (owner direct chat instruction 2026-11-23; recorded 2026-11-24)
+
+- **Event:** GRANT — one-time authority to wire the four Aegis tool suites into `local-tool-tests`.
+- **Owner instruction (owner's preserved words, quoted):** "B-011: grant the `.github` CI-wiring work." (item 4 of the seven authorized items)
+- **Source:** `_A/evidence/2026-11-24/OWNER-DECISIONS-2026-11-23.md`, "Authorized", item 4 (owner instruction 2026-11-23 23:41 PT).
+- **Status at recording:** CONSUMED — PR #1217, merge `90dbe8f9c73c4758461a70f9070aaac7480a8f5e` (merged 2026-11-24T16:57:18Z); `local-tool-tests` now runs 378 tests (330 new) per `docs/aegis-feedback-log.md`.
+- **Scope allowed:** the `.github` workflow change and the wiring of the run-record (72), adopt (61), guard (93) and Claude-adapter (104) suites.
+- **Scope FORBIDDEN:** editing the protected test literals; changing required checks, gate-guard, branch protection.
+- **Evidence required:** exact head, pre-merge authority comment, post-merge push run on main, gate-guard red recorded with an exact-head disposition (never green, never waived).
+- **Recorded at / By:** 2026-11-24 / the Aegis delivery agent (DeepSeek Harness; configured route deepseek-flash; serving model not observable), transcribing only.
+### AEGIS-APR-178: Correction note — APR-176/APR-177 provenance and source (recording only; no new authority)
+
+- **Event:** CORRECTION — no grant, no scope change.
+- **Status at recording:** Corrects the two entries recorded 2026-11-24; both remain CONSUMED.
+- **APR-176:** the owner confirmed the paid-run line on 2026-11-24. The sealed EVG-13 report does not contain the quoted "GRANTED" paragraph; the quote's only primary copy is the unsealed 2026-11-20 EVG-13 file; it is also reproduced in the sealed UNBLOCK report (sections 2.1 and 5), which quotes it without an owner message id; the sealed holding note records "Run with a $100 cap" with the paid-run line listed as open. APR-176 is therefore recorded as owner-confirmed with that provenance gap, not as a sealed verbatim quote.
+- **Authority timing:** the 2026-11-22 runs were conducted inside the owner's 2026-11-20 instruction (measurement run, total spend cap $100 — sealed holding note `_A/evidence/aegis-evg-1-2026-11-24/evg-01-owner-decisions-holding-2026-11-20.md`, sha256 `5fe1b7d183ab06bd7290dab0694b7ac2ee87384d95503d5b83b1ed385230464b`); the paid-run line's detailed conditions were confirmed by the owner on 2026-11-24, after the runs, so that confirmation is not the source of authority for the spend; the sealed EVG-06 plan records the line as granted on 2026-11-21, before that confirmation, and that is part of the stated provenance gap.
+- **APR-177:** the source path is `_aegis_evidence/2026-11-24/OWNER-DECISIONS-2026-11-23.md`, not `_A/evidence/...`.
+- **No new authority:** no protected path, key, spend or branch-protection authority is created.
+- **Recorded at / By:** 2026-11-24 / the Aegis delivery agent (DeepSeek Harness; configured route deepseek-flash; serving model not observable), transcribing the owner's confirmation only.
