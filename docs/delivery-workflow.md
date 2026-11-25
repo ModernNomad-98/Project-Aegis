@@ -507,11 +507,13 @@ the pointer, never the condition's requirement text.
 **The `aegis-verdict-gate` job is neutral/skip by default.** The workflow job is
 skipped unless repository variable `AEGIS_VERDICT_GATE` is exactly `on`; it
 registers no required context and must never be registered as one. A skipped
-job is neutral in the UI, publishes no commit status and produces no evidence,
-and GitHub may treat a skipped required check as satisfied. `AEGIS_VERDICT_GATE`
-is an operator switch, not automatic record detection: it defaults off, and
-enabling it is the operator's claim that the B/D/E stage records actually
-exist and the T6/T24 authority is present. Enable it only on that claim.
+job is neutral in the UI and publishes no commit status: the run itself is
+recorded with conclusion `skipped`, a record that no evaluation occurred and
+not evidence of a verdict. GitHub may treat a skipped required check as
+satisfied. `AEGIS_VERDICT_GATE` is an operator switch, not automatic record
+detection: it defaults off, and enabling it is the operator's claim that the
+B/D/E stage records actually exist and the T6/T24 authority is present. Enable
+it only on that claim.
 
 **Why the `MG` cells are links.** For an `MG` row the legitimate passing path is
 the linked condition itself. Stating that condition here would make this table
@@ -597,6 +599,15 @@ the original evidence identity and binds a target head; it does not replace or
 edit the original evidence, does not copy a `PASS`, does not waive required CI
 and does not create approval. A `VALID` reuse decision is a decision record;
 the review and approval route still applies.
+
+#### Planned stage-attestation input
+
+The planned machine-readable input for this advisory job — its format,
+transport, size budget and fail-closed rules — is described in
+[the CI page](offline-ci.md#the-planned-stage-attestation-input). Nothing there
+is implemented: no verifier, producer, signing key, workflow argument or
+required check exists. This pointer restates no stage definition and changes no
+stage, gate or check.
 
 ### Self-approval and one active worker (pointer)
 
