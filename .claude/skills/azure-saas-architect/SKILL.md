@@ -7,7 +7,7 @@ description: Map a DECIDED logical architecture onto provider-idiomatic Azure fo
 
 **Reading key:** API means application programming interface; DB means
 database; SaaS means software as a service. The last paragraph of Purpose
-defines the other abbreviations used here, such as IaC, CI/CD and SKU. The service map below uses current product names as choices to
+defines the other abbreviations used here, such as IaC, CI/CD and SKU. The service map in `references/azure-mapping.md` uses current product names as choices to
 verify, not as fixed quota or price claims.
 
 ## Purpose

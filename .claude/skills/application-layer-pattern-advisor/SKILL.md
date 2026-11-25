@@ -74,7 +74,7 @@ Return, in this order:
 - The caller wants implementation, execution or approval: refuse; return the artifact for the authorized owner.
 - Required evidence is unavailable: mark the artifact UNVERIFIED and state what is missing instead of inventing facts.
 - Transaction boundary/scope, isolation, lock order and compensation design route to `transaction-scope-designer`; this skill may identify where a transaction boundary sits but does not design its scope.
-- **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer`, `transaction-scope-designer`.
+- **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `outbound-integration-adapter-designer`, `release-readiness-reviewer`, `tech-spec-writer`, `transaction-scope-designer`.
 
 ## Supporting Files
 

@@ -81,6 +81,6 @@ Return, in this order:
 
 - [security-regression-checklist](references/security-regression-checklist.md) - Security regression harness checklist and evidence rules.
 - [evals/evals.json](evals/evals.json) - the 6 behaviour cases for this skill.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against the nearest owners.
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 15 negative trigger-discrimination cases against the nearest owners.
 
 **Source:** docs/skills-catalog.md - cat 03 #125 (Security Regression Harness); coverage roadmap #125. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.

@@ -431,7 +431,7 @@ The Batch 4 additions (D112, 2026-10-21) extend this pack to 30 skills: `state-m
 Most ship the standard 22-case trigger-eval file (8 positive / 14 negative) against real manifest owners; four skills include extra reciprocal/seam-handoff cases (23-25 cases, 8 positive and 15/16/17 negative; each SKILL records its own count).
 The Batch 1 Phase 2 additions (`layered-architecture-enforcer`,
 `dependency-direction-guard`, `interface-first-designer`, `data-flow-diagrammer`,
-`concurrency-race-reviewer`) also ship standalone 22-case trigger-eval files (data-flow-diagrammer is now 23 after its added PII-lifecycle negative case): `layered-architecture-enforcer` and `dependency-direction-guard` discriminate each other (layer-specific rules vs package/feature direction policy) and both against `architecture-designer`; `interface-first-designer` discriminates `api-event-architect`, `tdd-engineer` and `docs-first-implementer`; `data-flow-diagrammer` discriminates `architecture-designer`, `observability-by-design` and `threat-modeler`, and lists the PII lifecycle owner `pii-lifecycle-designer` as a near-miss owner; `concurrency-race-reviewer` discriminates `flaky-test-detective`, `systematic-debugger`, `background-job-orchestration-architect` and `test-plan-designer`.
+`concurrency-race-reviewer`) also ship standalone 22-case trigger-eval files (data-flow-diagrammer is now 23 after its added PII-lifecycle negative case; interface-first-designer also has 23, 8 positive and 15 negative): `layered-architecture-enforcer` and `dependency-direction-guard` discriminate each other (layer-specific rules vs package/feature direction policy) and both against `architecture-designer`; `interface-first-designer` discriminates `api-event-architect`, `tdd-engineer` and `docs-first-implementer`; `data-flow-diagrammer` discriminates `architecture-designer`, `observability-by-design` and `threat-modeler`, and lists the PII lifecycle owner `pii-lifecycle-designer` as a near-miss owner; `concurrency-race-reviewer` discriminates `flaky-test-detective`, `systematic-debugger`, `background-job-orchestration-architect` and `test-plan-designer`.
 
 A fourth cluster was added by D77 (2026-10-10): **boundary & telemetry design**
 (`validation-boundary-designer`, `observability-by-design`) — with cross-phase
@@ -449,7 +449,7 @@ discrimination against `security-pr-reviewer`, `multi-tenant-security-tester`,
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (the original nine sit in one of three overlap clusters;
-`feature-flag-architect`, added by D64, carries its own seams; the seven Batch 2 additions ship their own 22-case trigger-eval files). None has
+`feature-flag-architect`, added by D64, carries its own seams; the seven Batch 2 additions ship their own trigger-eval files: 22 cases each, except `saas-offboarding-architect` with 23). None has
 side effects, so all are model-invocable. Per [historical master prompt, section 5](prompts/claude-skills-master-generation-prompts-v4.md): tenant isolation is
 treated as cross-cutting (identity, data, API, storage, logs, analytics, support,
 exports, imports, jobs, search, AI retrieval, billing, flags, audit), every skill
@@ -508,7 +508,7 @@ A fifth cluster was added by D109 (2026-10-21): **SaaS lifecycle**
 ### Skills (Phase 4 — security, RLS & supply-chain pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (the original nine sit in one of two overlap clusters; the two Batch 1 additions ship standalone 22-case trigger-eval files). Per
+`evals/trigger-evals.json` (the original nine sit in one of two overlap clusters; the two Batch 1 additions ship standalone trigger-eval files: 23 cases for `security-regression-harness-designer` and 22 for `security-impact-note-author`). Per
 [historical master prompt, section 6](prompts/claude-skills-master-generation-prompts-v4.md): OWASP Application Security Verification Standard (ASVS)-style verification, NIST Secure Software Development Framework (SSDF)-style secure-SDLC, and Supply-chain Levels for Software Artifacts (SLSA)-style
 supply-chain thinking; scanner output is treated as input, not truth; high-severity
 claims require an exploit path or abuse scenario; tenant isolation and object-level
@@ -549,7 +549,7 @@ the **threat & hardening** cluster (`threat-modeler`, `appsec-implementer`,
 `static-analysis-reviewer`) — the latter with explicit discrimination against the
 shipped `code-reviewer` (general review vs security-specialized); the Batch 1 Phase 4 additions
 (`security-regression-harness-designer`, `security-impact-note-author`) also ship
-standalone 22-case trigger-eval files: `security-regression-harness-designer` discriminates
+standalone trigger-eval files (23 and 22 cases): `security-regression-harness-designer` discriminates
 `security-pr-reviewer`, `multi-tenant-security-tester`, `tdd-engineer` and
 `playwright-e2e-engineer`; `security-impact-note-author` discriminates `security-pr-reviewer`,
 `threat-modeler`, `human-approval-boundary` and `change-classification-gate`. The **tenant-security**

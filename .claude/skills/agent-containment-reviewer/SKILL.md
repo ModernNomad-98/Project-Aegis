@@ -39,7 +39,7 @@ skill authors or improves that procedure; it does not execute containment.
   agent fleet.
 - Use when: the Phase 7 (AI security and large language model (LLM) systems
   pack) expansion backlog
-  item roadmap #299 "AI feature kill switch" (AI means artificial
+  item roadmap #299 "AI feature kill switch" (dropped as already covered; AI means artificial
   intelligence) is raised for an AGENT system — this skill owns that agentic
   slice.
 - Do NOT use when: the deviation is attacker-directed goal alteration

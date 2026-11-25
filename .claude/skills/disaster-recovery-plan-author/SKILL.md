@@ -58,7 +58,7 @@ recovery, invents no target, designs no topology and certifies nothing.
 - Do NOT use when: the ask is a release or migration rollback —
   `rollback-runbook-author` owns release backout; this skill owns DR.
 - Do NOT use when: the ask is site, region or topology design — that design
-  belongs with site-resilience-architect (not built at this base); record the
+  belongs with site-resilience-architect; record the
   design gap and its owner instead of inventing topology.
 - Do NOT use when: the ask is an ISO 22301, SOC 2 or contract conformance
   claim — the compliance family reads a licensed copy and issues no verdict
@@ -259,4 +259,4 @@ Not claimed: <no target invented; no tier called tested without a dated
 - `evals/trigger-evals.json` — discrimination against
   `business-continuity-planner`, `resilience-architecture-reviewer`,
   `database-backup-verifier`, `incident-response-runbook`,
-  `rollback-runbook-author` and the future site-resilience design.
+  `rollback-runbook-author` and the site-resilience design.

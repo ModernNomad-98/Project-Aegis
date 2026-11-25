@@ -1,6 +1,6 @@
 {
   "skill": "disaster-recovery-plan-author",
-  "description": "Trigger discrimination for the Operational continuity DR author: the technical DR plan vs the BIA/BCP, design review, restore proof, live incident response, release rollback, the future site-resilience design and the compliance family.",
+  "description": "Trigger discrimination for the Operational continuity DR author: the technical DR plan vs the BIA/BCP, design review, restore proof, live incident response, release rollback, the site-resilience design and the compliance family.",
   "overlaps_with": [
     "business-continuity-planner",
     "resilience-architecture-reviewer",
@@ -109,7 +109,7 @@
       "should_not_trigger": [
         "disaster-recovery-plan-author"
       ],
-      "reason": "Topology and site design belong to the future site-resilience design (site-resilience-architect, not built at this base); the reviewer is the nearest review route and reviews, never designs. The DR author records the missing design as an owned gap and does not invent it."
+      "reason": "Topology and site design belong to the site-resilience design (site-resilience-architect); the reviewer is the nearest review route and reviews, never designs. The DR author records the missing design as an owned gap and does not invent it."
     },
     {
       "id": "certification-goes-to-compliance",

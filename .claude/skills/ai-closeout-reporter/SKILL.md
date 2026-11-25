@@ -118,7 +118,7 @@ Rule: every claim quotes command and observed output; missing or negative read-b
 
 ## Implementation-PR body requirement
 
-Every implementation PR body (M-2) carries exactly one five-column Aegis-skills-applied
+Every implementation PR body carries exactly one five-column Aegis-skills-applied
 table: Skill and source revision | Actor / role | Purpose | How applied | Result, evidence,
 and limitations.
 
