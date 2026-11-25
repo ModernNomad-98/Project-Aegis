@@ -20,7 +20,7 @@ workflow's own per-event allowed-skip set is enforced, so a skipped
 `validate-skills`, `changes`, `tools-tests-linux` or
 `windows-offline-checks` job on an event that should run it is INCOMPLETE
 with the job named, while the lawful `gate-guard` skip on a push and the
-three advisory skips on a pull request stay COMPLETE.
+four advisory skips on a pull request stay COMPLETE.
 
 `TokenHeaderRefusalTests` and `ArtifactCellTests` close the two MINOR
 findings the #740 final review r4 carried into this follow-up round: F-r4-1
@@ -130,7 +130,11 @@ def run_payload(head=HEAD, conclusion="success", status="completed",
 
 
 def green_jobs(event="push"):
-    """The push fixture: six real durations, `gate-guard` legitimately skipped."""
+    """The push fixture: six real durations, `gate-guard` legitimately skipped.
+
+    `local-tool-tests` is a synthetic seventh job (33 s): run 38198781208
+    predates that job, and the roster now requires it.
+    """
     return [job(1, "changes", "success", 0, 7, step_list=steps(event)),
             job(2, "validate-skills", "success", 0, 109,
                 step_list=steps(event)),
@@ -140,6 +144,8 @@ def green_jobs(event="push"):
             job(5, "tools-tests-linux", "success", 40, 172,
                 step_list=steps(event)),
             job(6, "tools-tests-windows", "success", 50, 279,
+                step_list=steps(event)),
+            job(7, "local-tool-tests", "success", 20, 53,
                 step_list=steps(event))]
 
 
@@ -166,6 +172,8 @@ def pr_jobs(dco="success", pr_body="success", gate="success"):
             job(5, "tools-tests-linux", "success", 0, 151,
                 step_list=steps("pull_request")),
             job(6, "tools-tests-windows", "success", 0, 246,
+                step_list=steps("pull_request")),
+            job(7, "local-tool-tests", "success", 0, 31,
                 step_list=steps("pull_request"))]
 
 
@@ -175,7 +183,8 @@ def a1_jobs():
             job(3, "gate-guard", "skipped", None, None),
             job(4, "windows-offline-checks", "success", 30, 271),
             job(5, "tools-tests-linux", "success", 40, 140),
-            job(6, "tools-tests-windows", "success", 50, 215)]
+            job(6, "tools-tests-windows", "success", 50, 215),
+            job(7, "local-tool-tests", "success", 20, 55)]
 
 
 ENTRY = object()
@@ -275,7 +284,8 @@ class RosterAndDurationsTests(unittest.TestCase):
         self.assertEqual(durations, {
             "changes": 7, "validate-skills": 109, "gate-guard":
                 "not_applicable", "windows-offline-checks": 224,
-            "tools-tests-linux": 132, "tools-tests-windows": 229})
+            "tools-tests-linux": 132, "tools-tests-windows": 229,
+            "local-tool-tests": 33})
 
     def test_ac1_a1_cross_check_pair(self):
         _, evidence = evidence_of(jobs=a1_jobs(), run_id=A1_RUN_ID,
@@ -283,11 +293,11 @@ class RosterAndDurationsTests(unittest.TestCase):
         durations = {name: row["duration_s"]
                      for name, row in rows_of(evidence).items()}
         self.assertEqual(list(durations.values()),
-                         [8, 111, "not_applicable", 241, 100, 165])
+                         [8, 111, "not_applicable", 241, 100, 165, 35])
 
-    def test_ac2_six_rows_and_identity_keys(self):
+    def test_ac2_seven_rows_and_identity_keys(self):
         _, evidence = evidence_of()
-        self.assertEqual(len(evidence["jobs"]), 6)
+        self.assertEqual(len(evidence["jobs"]), 7)
         self.assertEqual([row["job"] for row in evidence["jobs"]],
                          list(ci_durations.JOB_ROSTER))
         identity = evidence["run_identity"]
@@ -383,7 +393,7 @@ class StatusHonestyTests(unittest.TestCase):
         self.assertEqual(evidence["run_identity"]["run_attempt"], 2)
         self.assertIn("run_attempt=2", evidence["marker"]["reason"])
 
-    def test_ac5_failed_run_is_failed_and_still_prints_six_rows(self):
+    def test_ac5_failed_run_is_failed_and_still_prints_seven_rows(self):
         jobs = green_jobs()
         jobs[1] = job(2, "validate-skills", "failure", 0, 109)
         code, text, _ = invoke(
@@ -392,7 +402,7 @@ class StatusHonestyTests(unittest.TestCase):
         self.assertEqual(code, 4)
         self.assertIn("STATUS: FAILED", text)
         self.assertIn("failing: validate-skills", text)
-        self.assertEqual(len(columns_of(text)), 8)
+        self.assertEqual(len(columns_of(text)), 9)
 
     def test_ac5_cancelled_and_timed_out_runs_are_failed(self):
         for conclusion in ("cancelled", "timed_out"):
@@ -418,13 +428,13 @@ class StatusHonestyTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "FAILED")
 
     def test_ac12_roster_delta_is_visible_and_not_fatal(self):
-        jobs = green_jobs() + [job(7, "markdown-links", "success", 0, 5)]
+        jobs = green_jobs() + [job(8, "markdown-links", "success", 0, 5)]
         code, evidence = evidence_of(jobs=jobs)
         self.assertEqual(code, 1)
         self.assertEqual(evidence["status"], "INCOMPLETE")
         self.assertEqual(evidence["prerequisites"]["roster_delta"],
                          ["markdown-links"])
-        self.assertEqual(len(evidence["jobs"]), 6)
+        self.assertEqual(len(evidence["jobs"]), 7)
 
     def test_ac12_missing_roster_job_is_missing_not_a_pass(self):
         jobs = [entry for entry in green_jobs()
@@ -435,6 +445,20 @@ class StatusHonestyTests(unittest.TestCase):
         self.assertEqual(row["coverage"], "not_demonstrated")
         self.assertEqual(code, 1)
         self.assertIn("changes", evidence["marker"]["reason"])
+
+    def test_ac12_run_without_local_tool_tests_is_missing_not_a_pass(self):
+        """A run that predates the seventh job: fail closed, job named."""
+        jobs = [entry for entry in green_jobs()
+                if entry["name"] != "local-tool-tests"]
+        code, evidence = evidence_of(jobs=jobs)
+        self.assertEqual(len(evidence["jobs"]), 7)
+        self.assertEqual(rows_of(evidence)["local-tool-tests"]["state"],
+                         "missing")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertEqual(evidence["marker"]["reason"],
+                         "local-tool-tests=missing")
+        self.assertEqual(evidence["prerequisites"]["roster_delta"], [])
 
     def test_unresolved_conclusion_is_incomplete(self):
         jobs = green_jobs()
@@ -1378,7 +1402,7 @@ class RepairRoundTests(unittest.TestCase):
         evidence = json.loads(text)
         identity = evidence["run_identity"]
         self.assertEqual(identity["jobs_total_count"], 150)
-        self.assertEqual(identity["jobs_reported_total"], 6)
+        self.assertEqual(identity["jobs_reported_total"], 7)
         self.assertEqual(identity["jobs_truncated"], True)
         self.assertEqual(evidence["status"], "INCOMPLETE")
         self.assertEqual(code, 1)
@@ -1388,7 +1412,7 @@ class RepairRoundTests(unittest.TestCase):
 
     def test_f8_later_pages_are_fetched_and_inspected(self):
         """A 200-job run: the roster is on page 1, the drift on page 2."""
-        page_one = green_jobs() + filler_jobs("filler", 6, 99)
+        page_one = green_jobs() + filler_jobs("filler", 7, 99)
         page_two = ([job(20, "extra-job", "success", 0, 3)]
                     + filler_jobs("filler-b", 0, 98))
         path = _write_fixture(paginated_fixture([page_one, page_two],
@@ -1406,7 +1430,7 @@ class RepairRoundTests(unittest.TestCase):
 
     def test_f8_page_limit_truncation_is_never_green(self):
         """4000 advertised jobs: the MAX_JOB_PAGES cap must be visible."""
-        pages = [green_jobs() + filler_jobs("page1", 6, 99)]
+        pages = [green_jobs() + filler_jobs("page1", 7, 99)]
         for number in range(2, 12):
             pages.append(filler_jobs("page%d" % number, 0, 99))
         path = _write_fixture(paginated_fixture(pages, total_count=4000))
@@ -1426,7 +1450,7 @@ class RepairRoundTests(unittest.TestCase):
     def test_f8_complete_pages_without_truncation_stay_complete(self):
         _, evidence = evidence_of()
         self.assertEqual(evidence["run_identity"]["jobs_truncated"], False)
-        self.assertEqual(evidence["run_identity"]["jobs_total_count"], 6)
+        self.assertEqual(evidence["run_identity"]["jobs_total_count"], 7)
 
     def test_f9_matching_attempt_is_accepted_and_recorded(self):
         code, text, _ = invoke(argv=("--candidate", HEAD, "--attempt", "1",
@@ -1493,13 +1517,14 @@ class UnexpectedSkipEnforcementTests(unittest.TestCase):
     """N1: a roster job may skip only where the workflow lets it.
 
     `.github/workflows/validate-skills.yml`: `changes` (L57) and
-    `validate-skills` (L106) have no `if:`; `windows-offline-checks` (L289),
-    `tools-tests-linux` (L380) and `tools-tests-windows` (L430) are
-    `if: github.event_name == 'push' || <flag>`, and on a push the `changes`
-    job forces both flags true (L86-89); `gate-guard` (L493) is
-    pull_request-only. So on a push only `gate-guard` may skip and on a
-    pull_request only the three advisory jobs may; any other skip is
-    INCOMPLETE/exit 1 with the job named, never COMPLETE/exit 0.
+    `validate-skills` (L201) have no `if:`; `windows-offline-checks` (L393),
+    `tools-tests-linux` (L490) and `tools-tests-windows` (L579) are
+    `if: github.event_name == 'push' || <path condition>`; `local-tool-tests`
+    (L151) is `if: needs.changes.outputs.local_tools == 'true'` with no push
+    arm, and on a push the `changes` job forces that flag true (L93-96);
+    `gate-guard` (L675) is pull_request-only. So on a push only `gate-guard`
+    may skip and on a pull_request only the four advisory jobs may; any other
+    skip is INCOMPLETE/exit 1 with the job named, never COMPLETE/exit 0.
     """
 
     def _skip(self, name, event):
@@ -1558,6 +1583,17 @@ class UnexpectedSkipEnforcementTests(unittest.TestCase):
             "event-filter",
             rows_of(evidence)["windows-offline-checks"]["skip_reason"])
 
+    def test_n1_push_local_tool_tests_skip_is_incomplete(self):
+        jobs = self._skip("local-tool-tests", "push")
+        code, evidence = self._evidence(jobs, "push")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"],
+                         ["local-tool-tests"])
+        self.assertNotIn(
+            "event-filter",
+            rows_of(evidence)["local-tool-tests"]["skip_reason"])
+
     def test_n1_push_gate_guard_skip_is_the_lawful_event_filter(self):
         code, evidence = evidence_of()
         self.assertEqual(evidence["status"], "COMPLETE")
@@ -1569,7 +1605,7 @@ class UnexpectedSkipEnforcementTests(unittest.TestCase):
     def test_n1_pull_request_advisory_skips_stay_lawful(self):
         jobs = pr_jobs()
         for name in ("windows-offline-checks", "tools-tests-linux",
-                     "tools-tests-windows"):
+                     "tools-tests-windows", "local-tool-tests"):
             index = [entry["name"] for entry in jobs].index(name)
             jobs[index] = job(index + 1, name, "skipped", None, None,
                               step_list=steps("pull_request"))
@@ -1578,7 +1614,7 @@ class UnexpectedSkipEnforcementTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"], [])
         for name in ("windows-offline-checks", "tools-tests-linux",
-                     "tools-tests-windows"):
+                     "tools-tests-windows", "local-tool-tests"):
             self.assertIn("event-filter",
                           rows_of(evidence)[name]["skip_reason"])
 
@@ -1597,7 +1633,7 @@ class UnexpectedSkipEnforcementTests(unittest.TestCase):
         self.assertEqual(ci_durations.EXPECTED_SKIPS_BY_EVENT, {
             "push": ("gate-guard",),
             "pull_request": ("windows-offline-checks", "tools-tests-linux",
-                             "tools-tests-windows")})
+                             "tools-tests-windows", "local-tool-tests")})
         self.assertEqual(ci_durations.REQUIRED_JOBS_BY_EVENT,
                          {"pull_request": ("gate-guard",)})
 

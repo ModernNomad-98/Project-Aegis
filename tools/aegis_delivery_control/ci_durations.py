@@ -88,7 +88,7 @@ ILLEGAL_HEADER_VALUE_CHARS = ("\r", "\n", "\0")
 
 JOB_ROSTER = ("changes", "validate-skills", "gate-guard",
               "windows-offline-checks", "tools-tests-linux",
-              "tools-tests-windows")
+              "tools-tests-windows", "local-tool-tests")
 
 # D17: literal uploaded artifact names. The suffix -<run_id>-<attempt> is
 # stripped before lookup, so a run id containing hyphens cannot be mis-split;
@@ -113,26 +113,28 @@ SKIP_REASON_UNEXPECTED = "unexpected-skip-for-event"
 # F2: a job the inspected workflow makes unconditional on an event is a
 # prerequisite of that event's run, so its absence is a gap and never a pass.
 # `gate-guard` is gated `if: github.event_name == 'pull_request'`
-# (.github/workflows/validate-skills.yml L484-493, the `if:` at L493) and is
+# (.github/workflows/validate-skills.yml L666-675, the `if:` at L675) and is
 # one of the two registered required contexts, so a pull_request run may not
 # skip it; only a push may, and only as the event filter the workflow itself
 # encodes.
 #
 # N1: the same rule must hold for EVERY roster job, so the allowed-skip set is
 # derived from the workflow's own conditions and enforced, not left as dead
-# code. `changes` (L57) and `validate-skills` (L106) carry no `if:` at all:
+# code. `changes` (L57) and `validate-skills` (L201) carry no `if:` at all:
 # on both events they always run, and a skip is a gap. `windows-offline-checks`
-# (L285-289), `tools-tests-linux` (L378-380) and `tools-tests-windows`
-# (L428-430) are `if: github.event_name == 'push' || <flag>`, and on a push the
-# `changes` job forces both flags true (L86-89), so on a push those three
-# always run and only `gate-guard` may skip; on a pull_request the same three
-# may skip when the path filter did not select them. A skipped roster job
+# (L389-393), `tools-tests-linux` (L488-490) and `tools-tests-windows`
+# (L577-579) are `if: github.event_name == 'push' || <path condition>`, so on
+# a push those three always run. `local-tool-tests` (L149-151) is
+# `if: needs.changes.outputs.local_tools == 'true'` with no push arm; on a
+# push the `changes` job forces that flag true (L93-96), so it always runs on
+# a push too. On a push only `gate-guard` may skip; on a pull_request those
+# four may skip when the path filter did not select them. A skipped roster job
 # outside its event's set is INCOMPLETE with the job named, never COMPLETE.
 REQUIRED_JOBS_BY_EVENT = {"pull_request": ("gate-guard",)}
 EXPECTED_SKIPS_BY_EVENT = {
     "push": ("gate-guard",),
     "pull_request": ("windows-offline-checks", "tools-tests-linux",
-                     "tools-tests-windows"),
+                     "tools-tests-windows", "local-tool-tests"),
 }
 
 # F4: the two PR-only validate-skills steps. Their real state comes from the
