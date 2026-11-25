@@ -105,7 +105,7 @@
     {
       "id": "site-topology-goes-to-design-gap",
       "prompt": "Design our second site: region topology, network and carrier diversity, and what runs active-active versus warm standby.",
-      "expected_skill": "resilience-architecture-reviewer",
+      "expected_skill": "site-resilience-architect",
       "should_not_trigger": [
         "disaster-recovery-plan-author"
       ],
