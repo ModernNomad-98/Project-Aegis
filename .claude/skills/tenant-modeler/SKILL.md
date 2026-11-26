@@ -106,6 +106,7 @@ authorize execution.
 - For the invitation flow itself (token/link acceptance, expiry/revocation races, identity binding), `membership-invitation-designer` owns the design: hand off to it — optional; if your copy does not include it, keep the invitation lifecycle in this model.
 - When the request is the subscription state machine itself (states, transitions, dunning/grace timing), `subscription-lifecycle-designer` owns the design: hand off to it — optional; if your copy does not include it, record the subscription state machine as an open question.
 - For the tenant-creation path (signup, sales-led creation, import, first-owner assignment), `tenant-provisioning-designer` owns the design: hand off to it — optional; if your copy does not include it, record the creation path as an open question.
+
 ## Output Format
 
 When asking for a build choice, show the explained options and justified

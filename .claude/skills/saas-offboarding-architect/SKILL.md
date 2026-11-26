@@ -90,6 +90,6 @@ Return, in this order:
 
 - [offboarding-checklist](references/offboarding-checklist.md) - Tenant offboarding sequence, holds and evidence rules.
 - [evals/evals.json](evals/evals.json) - the 6 behaviour cases for this skill.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against the nearest owners.
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 15 negative trigger-discrimination cases against the nearest owners.
 
 **Source:** docs/skills-catalog.md - cat 02 #83 (Batch 2); coverage roadmap #83. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.

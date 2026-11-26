@@ -1,6 +1,6 @@
 ---
 name: disaster-recovery-plan-author
-description: 'Author the technical disaster-recovery (DR) plan a team executes: service tiers whose RTO and RPO each carry a source record, date and owner or UNDECIDED; observable declaration criteria, declarer, deputy and stand-down authority; the strategy per tier from the site-resilience design; recovery order and gates; numbered runbooks for region/site/provider loss, ransomware or corrupted data, lost credentials or keys and accidental deletion; failback with reconciliation and split-brain handling; and a dated test loop. Use when asked to write or overhaul a DR plan, set tiers and targets, write declaration criteria, scenario steps, failback or the test programme. Do NOT use for the BIA/BCP (business-continuity-planner), DR design review (resilience-architecture-reviewer), restore proof (database-backup-verifier, manual-only), a live incident (incident-response-runbook), release rollback (rollback-runbook-author), site design (site-resilience-architect, not built), or certification claims.'
+description: 'Author the technical disaster-recovery (DR) plan a team executes: service tiers whose RTO and RPO each carry a source record, date and owner or UNDECIDED; observable declaration criteria, declarer, deputy and stand-down authority; the strategy per tier from the site-resilience design; recovery order and gates; numbered runbooks for region/site/provider loss, ransomware or corrupted data, lost credentials or keys and accidental deletion; failback with reconciliation and split-brain handling; and a dated test loop. Use when asked to write or overhaul a DR plan, set tiers and targets, write declaration criteria, scenario steps, failback or the test programme. Do NOT use for the BIA/BCP (business-continuity-planner), DR design review (resilience-architecture-reviewer), restore proof (database-backup-verifier, manual-only), a live incident (incident-response-runbook), release rollback (rollback-runbook-author), site design (site-resilience-architect), or certification claims.'
 ---
 
 # Disaster Recovery Plan Author
@@ -58,7 +58,7 @@ recovery, invents no target, designs no topology and certifies nothing.
 - Do NOT use when: the ask is a release or migration rollback —
   `rollback-runbook-author` owns release backout; this skill owns DR.
 - Do NOT use when: the ask is site, region or topology design — that design
-  belongs with site-resilience-architect (not built at this base); record the
+  belongs with site-resilience-architect; record the
   design gap and its owner instead of inventing topology.
 - Do NOT use when: the ask is an ISO 22301, SOC 2 or contract conformance
   claim — the compliance family reads a licensed copy and issues no verdict
@@ -259,4 +259,4 @@ Not claimed: <no target invented; no tier called tested without a dated
 - `evals/trigger-evals.json` — discrimination against
   `business-continuity-planner`, `resilience-architecture-reviewer`,
   `database-backup-verifier`, `incident-response-runbook`,
-  `rollback-runbook-author` and the future site-resilience design.
+  `rollback-runbook-author` and the site-resilience design.

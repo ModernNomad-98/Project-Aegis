@@ -45,7 +45,7 @@ no tokens, and executes nothing.
 ## Workflow
 
 1. **Map the invitation entry points.** Invite-by-email, resend, bulk invite, acceptance link — name each path the state machine serves.
-2. **Design the record and token semantics.** Single-use, unguessable, expiring; one acceptance; the revocation-vs-acceptance race decided (revocation wins per the catalog's rule — cited, not restated). Token mechanics stay with `secrets-identity-hardener`.
+2. **Design the record and token semantics.** Single-use, unguessable, expiring; one acceptance; the revocation-vs-acceptance race decided (revocation wins per `tenant-modeler`'s catalog rule — cited, not restated). Token mechanics stay with `secrets-identity-hardener`.
 3. **Name the identity-binding rules.** What binds the invitee to an account: email match rules, existing-account handling, and the acceptance race outcomes.
 4. **Compose seat checks and spam limits.** Seat checks read the plan's seat pool (composed, not restated); behavior at the limit named (deny/queue/upgrade prompt). Spam limits compose the rate-limit contract per inviter and per tenant.
 5. **Enumerate the negative cases.** Expired token, reused token, revoked-vs-acceptance race, cross-tenant acceptance, seat-limit race — each named with its expected denial.
@@ -75,7 +75,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 
 ## Validation Checklist
 
-- [ ] The token is single-use, unguessable, and expiring, with the revocation-vs-acceptance race decided (revocation wins — cited from the catalog, not restated).
+- [ ] The token is single-use, unguessable, and expiring, with the revocation-vs-acceptance race decided (revocation wins — cited from `tenant-modeler`'s catalog, not restated).
 - [ ] Identity-binding rules are named: email match, existing-account handling, and each race outcome.
 - [ ] Seat checks compose the entitlement matrix, never restate it; behavior at the limit is named.
 - [ ] Spam limits compose the rate-limit contract per inviter and per tenant.

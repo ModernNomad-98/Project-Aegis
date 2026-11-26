@@ -115,7 +115,6 @@ message exchange.
    compromise is reported to the human incident owner, who follows the
    approved response runbook (the procedure-authoring skill is
    `incident-response-runbook`, which only authors procedures).
-   response runbook (`incident-response-runbook` only authors procedures).
 
 ## Output Format
 

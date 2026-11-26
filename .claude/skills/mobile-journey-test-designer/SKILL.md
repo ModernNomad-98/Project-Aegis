@@ -76,7 +76,7 @@ selection state and the detail identity in agreement.
    and focus restoration explicitly, including what is not restored. Layout
    correctness stays with mobile-viewport-craft; the zero-match state design
    stays with edge-state-ux-designer; execution stays with the manual-only
-   owners named in this skill's own pass-execution step (step 5).
+   owners named in this skill's Use When section; step 5 specifies the handoff.
 4. **Map journeys to a device/viewport + data matrix.** Which journey is checked on which device or viewport, with which persona and dataset.
 5. **Specify pass execution and evidence.** How the pass is run (a manual clickthrough session or Playwright specs — named as handoffs, never executed here) and how evidence is captured, composing `screenshot-evidence-planner`'s naming and masking conventions.
 6. **Emit the design** in the Output Format. State what was chosen, why, and the main rejected alternative.

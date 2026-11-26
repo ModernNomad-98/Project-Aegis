@@ -231,10 +231,10 @@ rules live in [references/evidence-rules.md](references/evidence-rules.md).
         state descriptions) is masked/sanitized before storage; no tokens, PII,
         tenant data or typed secrets appear in metadata or the sidecar.
         `candidate_id` keeps its canonical value, passes strict allowlist
-        validation, and is never masked/rewritten (optional @candidate_slug` for
+        validation, and is never masked/rewritten (optional `candidate_slug` for
         path use).
   - [ ] Expected member patterns (captures + sidecars), allowed non-evidence
-        files, justified-reuse entries (@captured_at_candidate_id` + `reuse_ref`),
+        files, justified-reuse entries (`captured_at_candidate_id` + `reuse_ref`),
         context captures and unexpected members are reported separately; a
         recorded disposition clears contamination without deletion, and review
         completeness is not claimed while unresolved unexpected members remain.

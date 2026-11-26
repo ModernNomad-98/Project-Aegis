@@ -122,7 +122,7 @@ access — so it is safe for model invocation.
    answer first: the top level answers "is everything OK" (counts, open
    incidents, breach badges). Grouped drill-down panels behind it — Overview
    / Customers & Billing / Security & Access / Operations & Reliability /
-   Verification / Support — with collapsed groups showing an escalation
+   Verification / Support / Meta — with collapsed groups showing an escalation
    badge so nothing urgent hides behind a closed section. RESTRAINT is the
    stated principle: the default view answers one question; walls of metrics
    are opt-in — the everything-at-once dashboard is the anti-pattern. Select

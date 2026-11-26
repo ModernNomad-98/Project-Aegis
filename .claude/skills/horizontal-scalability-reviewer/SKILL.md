@@ -103,7 +103,7 @@ findings may point to.
 7. **Check graceful drain.** On termination: does the node deregister from
    the LB, stop taking new work, finish or safely hand off in-flight
    requests/jobs/connections, within a bounded grace period? A missing drain
-   drops user requests and in-flight jobs on every deploy. Verify readiness/
+   drops user requests and in-flight jobs on every deploy. Verify
    readiness stops new traffic while liveness remains healthy through the
    bounded drain, until controlled shutdown. Check the actual probe and
    termination behavior.
