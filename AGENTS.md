@@ -188,9 +188,13 @@ independent reviewer subagent it uses, where one is available.
    impact, is accepted only with a recorded disposition and a follow-up
    backlog item. A style, wording or readability remark is recorded with its
    disposition. In the Project Aegis source library (Role A)
-   the backlog is GitHub issues: one follow-up issue per pull request holds
-   that pull request's backlogged findings, its number is the backlog id, and
-   an agent creates an issue only with the owner's permission. Elsewhere the
+   the backlog is GitHub issues, and those issues are the owner-ordered queue
+   that `docs/delivery-workflow.md` names, so recording a finding there makes
+   no second queue: one follow-up issue per pull request holds that pull
+   request's backlogged findings, its number is the backlog id, and an agent
+   creates an issue only with the owner's permission. Without that permission
+   the findings are listed in the final report for the owner and none is
+   dropped. Elsewhere the
    repository's owner says where the backlog is. The reviewer or the owner
    decides the class, never the author of the change. Where the repository's
    own merge conditions ask more for a finding, they govern.
@@ -224,7 +228,9 @@ independent reviewer subagent it uses, where one is available.
    most once per candidate. Its result is advice, not a verdict, and the
    local review is not a merge condition: its findings are triaged under
    item 2, it never stands in for a review the process requires to be posted
-   or recorded, and it is not repeated to chase a clean result.
+   or recorded, and it is not repeated to chase a clean result. When a
+   blocking finding moves the candidate after it was run, it may be run once
+   more at the new final candidate.
 6. **Checks: classify before any re-run.** A stage runs the checks it is
    required to run and never cites another stage's or another agent's run in
    their place. Only a check that a named automated job ran at this exact
@@ -238,8 +244,12 @@ independent reviewer subagent it uses, where one is available.
    only, with no failed assertion in its log, may be run again, once, by
    whoever holds the authority to do so; after a timeout the unfinished part
    is resumed rather than everything re-run, where the pipeline can resume.
-   The classification and both results are recorded. A second failure, or any
-   other class, is fixed or escalated and never retried.
+   The classification and both results are recorded. A job that failed for a
+   missing secret or configuration may also be run again, once, after whoever
+   holds the authority has repaired it and the repair has been checked
+   independently; the repair and the run are recorded. A second failure, or
+   any other class, is fixed or escalated and its unchanged failure is never
+   retried; a run at a new head after a fix is a new validation, not a retry.
 7. **Limits that stop the work.** Before an item starts, the agent states its
    estimated wall time to the coordinator, or to the human owner where there
    is no coordinator. A limit is reached when, on one change: the same stage

@@ -22,6 +22,10 @@ copy of this rule. Where this page and the `AGENTS.md` summary differ, this page
 governs and the summary is corrected forward; the summary is a pointer plus the
 invariant, never an independent source.
 
+One exception: the review economy rule is stated once, in `AGENTS.md`, and that
+copy is authoritative for it; the pointer to it on this page restates none of
+it. Where a stricter rule on this page applies, it governs, as the rule says.
+
 ## The seven stages
 
 Every change moves through these seven stages, in this order. The names are the
