@@ -888,6 +888,16 @@ a rule that is routed around. Over-gating is a failure mode: a process that
 demands approval for everything gets bypassed, and then protects nothing.
 Fail-closed does not mean never-fast. It means **earned-fast**.
 
+**The cost of this process is bounded by the review economy rule.** The rule
+is stated once, in [`AGENTS.md`](../AGENTS.md) under "Review economy rule",
+because that file is the one a consumer copy receives; this paragraph is a
+pointer and restates none of it. On this page the rule changes no stage, no
+gate, no receipt row and no bound field, and where
+[exact-head invalidation](#exact-head-invalidation),
+[the R3 finding-triage rubric](#r3-finding-triage-rubric), the recorded
+review-head budget or [the bound fields](#the-bound-fields) are stricter,
+they govern.
+
 Risk tiering and validation depth are decided here. Approval routing is not: it
 stays with `change-classification-gate` and `human-approval-boundary`.
 
@@ -1092,6 +1102,7 @@ says so.
 | [**the agreement check**](#the-agreement-check-procedural) — derivation | **Nothing** — and none can be added in this change's scope, because `scripts/` is out of it. |
 | The honesty of the "Aegis skills used" table | **Nothing.** |
 | Proportionality | **Nothing.** |
+| The review economy rule in `AGENTS.md` — freeze and a candidate the reviewer can read, one batch per round, non-blocking findings to the backlog, one wording fix of body text, retained reviewer with a new final reviewer per candidate, one local review before publishing, one classified re-run, limits that stop the work, cost record | **Nothing.** No check counts rounds, candidates or body edits, reads a clock, reads a failure classification, reads a finding's class or checks that a local review ran. |
 | The `AGENTS.md` binding summary drifting from this page | **Nothing** — no test compares them, and no check can be added inside a change of this kind. This is the acknowledged cost of keeping a summary in the startup file at all, and the reason this page must state that it supersedes the summary. |
 | The rule-preservation inventory being honest | **Nothing** — it is carried in the PR body and checked by a human reviewer. |
 

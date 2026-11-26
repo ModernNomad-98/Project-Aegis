@@ -152,6 +152,116 @@ or actual duration; mark unavailable measurements explicitly. Keep the
 existing work-package measurement log and five-merge re-estimation rule in
 [the execution measurements](docs/roadmaps/aegis-execution-metrics.md).
 
+**Review economy rule: bound what the process costs without weakening a safeguard (both roles).**
+This section is the single authoritative copy of the review economy rule. It
+applies in Role A and in Role B. It removes no stage, review, check, approval
+or binding: a verdict still names the exact revision or head it covers, a
+moved head still voids a verdict bound to the earlier head, whatever review
+the repository requires is still required at the head that is merged, an
+author still never reviews its own work, and reaching a limit below never
+accepts anything: it stops the work, and what happens next is for the human
+owner to say. Where the repository has a stricter rule, the stricter rule
+governs. No machine check enforces this section; it is a documented rule.
+Where one agent performs the stages itself, "reviewer" below means the
+independent reviewer subagent it uses, where one is available.
+
+1. **Freeze before review.** A review starts only on a frozen candidate: a
+   commit with its tree and base for tracked files, or a content hash for a
+   plan or other text. Do not send a moving draft to review. Before a review
+   is sent, confirm that the frozen candidate is readable by the reviewer at
+   the identifier it is given; a candidate the reviewer cannot read is not
+   sent for review.
+2. **One round, one batch; the rest goes to the backlog.** Read every finding
+   of a review round before changing anything and triage them together. Only
+   a blocking finding justifies a new candidate, and every accepted fix of a
+   round goes into one new candidate. Blocking means: credential or secret
+   exposure or a data-integrity defect; evidence dishonesty; a behavioural
+   defect or a weakened or deleted assertion; an approved-scope violation; or
+   an unmet applicable acceptance, authorization, security or
+   required-validation condition. What a finding is decides its class, never
+   its label: a label such as "minor", "medium", "P2", "pre-existing" or
+   "follow-up" never makes one of these non-blocking. A finding that is not
+   blocking starts no new round and does not hold the change:
+   it goes to the backlog. It is fixed in this change only when it is small,
+   related, and sits in lines that a required fix of that round already
+   changes. A real defect that is not blocking, with understood and bounded
+   impact, is accepted only with a recorded disposition and a follow-up
+   backlog item. A style, wording or readability remark is recorded with its
+   disposition. In the Project Aegis source library (Role A)
+   the backlog is GitHub issues: one follow-up issue per pull request holds
+   that pull request's backlogged findings, its number is the backlog id, and
+   an agent creates an issue only with the owner's permission. Elsewhere the
+   repository's owner says where the backlog is. The reviewer or the owner
+   decides the class, never the author of the change. Where the repository's
+   own merge conditions ask more for a finding, they govern.
+3. **Keep the same reviewer.** The agent that reviewed a stage re-reviews the
+   later rounds of that stage on the same change. A new reviewer is assigned,
+   and the reason recorded, only when that agent is unavailable, has edited
+   the change, or wrote text that was committed into it. Exception: the final
+   review of each new candidate head is done by a new reviewer, one that has
+   reviewed no earlier candidate of that change. A retained reviewer holds
+   only that one stage, and re-reads the files it reviews from disk at the
+   new revision instead of relying on what it remembers.
+4. **Text outside the tracked files.** An edit that changes no tracked file,
+   such as a pull request description, voids only the verdicts the
+   repository's rules bind to that text and restarts no review of the tracked
+   files. Draft such text once, review it once and send it once. Grammar and
+   wording remarks on it are fixed together in one edit, once; a wording
+   remark that remains goes to the backlog and the change proceeds to its
+   next stage. A statement that is false is not a wording remark. An edit the
+   process itself requires, such as adding a reviewer's own record, is not
+   counted. A wording remark found at the final review is fixed only in an
+   edit the process requires before the verdict is posted; no wording edit is
+   made after the verdict. Proceeding is not merging: every merge condition
+   still applies. A further round needs a blocking finding.
+5. **One local review before publishing, and it is advice.** A local review
+   before publishing is a review by a separate agent that is not one of the
+   stages; the plan audit, the implementation audit and validation are
+   required stages, not this review. In the Project Aegis source library
+   (Role A) it is required once per change: at the final candidate only (the
+   candidate that goes to the final review), covering the commit and the
+   pull request description together. Elsewhere it is optional and is run at
+   most once per candidate. Its result is advice, not a verdict, and the
+   local review is not a merge condition: its findings are triaged under
+   item 2, it never stands in for a review the process requires to be posted
+   or recorded, and it is not repeated to chase a clean result.
+6. **Checks: classify before any re-run.** A stage runs the checks it is
+   required to run and never cites another stage's or another agent's run in
+   their place. Only a check that a named automated job ran at this exact
+   head, where the repository has such jobs, may be cited by a stage that
+   would otherwise list it as not run. This item changes no rule of the
+   repository that allows earlier evidence to be reused under recorded
+   conditions. A failed job is classified first, with the log lines that show
+   the class: product defect, test defect, missing secret or configuration,
+   timeout only, infrastructure, a skip that hides the real result, or
+   indeterminate. Only a failure classified as infrastructure or timeout
+   only, with no failed assertion in its log, may be run again, once, by
+   whoever holds the authority to do so; after a timeout the unfinished part
+   is resumed rather than everything re-run, where the pipeline can resume.
+   The classification and both results are recorded. A second failure, or any
+   other class, is fixed or escalated and never retried.
+7. **Limits that stop the work.** Before an item starts, the agent states its
+   estimated wall time to the coordinator, or to the human owner where there
+   is no coordinator. A limit is reached when, on one change: the same stage
+   returns a third non-accepting verdict; a fourth candidate head would be
+   published; or an item's measured wall time passes its stated
+   wall-time estimate. At a limit, work on that stage stops, and the record
+   of the rounds so far, the open findings and the options go to the human
+   owner. Where the owner has already recorded what happens at that limit,
+   follow that record; otherwise ask the owner, and that stage waits for the
+   answer. In the Project Aegis source library (Role A) the owner's record
+   for the first two limits is the operating-mode policy in
+   `docs/approvals/OPERATING-MODE-2026-11-18.md`, while it is in force; this
+   rule does not restate it. Reaching a limit never accepts, merges, skips or
+   lowers anything.
+8. **Show the cost.** Each stage records its start and finish time read from
+   a clock, its round number and the candidate it covered. The final report
+   or pull request states, per stage, the rounds and the measured wall time,
+   the number of candidate heads, the findings sent to the backlog, and each
+   limit reached with the owner's answer or the owner's record that was
+   followed. The coordinator, or the single agent where there is no
+   coordinator, checks the limits at every handoff.
+
 **Source-library owner preference: never report a bare label to the owner.** In
 Role A, every internal label that appears in anything the owner reads as a
 report — a final report, a status line, a to-do or progress panel entry, or a
