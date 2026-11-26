@@ -443,7 +443,13 @@ The **offline form** replays a `{"<url>": <payload>}` fixture map of the two
 endpoints the reader calls (`.../actions/runs/<id>` and its `/jobs`). A
 fixture always wins over `--allow-network`, and the fixture path constructs
 no transport and opens no socket. The test module is the fixture's source of
-truth, so an operator can emit one and replay it:
+truth, so an operator can emit one and replay it. No fixture file is shipped:
+the path in the command below is a file you write first, from the `fixture()`
+helper in `tests/test_ci_durations.py`. Without that file the command exits 2
+(`fixture unreadable`). The helper's default sample is not the real run's job
+list: it adds a synthetic seventh job, `local-tool-tests`, to the six
+recorded jobs, so replaying it prints seven rows and
+`STATUS: COMPLETE (exit 0)`:
 
 ```powershell
 python -m tools.aegis_delivery_control --repository-id example-project ci-durations --run-id 38198781208 --fixture tools/aegis_delivery_control/tests/fixtures/run-38198781208.json --candidate 4d5ccb0b38369812bef198b7083d113d559ad387 --now 2026-10-12T04:00:00Z
@@ -493,13 +499,14 @@ Two further gaps force `INCOMPLETE` (exit 1) rather than a pass:
 - **A roster job was skipped on an event that should have run it.** The
   allowed-skip set is the workflow's own truth. In
   `.github/workflows/validate-skills.yml`, `changes` (L57) and
-  `validate-skills` (L106) carry no `if:` at all;
+  `validate-skills` (L201) carry no `if:` at all;
   `windows-offline-checks`, `tools-tests-linux` and `tools-tests-windows`
-  are `if: github.event_name == 'push' || <path flag>`, and on a push the
-  `changes` job forces both flags true; `gate-guard` is
+  are `if: github.event_name == 'push' || <path condition>`;
+  `local-tool-tests` is `if: <path flag>` with no push arm, and on a push the
+  `changes` job forces that flag true; `gate-guard` is
   `github.event_name == 'pull_request'`. So on a push only `gate-guard` may
   skip - that lawful skip stays green with an `event-filter` reason - and on
-  a pull request only the three advisory jobs may skip by path filter. Any
+  a pull request only the four advisory jobs may skip by path filter. Any
   other skip is `unexpected-skip-for-event:<job>` in the marker reason, is
   listed by `unexpected-skip: <job>` in the table, and is named in
   `marker.unexpected_skipped_jobs`. A skipped `gate-guard` on a pull request
@@ -515,6 +522,10 @@ of silently reporting attempt 1 for every request.
 
 ### Worked example (run 38198781208, push, head 4d5ccb0b, attempt 1)
 
+The table and status below are a historical recording, made when the roster
+had six jobs. The same run reads differently today; the note after the
+recorded status says how.
+
 | job | state | conclusion | duration_s | exit_code | coverage |
 | --- | --- | --- | --- | --- | --- |
 | changes | executed | success | 7 | not_recorded | demonstrated |
@@ -524,7 +535,19 @@ of silently reporting attempt 1 for every request.
 | tools-tests-linux | executed | success | 132 | not_recorded | demonstrated |
 | tools-tests-windows | executed | success | 229 | not_recorded | demonstrated |
 
-`STATUS: COMPLETE (exit 0)`. `gate-guard` is skipped because it is a
+Recorded status at that time: `STATUS: COMPLETE (exit 0)`.
+
+**How the same run reads today.** Run 38198781208 is a real run with six
+jobs; it predates the `local-tool-tests` job. Read with the current
+seven-job roster, the same run gains a seventh row, `local-tool-tests` with
+state `missing`, and the marker is `INCOMPLETE` (exit 1) with reason
+`local-tool-tests=missing`, because the roster follows the current workflow
+and not the workflow at the run's head. So a read of the real run's job list
+today does not print the six rows and the `COMPLETE` status above. The
+offline sample from the test module differs again: it carries a synthetic
+seventh job and reads `COMPLETE` (see the offline form above).
+
+`gate-guard` is skipped because it is a
 pull-request-only job on a push run. A GitHub job record carries a
 *conclusion*, never a process exit code, so `exit_code` stays `not_recorded`
 unless you also pass `--artifact-dir` with the extracted
@@ -533,7 +556,8 @@ unless you also pass `--artifact-dir` with the extracted
 (`offline-checks-linux-<run>-<attempt>` maps to `validate-skills`,
 `offline-checks-windows-...` to `windows-offline-checks`,
 `tools-tests-linux-...` and `tools-tests-windows-...` to their same-named
-jobs; `changes` and `gate-guard` upload nothing), and only when the record
+jobs; `changes`, `gate-guard` and `local-tool-tests` upload nothing), and
+only when the record
 binds to the run head. One uploaded directory holds **many** records - the
 `offline-checks-linux` artifact alone is fed by every recorded step of that
 job - so the whole per-job set is reported in `exit_codes` with its
