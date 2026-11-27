@@ -163,7 +163,20 @@ accepts anything: it stops the work, and what happens next is for the human
 owner to say. Where the repository has a stricter rule, the stricter rule
 governs. No machine check enforces this section; it is a documented rule.
 Where one agent performs the stages itself, "reviewer" below means the
-independent reviewer subagent it uses, where one is available.
+independent reviewer subagent it uses, where one is available. Where none is
+available, the author's own reading is never the review; the repository's own
+rules and its human owner say what happens to that stage (in Role A the change
+halts and the owner is asked, as `docs/delivery-workflow.md` says).
+
+Terms. "Item" with a number is a numbered point of this rule; a work item is
+one named piece of work held by one agent. A round is one review of one frozen
+candidate and the fixes that answer it. A candidate head is one published head
+of the change; any move of that head makes a new one, a rebase or a
+base-branch merge included, and this rule makes no exception for it. A
+non-accepting verdict is any stage verdict other than the accepting one. Wall
+time is elapsed clock time from a work item's recorded start to its recorded
+finish, waiting included. In Role A the owner's recorded definitions of round
+and candidate govern.
 
 1. **Freeze before review.** A review starts only on a frozen candidate: a
    commit with its tree and base for tracked files, or a content hash for a
@@ -172,29 +185,32 @@ independent reviewer subagent it uses, where one is available.
    the identifier it is given; a candidate the reviewer cannot read is not
    sent for review.
 2. **One round, one batch; the rest goes to the backlog.** Read every finding
-   of a review round before changing anything and triage them together. Only
-   a blocking finding justifies a new candidate, and every accepted fix of a
+   of a review round before changing anything and triage them together. Only a
+   blocking finding justifies a new candidate, and every accepted fix of a
    round goes into one new candidate. Blocking means: credential or secret
    exposure or a data-integrity defect; evidence dishonesty; a behavioural
    defect or a weakened or deleted assertion; an approved-scope violation; or
    an unmet applicable acceptance, authorization, security or
    required-validation condition. What a finding is decides its class, never
    its label: a label such as "minor", "medium", "P2", "pre-existing" or
-   "follow-up" never makes one of these non-blocking. A finding that is not
-   blocking starts no new round and does not hold the change:
-   it goes to the backlog. It is fixed in this change only when it is small,
-   related, and sits in lines that a required fix of that round already
+   "follow-up" never makes one of these non-blocking. A blocking finding whose
+   fix would go outside the approved scope stays blocking: it goes to the
+   human owner with the options, and the change waits for the answer. A
+   finding that is not blocking starts no new round and does not hold the
+   change: it goes to the backlog. It is fixed in this change only when it is
+   small, related, and sits in lines that a required fix of that round already
    changes. A real defect that is not blocking, with understood and bounded
    impact, is accepted only with a recorded disposition and a follow-up
    backlog item. A style, wording or readability remark is recorded with its
-   disposition. In the Project Aegis source library (Role A)
-   the backlog is GitHub issues, and those issues are the owner-ordered queue
-   that `docs/delivery-workflow.md` names, so recording a finding there makes
-   no second queue: one follow-up issue per pull request holds that pull
-   request's backlogged findings, its number is the backlog id, and an agent
-   creates an issue only with the owner's permission. Without that permission
-   the findings are listed in the final report for the owner and none is
-   dropped. Elsewhere the
+   disposition. In the Project Aegis source library (Role A) the backlog is
+   GitHub issues. Those issues are the owner-ordered queue that
+   `docs/delivery-workflow.md` names, so recording a finding there makes no
+   second queue. One follow-up issue per pull request holds that pull
+   request's backlogged findings, and that issue's number is the backlog id.
+   An agent creates an issue only with the owner's permission. Without that
+   permission the findings are listed in the final report for the owner and
+   none is dropped. That listing is not a backlog id: a finding listed this
+   way still waits for its issue and is not thereby accepted. Elsewhere the
    repository's owner says where the backlog is. The reviewer or the owner
    decides the class, never the author of the change. Where the repository's
    own merge conditions ask more for a finding, they govern.
@@ -202,75 +218,94 @@ independent reviewer subagent it uses, where one is available.
    later rounds of that stage on the same change. A new reviewer is assigned,
    and the reason recorded, only when that agent is unavailable, has edited
    the change, or wrote text that was committed into it. Exception: the final
-   review of each new candidate head is done by a new reviewer, one that has
+   review is per candidate head, not per change. Each candidate head that
+   reaches it gets its own final review, done by a new reviewer, one that has
    reviewed no earlier candidate of that change. A retained reviewer holds
-   only that one stage, and re-reads the files it reviews from disk at the
-   new revision instead of relying on what it remembers.
+   only that one stage, and re-reads the files it reviews from disk at the new
+   revision instead of relying on what it remembers.
 4. **Text outside the tracked files.** An edit that changes no tracked file,
    such as a pull request description, voids only the verdicts the
    repository's rules bind to that text and restarts no review of the tracked
-   files. Draft such text once, review it once and send it once. Grammar and
-   wording remarks on it are fixed together in one edit, once; a wording
-   remark that remains goes to the backlog and the change proceeds to its
-   next stage. A statement that is false is not a wording remark. An edit the
-   process itself requires, such as adding a reviewer's own record, is not
-   counted. A wording remark found at the final review is fixed only in an
-   edit the process requires before the verdict is posted; no wording edit is
-   made after the verdict. Proceeding is not merging: every merge condition
-   still applies. A further round needs a blocking finding.
+   files. Draft such text once, review it once and send it once. The one
+   change that sequence allows is this: grammar and wording remarks on it are
+   fixed together in one edit, once, and that edit voids verdicts exactly as
+   the first sentence says; a wording remark that remains goes to the backlog
+   and the change proceeds to its next stage. A statement that is false is not
+   a wording remark. An edit the process itself requires, such as adding a
+   reviewer's own record, is not counted. A wording remark found at the final
+   review is fixed only in an edit the process requires before the verdict is
+   posted; no wording edit is made after the verdict. Proceeding is not
+   merging: every merge condition still applies. A further round needs a
+   blocking finding.
 5. **One local review before publishing, and it is advice.** A local review
    before publishing is a review by a separate agent that is not one of the
    stages; the plan audit, the implementation audit and validation are
-   required stages, not this review. In the Project Aegis source library
-   (Role A) it is required once per change: at the final candidate only (the
-   candidate that goes to the final review), covering the commit and the
-   pull request description together. Elsewhere it is optional and is run at
-   most once per candidate. Its result is advice, not a verdict, and the
-   local review is not a merge condition: its findings are triaged under
-   item 2, it never stands in for a review the process requires to be posted
-   or recorded, and it is not repeated to chase a clean result. When a
-   blocking finding moves the candidate after it was run, it may be run once
-   more at the new final candidate.
+   required stages, not this review. In the Project Aegis source library (Role
+   A) it is required once per change: at the final candidate only (the
+   candidate that goes to the final review), covering the commit and the pull
+   request description together. Elsewhere it is optional and is run at most
+   once per candidate. Its result is advice, not a verdict, and the local
+   review is not a merge condition: its findings are triaged under item 2, it
+   never stands in for a review the process requires to be posted or recorded,
+   and it is not repeated to chase a clean result. When a blocking finding
+   moves the candidate after it was run, it may be run once more, at the new
+   final candidate; that run is optional and is the last, and a candidate that
+   moves again proceeds without another local review.
 6. **Checks: classify before any re-run.** A stage runs the checks it is
    required to run and never cites another stage's or another agent's run in
-   their place. Only a check that a named automated job ran at this exact
-   head, where the repository has such jobs, may be cited by a stage that
-   would otherwise list it as not run. This item changes no rule of the
-   repository that allows earlier evidence to be reused under recorded
-   conditions. A failed job is classified first, with the log lines that show
-   the class: product defect, test defect, missing secret or configuration,
-   timeout only, infrastructure, a skip that hides the real result, or
-   indeterminate. Only a failure classified as infrastructure or timeout
-   only, with no failed assertion in its log, may be run again, once, by
-   whoever holds the authority to do so; after a timeout the unfinished part
-   is resumed rather than everything re-run, where the pipeline can resume.
-   The classification and both results are recorded. A job that failed for a
-   missing secret or configuration may also be run again, once, after whoever
-   holds the authority has repaired it and the repair has been checked
-   independently; the repair and the run are recorded. A second failure, or
-   any other class, is fixed or escalated and its unchanged failure is never
-   retried; a run at a new head after a fix is a new validation, not a retry.
-7. **Limits that stop the work.** Before an item starts, the agent states its
-   estimated wall time to the coordinator, or to the human owner where there
-   is no coordinator. A limit is reached when, on one change: the same stage
-   returns a third non-accepting verdict; a fourth candidate head would be
-   published; or an item's measured wall time passes its stated
-   wall-time estimate. At a limit, work on that stage stops, and the record
-   of the rounds so far, the open findings and the options go to the human
-   owner. Where the owner has already recorded what happens at that limit,
-   follow that record; otherwise ask the owner, and that stage waits for the
-   answer. In the Project Aegis source library (Role A) the owner's record
-   for the first two limits is the operating-mode policy in
+   their place. The one thing a stage may cite for a check it would otherwise
+   list as not run is a named automated job's result for that check at this
+   exact head, where the repository has such jobs, whoever or whatever started
+   the job; a check that another stage or agent ran by hand is never cited.
+   This item changes no rule of the repository that allows earlier evidence to
+   be reused under recorded conditions. A failed job is classified first, with
+   the log lines that show the class: product defect, test defect, missing
+   secret or configuration, timeout only, infrastructure, a skip that hides
+   the real result, or indeterminate. The skip class is listed although such a
+   job did not itself fail: a job that skipped a check required at this head
+   is classified and handled like a failed job, while a skip the repository's
+   own rules provide for is recorded as skipped. A failed job is run again at
+   the same head in two cases only, once in each. First, a failure classified
+   as infrastructure or timeout only, with no failed assertion in its log;
+   after a timeout the unfinished part is resumed rather than everything
+   re-run, where the pipeline can resume. The classification and both results
+   are recorded. Second, a failure classified as missing secret or
+   configuration, once it has been repaired and the repair has been checked
+   independently; the repair and the run are recorded. Each re-run and each
+   repair is done by whoever already holds the authority for it under the
+   repository's own rules and approvals; this item grants that authority to no
+   one, and where no one holds it the failure is escalated. A second failure,
+   or any other class, is fixed or escalated and its unchanged failure is
+   never retried; a run at a new head after a fix is a new validation, not a
+   retry.
+7. **Limits that stop the work.** Before a work item starts, the agent states
+   its estimated wall time to the coordinator, or to the human owner where
+   there is no coordinator. There are three limits, each counted on one
+   change. The round limit, counted per stage: the same stage returns a third
+   non-accepting verdict. The candidate limit, counted across all stages: a
+   fourth candidate head would be published, whatever moved the head. The time
+   limit, counted per work item: a work item's measured wall time passes its
+   stated wall-time estimate. At a limit, work on that stage stops (for the
+   time limit, the stage the work item belongs to), and the record of the
+   rounds so far, the open findings and the options go to the human owner.
+   Where the owner has already recorded what happens at that limit, follow
+   that record; otherwise ask the owner, and that stage waits for the answer.
+   In the Project Aegis source library (Role A) the owner's record for the
+   round limit and the candidate limit is the operating-mode policy in
    `docs/approvals/OPERATING-MODE-2026-11-18.md`, while it is in force; this
-   rule does not restate it. Reaching a limit never accepts, merges, skips or
-   lowers anything.
-8. **Show the cost.** Each stage records its start and finish time read from
-   a clock, its round number and the candidate it covered. The final report
-   or pull request states, per stage, the rounds and the measured wall time,
-   the number of candidate heads, the findings sent to the backlog, and each
-   limit reached with the owner's answer or the owner's record that was
-   followed. The coordinator, or the single agent where there is no
-   coordinator, checks the limits at every handoff.
+   rule does not restate it, and it names no owner record for the time limit.
+   Reaching a limit never accepts, merges, skips or lowers anything.
+8. **Show the cost.** For each round, a stage records its measured start and
+   finish time, the round's number within that stage and the candidate the
+   round covered, in the record the stage already produces. The final report
+   or pull request states, per stage, the number of rounds and the measured
+   wall time, and, per change, the number of candidate heads, the findings
+   sent to the backlog, and each limit reached with the owner's answer or the
+   owner's record that was followed. This cost record adds no receipt row and
+   no bound field; adding it to a pull request description is an edit the
+   process requires under item 4, not the one wording edit. The coordinator,
+   or the single agent where there is no coordinator, checks the limits at
+   every handoff.
 
 **Source-library owner preference: never report a bare label to the owner.** In
 Role A, every internal label that appears in anything the owner reads as a
