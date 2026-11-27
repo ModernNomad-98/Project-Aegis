@@ -23,7 +23,7 @@ governs and the summary is corrected forward; the summary is a pointer plus the
 invariant, never an independent source.
 
 One exception: the review economy rule is stated once, in `AGENTS.md`, and that
-copy is authoritative for it; the pointer to it on this page restates none of
+copy is authoritative for it; each pointer to it on this page restates none of
 it. Where a stricter rule on this page applies, it governs, as the rule says.
 
 ## The seven stages
@@ -892,7 +892,7 @@ a rule that is routed around. Over-gating is a failure mode: a process that
 demands approval for everything gets bypassed, and then protects nothing.
 Fail-closed does not mean never-fast. It means **earned-fast**.
 
-**The cost of this process is bounded by the review economy rule.** The rule
+**The review economy rule is the documented rule meant to bound this process's cost.** The rule
 is stated once, in [`AGENTS.md`](../AGENTS.md) under "Review economy rule",
 because that file is the one a consumer copy receives; this paragraph is a
 pointer and restates none of it. On this page the rule changes no stage, no
@@ -1106,7 +1106,7 @@ says so.
 | [**the agreement check**](#the-agreement-check-procedural) — derivation | **Nothing** — and none can be added in this change's scope, because `scripts/` is out of it. |
 | The honesty of the "Aegis skills used" table | **Nothing.** |
 | Proportionality | **Nothing.** |
-| The review economy rule in `AGENTS.md` — freeze and a candidate the reviewer can read, one batch per round, non-blocking findings to the backlog, one wording fix of body text, retained reviewer with a new final reviewer per candidate, one local review before publishing, one classified re-run, limits that stop the work, cost record | **Nothing.** No check counts rounds, candidates or body edits, reads a clock, reads a failure classification, reads a finding's class or checks that a local review ran. |
+| The review economy rule — stated once, in [`AGENTS.md`](../AGENTS.md) under "Review economy rule"; this row points to it and restates none of it | **Nothing** — meaning no machine check: no check verifies that the rule was followed. It is a documented rule, as `AGENTS.md` itself says. |
 | The `AGENTS.md` binding summary drifting from this page | **Nothing** — no test compares them, and no check can be added inside a change of this kind. This is the acknowledged cost of keeping a summary in the startup file at all, and the reason this page must state that it supersedes the summary. |
 | The rule-preservation inventory being honest | **Nothing** — it is carried in the PR body and checked by a human reviewer. |
 
